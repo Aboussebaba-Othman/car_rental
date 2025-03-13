@@ -105,6 +105,11 @@ return [
         ),
     ],
 
+    'providers' => [
+    // Other service providers...
+    App\Providers\MiddlewareServiceProvider::class,
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Maintenance Mode Driver
