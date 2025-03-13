@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  db:
+    container_name: postgres_Location_des_Voitures
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root_des_Voitures
+      POSTGRES_DB: Location_des_Voitures
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - laravel_network
+
+  pgadmin:
+    container_name: pgadmin4_Location_des_Voitures
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@Location.com
+      PGADMIN_DEFAULT_PASSWORD: admin_des_Voitures
+    ports:
+      - "8085:80"
+    networks:
+      - laravel_network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: Location_des_Voitures
+    restart: always
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "8000:80"
+    depends_on:
+      - db
+    networks:
+      - laravel_network
+
+volumes:
+  db_data:
+
+networks:
+  laravel_network:
+    
