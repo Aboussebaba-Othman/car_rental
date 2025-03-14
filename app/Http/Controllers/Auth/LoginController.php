@@ -44,7 +44,7 @@ class LoginController extends Controller
             }
 
             if ($user->isCompany() && !$user->company->is_validated) {
-                return redirect()->route('home')
+                return redirect()->route('company.documents.upload')
                     ->with('info', 'Your company account is pending approval from administrators.');
             }
 

@@ -35,10 +35,12 @@ Route::post('/logout', [LogoutController::class, 'logout'])->name('logout')->mid
 //     // Add more user routes here
 // });
 
-// Route::middleware(['auth', 'role:company'])->group(function () {
-//     Route::get('/company/dashboard', [CompanyController::class, 'dashboard'])->name('company.dashboard');
-//     // Add more company routes here
-// });
+// Company document routes
+Route::middleware(['auth', 'role:company'])->group(function () {
+    Route::get('/company/dashboard', 'App\Http\Controllers\Company\DashboardController@index')->name('company.dashboard');
+    Route::get('/company/documents/upload', [App\Http\Controllers\Company\DocumentController::class, 'showUploadForm'])->name('company.documents.upload');
+    Route::post('/company/documents/upload', [App\Http\Controllers\Company\DocumentController::class, 'uploadDocuments'])->name('company.documents.store');
+});
 
 // Route::middleware(['auth', 'role:admin'])->group(function () {
 //     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');

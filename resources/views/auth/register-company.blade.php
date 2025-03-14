@@ -65,7 +65,7 @@
                         @enderror
                     </div>
 
-                    <div class="mb-4">
+                    {{-- <div class="mb-4">
                         <label for="legal_documents" class="block text-gray-700 text-sm font-bold mb-2">
                             Legal Documents (PDF, DOC, DOCX)
                         </label>
@@ -74,7 +74,7 @@
                         @error('legal_documents')
                             <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
                         @enderror
-                    </div>
+                    </div> --}}
 
                     <div class="mb-4">
                         <label for="password" class="block text-gray-700 text-sm font-bold mb-2">
