@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use App\Http\Middleware\CheckUserRole;
-use Illuminate\Foundation\Application;
+// use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 
 class MiddlewareServiceProvider extends ServiceProvider

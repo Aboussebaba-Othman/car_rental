@@ -27,8 +27,10 @@ class Company extends Model
      *
      * @var array<string, string>
      */
+    
     protected $casts = [
         'is_validated' => 'boolean',
+        'legal_documents' => 'array',
     ];
 
     /**
@@ -39,11 +41,5 @@ class Company extends Model
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Get the vehicles for the company.
-     */
-    public function vehicles()
-    {
-        return $this->hasMany(Vehicle::class);
-    }
+   
 }
