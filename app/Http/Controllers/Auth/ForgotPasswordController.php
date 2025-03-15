@@ -30,42 +30,38 @@ class ForgotPasswordController extends Controller
      * @return \Illuminate\Http\RedirectResponse
      */
     public function forgotPassword(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email|exists:users,email',
-        ], [
-            'email.exists' => 'No account found with this email address',
-        ]);
+{
+    $validator = Validator::make($request->all(), [
+        'email' => 'required|email|exists:users,email',
+    ], [
+        'email.exists' => 'No account found with this email address',
+    ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-
-        $token = Str::random(64);
-        $email = $request->email;
-
-        DB::table('password_reset_tokens')->updateOrInsert(
-            ['email' => $email],
-            [
-                'email' => $email,
-                'token' => $token,
-                'created_at' => Carbon::now()
-            ]
-        );
-
-        // For a production environment, you would send an actual email
-        // This is a placeholder for the email sending functionality
-        /*
-        Mail::send('emails.password-reset', ['token' => $token], function($message) use($request) {
-            $message->to($request->email);
-            $message->subject('Reset Password Notification');
-        });
-        */
-
-        // For demonstration purposes, we'll just redirect with a success message
+    if ($validator->fails()) {
         return redirect()->back()
-            ->with('success', 'Password reset link has been sent to your email address.');
+            ->withErrors($validator)
+            ->withInput();
     }
+
+    $token = Str::random(64);
+    $email = $request->email;
+
+    DB::table('password_reset_tokens')->updateOrInsert(
+        ['email' => $email],
+        [
+            'email' => $email,
+            'token' => $token,
+            'created_at' => Carbon::now()
+        ]
+    );
+    
+    // Send the actual email
+    Mail::send('emails.password-reset', ['token' => $token, 'email' => $email], function($message) use($request) {
+        $message->to($request->email);
+        $message->subject('Reset Password Notification');
+    });
+
+    return redirect()->back()
+        ->with('success', 'Password reset link has been sent to your email address.');
+}
 }
