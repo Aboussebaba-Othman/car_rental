@@ -10,7 +10,7 @@
         <div class="flex">
             <!-- Left side - Image -->
             <div class="w-1/3">
-                <img src="./close-up-hand-holding-car-keys.jpg" alt="Business professionals" class="w-full h-full object-cover">
+                <img src="../../images/car-rental-sign.webp" alt="Business professionals" class="w-full h-full object-cover">
             </div>
 
             <!-- Right side - Form -->
@@ -44,11 +44,11 @@
                         <div class="grid grid-cols-2 gap-6">
                             <div>
                                 <label for="nom" class="block text-sm font-medium text-gray-700">Nom *:</label>
-                                <input id="nom" type="text" name="nom" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                                <input id="nom" type="text" name="firstName" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
                             </div>
                             <div>
                                 <label for="prenom" class="block text-sm font-medium text-gray-700">Prénom *:</label>
-                                <input id="prenom" type="text" name="prenom" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                                <input id="prenom" type="text" name="lastName" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
                             </div>
                         </div>
 
@@ -59,7 +59,7 @@
                             </div>
                             <div>
                                 <label for="telephone" class="block text-sm font-medium text-gray-700">Téléphone *:</label>
-                                <input id="telephone" type="text" name="telephone" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                                <input id="telephone" type="text" name="phone" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
                             </div>
                         </div>
 
@@ -90,12 +90,12 @@
                         <div class="grid grid-cols-2 gap-6">
                             <div>
                                 <label for="societe" class="block text-sm font-medium text-gray-700">Société *:</label>
-                                <input id="societe" type="text" name="societe" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                                <input id="societe" type="text" name="company_name" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
                                 <p class="text-xs text-gray-500 mt-1">Merci de mettre la société</p>
                             </div>
                             <div>
                                 <label for="ville" class="block text-sm font-medium text-gray-700">Ville *:</label>
-                                <select id="ville" name="ville" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                                <select id="ville" name="city" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
                                     <option value="Casablanca">Casablanca</option>
                                     <option value="Rabat">Rabat</option>
                                     <option value="Marrakech">Marrakech</option>
@@ -111,7 +111,7 @@
                             
                             <div>
                                 <label for="address" class="block text-sm font-medium text-gray-700">Adress *:</label>
-                                <textarea id="address" rows="5" cols="50" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></textarea>                            </div>
+                                <textarea id="address" name="address" rows="5" cols="50" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></textarea>                            </div>
                         </div>
                         
 
@@ -144,6 +144,20 @@
                         </div>
                     </div>
                 </form>
+                <div class="mt-6 text-center">
+                    <p class="text-sm text-gray-600">
+                        Already have an account?
+                        <a href="{{ route('login') }}" class="font-bold text-blue-500 hover:text-blue-800">
+                            Login
+                        </a>
+                    </p>
+                    <p class="text-sm text-gray-600 mt-2">
+                        Want to register as a user?
+                        <a href="{{ route('register') }}" class="font-bold text-blue-500 hover:text-blue-800">
+                            Register as user
+                        </a>
+                    </p>
+                </div>
             </div>
         </div>
     </div>
@@ -189,8 +203,9 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         
         // Validate step 1 fields
-        const requiredFields = ['nom', 'prenom', 'email', 'telephone', 'password', 'password_confirmation'];
+        const requiredFields = ['nom', 'prenom', 'email', 'telephone', 'password', 'password_confirmation'];    
         let isValid = true;
+        
         
         requiredFields.forEach(fieldId => {
             const field = document.getElementById(fieldId);

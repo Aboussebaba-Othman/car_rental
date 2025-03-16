@@ -14,10 +14,11 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('company_name');
             $table->string('address');
+            $table->string('city');
             $table->json('legal_documents')->nullable();
             $table->boolean('is_validated')->default(false);
-            $table->timestamp('created_at')->nullable();
-            $table->timestamp('updated_at')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
     /**

@@ -18,6 +18,7 @@ class Company extends Model
         'user_id',
         'company_name',
         'address',
+        'city',
         'legal_documents',
         'is_validated'
     ];

@@ -40,7 +40,8 @@ class RegisterController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'username' => 'required|string|max:255|unique:users',
+            'firstName' => 'required|string|max:255|unique:users',
+            'lastName' => 'required|string|max:255|unique:users',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'phone' => 'nullable|string|max:20',
@@ -54,7 +55,8 @@ class RegisterController extends Controller
 
          $this->userRepository->create([
             'role_id' => Role::USER,
-            'username' => $request->username,
+            'firstName' => $request->firstName,
+            'lastName' => $request->lastName,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'phone' => $request->phone,
@@ -113,12 +115,14 @@ class RegisterController extends Controller
 public function registerCompany(Request $request)
 {
     $validator = Validator::make($request->all(), [
-        'username' => 'required|string|max:255|unique:users',
+        'firstName' => 'required|string|max:255|unique:users',
+        'lastName' => 'required|string|max:255|unique:users',
         'email' => 'required|string|email|max:255|unique:users',
         'password' => 'required|string|min:8|confirmed',
         'phone' => 'required|string|max:20',
         'company_name' => 'required|string|max:255',
         'address' => 'required|string|max:255',
+        'city' => 'required|string|max:255',
     ]);
 
     if ($validator->fails()) {
@@ -130,7 +134,8 @@ public function registerCompany(Request $request)
     // Create user first
     $user = $this->userRepository->create([
         'role_id' => Role::COMPANY,
-        'username' => $request->username,
+        'firstName' => $request->firstName,
+        'lastName' => $request->lastName,
         'email' => $request->email,
         'password' => Hash::make($request->password),
         'phone' => $request->phone,
@@ -142,6 +147,7 @@ public function registerCompany(Request $request)
         'user_id' => $user->id,
         'company_name' => $request->company_name,
         'address' => $request->address,
+        'city' => $request->city,
         'is_validated' => false,
     ]);
 
