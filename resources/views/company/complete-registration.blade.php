@@ -3,19 +3,28 @@
 @section('content')
 <div class="min-h-screen bg-white py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-5xl mx-auto">
-        <div class="bg-yellow-400 p-6 text-center">
-            <h2 class="text-3xl font-bold text-black">Créer votre compte professionnel</h2>
+        <div class="bg-yellow-400 p-6 text-center mb-8">
+            <h2 class="text-3xl font-bold text-black">Complétez votre inscription entreprise</h2>
         </div>
 
         <div class="flex">
             <!-- Left side - Image -->
-            <div class="w-1/3">
-                <img src="{{ asset('images/car-rental-sign.webp') }}" alt="Business professionals" class="w-full h-full object-cover">
+            <div class="w-1/3 hidden lg:block">
+                <div class="relative h-full">
+                    <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" 
+                         alt="Business professionals" 
+                         class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                    <div class="absolute bottom-6 left-6 right-6 text-white">
+                        <h3 class="text-xl font-bold">Rejoignez notre réseau d'entreprises</h3>
+                        <p class="mt-2 text-sm opacity-90">Complétez votre profil pour accéder à tous nos services</p>
+                    </div>
+                </div>
             </div>
 
             <!-- Right side - Form -->
-            <div class="w-2/3 bg-gray-50 p-6">
-                <form method="POST" action="{{ route('register.company') }}" enctype="multipart/form-data" id="registration-form">
+            <div class="w-full lg:w-2/3 bg-gray-50 p-6">
+                <form method="POST" action="{{ route('company.complete-registration.process') }}" enctype="multipart/form-data" id="registration-form">
                     @csrf
 
                     <!-- Step indicators -->
@@ -27,100 +36,83 @@
                         <div id="step2-indicator" class="bg-yellow-200 w-20 h-12 flex items-center justify-center font-bold text-black text-xl">
                             2
                         </div>
-                        <div class="border-t-2 border-gray-300 w-32"></div>
-                        <div id="step3-indicator" class="bg-yellow-200 w-20 h-12 flex items-center justify-center font-bold text-black text-xl">
-                            3
+                    </div>
+
+                    <!-- Section titles -->
+                    <div class="flex justify-between mb-6">
+                        <div class="w-1/2 text-center">
+                            <h3 class="text-lg font-bold">Informations entreprise</h3>
+                        </div>
+                        <div class="w-1/2 text-center">
+                            <h3 class="text-lg font-bold">Documents obligatoires</h3>
                         </div>
                     </div>
 
-                    <!-- Step 1: Personal Information -->
+                    <!-- Step 1: Company Information (visible first) -->
                     <div id="step1-form" class="block">
-                        <h3 class="text-lg font-bold mb-4">Informations personnelles</h3>
-                        <div class="grid grid-cols-2 gap-6">
-                            <div>
-                                <label for="nom" class="block text-sm font-medium text-gray-700">Nom *:</label>
-                                <input id="nom" type="text" name="firstName" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-2">
+                                <label for="company_name" class="block text-sm font-medium text-gray-700">
+                                    Société <span class="text-red-500">*</span>
+                                </label>
+                                <input id="company_name" type="text" name="company_name" value="{{ old('company_name') }}" required 
+                                    class="block w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all duration-200 @error('company_name') border-red-500 @enderror">
+                                @error('company_name')
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                @enderror
+                                <p class="text-xs text-gray-500 mt-1">Merci de mettre la société</p>
                             </div>
-                            <div>
-                                <label for="prenom" class="block text-sm font-medium text-gray-700">Prénom *:</label>
-                                <input id="prenom" type="text" name="lastName" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-6 mt-4">
-                            <div>
-                                <label for="email" class="block text-sm font-medium text-gray-700">E-mail *:</label>
-                                <input id="email" type="email" name="email" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                            </div>
-                            <div>
-                                <label for="telephone" class="block text-sm font-medium text-gray-700">Téléphone *:</label>
-                                <input id="telephone" type="text" name="phone" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-6 mt-4">
-                            <div>
-                                <label for="password" class="block text-sm font-medium text-gray-700">Mot de passe *:</label>
-                                <input id="password" type="password" name="password" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                                @error('password')
-                                    <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
+                            
+                            <div class="space-y-2">
+                                <label for="phone" class="block text-sm font-medium text-gray-700">
+                                    Téléphone <span class="text-red-500">*</span>
+                                </label>
+                                <input id="phone" type="text" name="phone" value="{{ old('phone') }}" required 
+                                    class="block w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all duration-200 @error('phone') border-red-500 @enderror">
+                                @error('phone')
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
-                            <div>
-                                <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirmer le mot de passe *:</label>
-                                <input id="password_confirmation" type="password" name="password_confirmation" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                            
+                            <div class="space-y-2">
+                                <label for="address" class="block text-sm font-medium text-gray-700">
+                                    Adresse <span class="text-red-500">*</span>
+                                </label>
+                                <input id="address" type="text" name="address" value="{{ old('address') }}" required 
+                                    class="block w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all duration-200 @error('address') border-red-500 @enderror">
+                                @error('address')
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            
+                            <div class="space-y-2">
+                                <label for="city" class="block text-sm font-medium text-gray-700">
+                                    Ville <span class="text-red-500">*</span>
+                                </label>
+                                <select id="city" name="city" required 
+                                    class="block w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all duration-200 @error('city') border-red-500 @enderror">
+                                    <option value="">Sélectionner une ville</option>
+                                    <option value="Alger">Alger</option>
+                                    <option value="Oran">Oran</option>
+                                    <option value="Constantine">Constantine</option>
+                                    <option value="Annaba">Annaba</option>
+                                </select>
+                                @error('city')
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                @enderror
                             </div>
                         </div>
 
                         <!-- Next button for step 1 -->
                         <div class="flex justify-end mt-8">
-                            <button type="button" id="next-button" class="bg-black text-white px-8 py-2 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
+                            <button type="button" id="next-button" class="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-all duration-200">
                                 Suivant
                             </button>
                         </div>
                     </div>
 
-                    <!-- Step 2: Professional Information (initially hidden) -->
+                    <!-- Step 2: Required Documents (initially hidden) -->
                     <div id="step2-form" class="hidden">
-                        <h3 class="text-lg font-bold mb-4">Informations professionnelles</h3>
-                        <div class="grid grid-cols-2 gap-6">
-                            <div>
-                                <label for="societe" class="block text-sm font-medium text-gray-700">Société *:</label>
-                                <input id="societe" type="text" name="company_name" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                            </div>
-                            <div>
-                                <label for="ville" class="block text-sm font-medium text-gray-700">Ville *:</label>
-                                <select id="ville" name="city" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                                    <option value="Casablanca">Casablanca</option>
-                                    <option value="Rabat">Rabat</option>
-                                    <option value="Marrakech">Marrakech</option>
-                                    <option value="Tanger">Tanger</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 gap-6 mt-4">
-                            <div>
-                                <label for="address" class="block text-sm font-medium text-gray-700">Adresse *:</label>
-                                <textarea id="address" name="address" rows="5" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></textarea>
-                            </div>
-                        </div>
-
-
-                        <!-- Navigation buttons -->
-                        <div class="flex justify-between mt-8">
-                            <button type="button" id="prev-button" class="bg-gray-700 text-white px-8 py-2 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
-                                Précédent
-                            </button>
-                            <button type="button" id="next-button-professional" class="bg-black text-white px-8 py-2 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
-                                Suivant
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Step 3: Documents (initially hidden) -->
-                    <div id="step3-form" class="hidden">
-                        <h3 class="text-lg font-bold mb-4">Documents à fournir</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-2">
                                 <label for="registre_commerce" class="block text-sm font-medium text-gray-700">
@@ -242,45 +234,45 @@
                                 @enderror
                             </div>
                         </div>
-                        <div class="mt-6 space-y-2">
+
+                        <!-- Terms and conditions -->
+                        <div class="mt-8 space-y-4">
                             <div class="flex items-start">
-                                <input id="offers" type="checkbox" name="offers" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                                <label for="offers" class="ml-2 block text-sm text-gray-700">
-                                    J'accepte de recevoir les offres des partenaires.
-                                </label>
+                                <div class="flex items-center h-5">
+                                    <input id="terms" name="terms" type="checkbox" required
+                                        class="h-4 w-4 text-yellow-500 focus:ring-yellow-400 border-gray-300 rounded transition-colors duration-200">
+                                </div>
+                                <div class="ml-3 text-sm">
+                                    <label for="terms" class="text-gray-600">
+                                        J'accepte de recevoir les offres des partenaires Télécontact
+                                    </label>
+                                </div>
                             </div>
+                            
                             <div class="flex items-start">
-                                <input id="terms" type="checkbox" name="terms" required class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                                <div class="ml-2">
-                                    <label for="terms" class="block text-xs text-gray-700">
-                                        J'autorise l'utilisation de mes données personnelles conformément à la loi 09-08.
+                                <div class="flex items-center h-5">
+                                    <input id="privacy" name="privacy" type="checkbox" required
+                                        class="h-4 w-4 text-yellow-500 focus:ring-yellow-400 border-gray-300 rounded transition-colors duration-200">
+                                </div>
+                                <div class="ml-3 text-sm">
+                                    <label for="privacy" class="text-gray-600">
+                                        J'autorise Edicom à utiliser mes données personnelles pour des fins d'affichage sur ses supports papiers et internet et que mes données soit publiées sur un annuaire susceptible d'être vendu à des tiers. Conformément à la loi 09-08, je suis informé de mes droits d'accès, de rectification et d'opposition pour des motifs légitime en contactant <a href="mailto:donnees.personnelles@edicom.ma" class="text-yellow-600 hover:underline">donnees.personnelles@edicom.ma</a>. Ce traitement a fait l'objet d'une déclaration à la CNDP sous le N° D-M-310/2015
                                     </label>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Navigation buttons -->
-                        <div class="flex justify-between mt-8">
-                            <button type="button" id="prev-button-docs" class="bg-gray-700 text-white px-8 py-2 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                        <div class="mt-10 flex justify-between">
+                            <button type="button" id="prev-button" class="inline-flex items-center px-6 py-3 border border-gray-300 shadow-sm text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400 transition-all duration-200">
                                 Précédent
                             </button>
-                            <button type="submit" class="bg-green-600 text-white px-8 py-2 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                            <button type="submit" id="submit-btn" class="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-all duration-200 transform hover:scale-105">
                                 Créer mon compte
                             </button>
                         </div>
                     </div>
                 </form>
-
-                <div class="mt-6 text-center">
-                    <p class="text-sm text-gray-600">
-                        Already have an account?
-                        <a href="{{ route('login') }}" class="font-bold text-blue-500 hover:text-blue-800">Login</a>
-                    </p>
-                    <p class="text-sm text-gray-600 mt-2">
-                        Want to register as a user?
-                        <a href="{{ route('register') }}" class="font-bold text-blue-500 hover:text-blue-800">Register as user</a>
-                    </p>
-                </div>
             </div>
         </div>
     </div>
@@ -290,53 +282,44 @@
 document.addEventListener('DOMContentLoaded', function() {
     const step1Form = document.getElementById('step1-form');
     const step2Form = document.getElementById('step2-form');
-    const step3Form = document.getElementById('step3-form');
+    const step1Indicator = document.getElementById('step1-indicator');
+    const step2Indicator = document.getElementById('step2-indicator');
     const nextButton = document.getElementById('next-button');
-    const nextButtonProfessional = document.getElementById('next-button-professional');
     const prevButton = document.getElementById('prev-button');
-    const prevButtonDocs = document.getElementById('prev-button-docs');
+    const submitBtn = document.getElementById('submit-btn');
 
+    // Function to show step 1 and hide step 2
     function showStep1() {
         step1Form.classList.remove('hidden');
+        step1Form.classList.add('block');
         step2Form.classList.add('hidden');
-        step3Form.classList.add('hidden');
+        step2Form.classList.remove('block');
         
-        document.getElementById('step1-indicator').classList.add('bg-yellow-400');
-        document.getElementById('step2-indicator').classList.remove('bg-yellow-400');
-        document.getElementById('step2-indicator').classList.add('bg-yellow-200');
-        document.getElementById('step3-indicator').classList.remove('bg-yellow-400');
-        document.getElementById('step3-indicator').classList.add('bg-yellow-200');
+        step1Indicator.classList.remove('bg-yellow-200');
+        step1Indicator.classList.add('bg-yellow-400');
+        step2Indicator.classList.remove('bg-yellow-400');
+        step2Indicator.classList.add('bg-yellow-200');
     }
 
+    // Function to show step 2 and hide step 1
     function showStep2() {
         step1Form.classList.add('hidden');
+        step1Form.classList.remove('block');
         step2Form.classList.remove('hidden');
-        step3Form.classList.add('hidden');
-
-        // document.getElementById('step1-indicator').classList.remove('bg-yellow-400');
-        // document.getElementById('step1-indicator').classList.add('bg-yellow-200');
-        document.getElementById('step2-indicator').classList.add('bg-yellow-400');
-        document.getElementById('step3-indicator').classList.remove('bg-yellow-400');
-        document.getElementById('step3-indicator').classList.add('bg-yellow-200');
+        step2Form.classList.add('block');
+        
+        // step1Indicator.classList.add('bg-gray-200');
+        // step1Indicator.classList.remove('bg-yellow-400');
+        step2Indicator.classList.remove('bg-yellow-200');
+        step2Indicator.classList.add('bg-yellow-400');
     }
 
-    function showStep3() {
-        step1Form.classList.add('hidden');
-        step2Form.classList.add('hidden');
-        step3Form.classList.remove('hidden');
-
-        // document.getElementById('step1-indicator').classList.remove('bg-yellow-400');
-        // document.getElementById('step1-indicator').classList.add('bg-yellow-200');
-        // document.getElementById('step2-indicator').classList.remove('bg-yellow-400');
-        // document.getElementById('step2-indicator').classList.add('bg-yellow-200');
-        document.getElementById('step3-indicator').classList.add('bg-yellow-400');
-    }
-
+    // Event listener for Next button
     nextButton.addEventListener('click', function(e) {
         e.preventDefault();
         
         // Validate step 1 fields
-        const requiredFields = ['nom', 'prenom', 'email', 'telephone', 'password', 'password_confirmation'];    
+        const requiredFields = ['company_name', 'phone', 'address', 'city'];
         let isValid = true;
         
         requiredFields.forEach(fieldId => {
@@ -349,40 +332,18 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Check if passwords match
-        const password = document.getElementById('password');
-        const passwordConfirmation = document.getElementById('password_confirmation');
-        if (password.value !== passwordConfirmation.value) {
-            isValid = false;
-            password.classList.add('border-red-500');
-            passwordConfirmation.classList.add('border-red-500');
-        }
-
         if (isValid) {
             showStep2();
         }
     });
 
-    nextButtonProfessional.addEventListener('click', function(e) {
+    // Event listener for Previous button
+    prevButton.addEventListener('click', function(e) {
         e.preventDefault();
-        // Validate step 2 fields
-        const requiredFields = ['societe', 'ville', 'address'];    
-        let isValid = true;
-        
-        requiredFields.forEach(fieldId => {
-            const field = document.getElementById(fieldId);
-            if (!field.value) {
-                isValid = false;
-                field.classList.add('border-red-500');
-            } else {
-                field.classList.remove('border-red-500');
-            }
-        });
-
-        if (isValid) {
-            showStep3();
-        }
+        showStep1();
     });
+    
+    // File upload handling
     const fileInputs = document.querySelectorAll('input[type="file"]');
     
     fileInputs.forEach(input => {
@@ -406,16 +367,56 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-
-    prevButton.addEventListener('click', function(e) {
-        e.preventDefault();
-        showStep1();
-    });
-
-    prevButtonDocs.addEventListener('click', function(e) {
-        e.preventDefault();
-        showStep2();
-    });
+    
+    // // Form submission handling
+    // const form = document.getElementById('registration-form');
+    
+    // form.addEventListener('submit', function(e) {
+    //     // Add loading state to button
+    //     submitBtn.innerHTML = `
+    //         <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+    //             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+    //             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    //         </svg>
+    //         Traitement en cours...
+    //     `;
+    //     submitBtn.disabled = true;
+    // });
 });
 </script>
+
+<style>
+/* File upload animation */
+.file-upload-label {
+    transition: all 0.3s ease;
+}
+
+.file-selected {
+    animation: pulse 1s;
+}
+
+@keyframes pulse {
+    0%, 100% { 
+        transform: scale(1); 
+    }
+    50% { 
+        transform: scale(1.03); 
+    }
+}
+
+/* Form field focus animation */
+input:focus, select:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Checkbox animation */
+input[type="checkbox"] {
+    transition: all 0.2s ease;
+}
+
+input[type="checkbox"]:checked {
+    transform: scale(1.1);
+}
+</style>
 @endsection

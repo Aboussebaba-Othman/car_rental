@@ -32,6 +32,10 @@ Route::get('/auth/google/callback', [App\Http\Controllers\Auth\GoogleController:
 // Logout Route
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout')->middleware('auth');
 
+Route::get('/auth/account-type', [App\Http\Controllers\Auth\AccountTypeController::class, 'showTypeSelection'])->name('auth.account.type');
+Route::post('/auth/account-type', [App\Http\Controllers\Auth\AccountTypeController::class, 'processTypeSelection'])->name('auth.account.type.process');
+
+
 // Role-based Routes
 // Route::middleware(['auth', 'role:user'])->group(function () {
 //     Route::get('/profile', [UserController::class, 'showProfile'])->name('user.profile');
@@ -43,6 +47,8 @@ Route::middleware(['auth', 'role:company'])->group(function () {
     Route::get('/company/dashboard', 'App\Http\Controllers\Company\DashboardController@index')->name('company.dashboard');
     Route::get('/company/documents/upload', [App\Http\Controllers\Company\DocumentController::class, 'showUploadForm'])->name('company.documents.upload');
     Route::post('/company/documents/upload', [App\Http\Controllers\Company\DocumentController::class, 'uploadDocuments'])->name('company.documents.store');
+    Route::get('/company/complete-registration', [App\Http\Controllers\Company\RegistrationController::class, 'showCompleteRegistration'])->name('company.complete-registration');
+    Route::post('/company/complete-registration', [App\Http\Controllers\Company\RegistrationController::class, 'completeRegistration'])->name('company.complete-registration.process');
 });
 
 // Route::middleware(['auth', 'role:admin'])->group(function () {
