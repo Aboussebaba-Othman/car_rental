@@ -4,6 +4,7 @@ namespace App\Repositories\Interfaces;
 
 interface CompanyRepositoryInterface extends RepositoryInterface
 {
-    public function findByUserId(int $userId);
+    public function getAllWithUsers();
+    public function findWithUser($id);
     public function getPendingValidation();
 }

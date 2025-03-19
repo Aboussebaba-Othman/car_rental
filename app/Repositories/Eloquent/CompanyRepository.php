@@ -12,13 +12,21 @@ class CompanyRepository extends BaseRepository implements CompanyRepositoryInter
         parent::__construct($model);
     }
 
-    public function findByUserId(int $userId)
+    public function getAllWithUsers()
     {
-        return $this->model->where('user_id', $userId)->first();
+        return $this->model->with('user')->latest()->paginate(10);
+    }
+
+    public function findWithUser($id)
+    {
+        return $this->model->with('user')->findOrFail($id);
     }
 
     public function getPendingValidation()
     {
-        return $this->model->where('is_validated', false)->with('user')->get();
+        return $this->model->where('is_validated', false)
+            ->with('user')
+            ->latest()
+            ->get();
     }
 }
