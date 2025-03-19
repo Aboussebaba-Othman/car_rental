@@ -40,11 +40,22 @@ class RegisterController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'firstName' => 'required|string|max:255|unique:users',
-            'lastName' => 'required|string|max:255|unique:users',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'phone' => 'nullable|string|max:20',
+            'firstName' => 'required|string|min:3|max:255',
+            'lastName' => 'required|string|min:3|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email',
+            'password' => [
+            'required',
+            'string',
+            'min:8',
+            'confirmed'
+            // 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/'
+            ],
+            'phone' => [
+            'nullable',
+            'string',
+            'max:20',
+            'regex:/^(?:\+212|0)([6-7])\d{8}$/'
+            ],
         ]);
 
         if ($validator->fails()) {
@@ -115,14 +126,31 @@ class RegisterController extends Controller
 public function registerCompany(Request $request)
 {
     $validator = Validator::make($request->all(), [
-        'firstName' => 'required|string|max:255|unique:users',
-        'lastName' => 'required|string|max:255|unique:users',
-        'email' => 'required|string|email|max:255|unique:users',
-        'password' => 'required|string|min:8|confirmed',
-        'phone' => 'required|string|max:20',
-        'company_name' => 'required|string|max:255',
-        'address' => 'required|string|max:255',
+        'firstName' => 'required|string|min:3|max:255',
+        'lastName' => 'required|string|min:3|max:255',
+        'email' => 'required|string|email|max:255|unique:users,email',
+        'password' => [
+        'required',
+        'string',
+        'min:8',
+        'confirmed'
+        // 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/'
+        ],
+        'phone' => [
+        'nullable',
+        'string',
+        'max:20',
+        // 'regex:/^(?:\+212|0)([6-7])\d{8}$/'
+        ],
+        'company_name' => 'required|string|min:3|max:255',
+        'address' => 'required|string|min:10|max:255',
         'city' => 'required|string|max:255',
+        'registre_commerce' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
+        'carte_fiscale' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
+            'cnas_casnos' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
+            'autorisation_exploitation' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
+            'contrat_location' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
+            'assurance_entreprise' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
     ]);
 
     if ($validator->fails()) {
@@ -148,6 +176,12 @@ public function registerCompany(Request $request)
         'company_name' => $request->company_name,
         'address' => $request->address,
         'city' => $request->city,
+        'registre_commerce' => $request->registre_commerce,
+        'carte_fiscale' => $request->carte_fiscale,
+        'cnas_casnos' => $request->cnas_casnos,
+        'autorisation_exploitation' => $request->autorisation_exploitation,
+        'contrat_location' => $request->contrat_location,
+        'assurance_entreprise' => $request->assurance_entreprise,
         'is_validated' => false,
     ]);
 
@@ -155,7 +189,7 @@ public function registerCompany(Request $request)
     // Auth::login($user);
 
     // Redirect to document upload page
-    return redirect()->route('company.documents.upload')
-        ->with('success', 'Basic registration completed. Please upload your required documents.');
+    return redirect()->route('login')
+        ->with('success', 'Account registered successfully! Please login to continue.');
 }
 }
