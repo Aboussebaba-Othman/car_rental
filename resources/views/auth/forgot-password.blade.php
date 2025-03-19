@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-6xl mx-auto">
         <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 p-6 rounded-t-xl shadow-lg text-center">
             <h2 class="text-3xl font-bold text-white">Réinitialisation du mot de passe</h2>
             <p class="text-white mt-2">Nous vous enverrons un lien pour créer un nouveau mot de passe</p>

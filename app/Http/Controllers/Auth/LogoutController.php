@@ -20,8 +20,14 @@ class LogoutController extends Controller
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
-        return redirect()->route('login')
+        
+        // Clear all cookies to help with OAuth state
+        $response = redirect()->route('login')
             ->with('success', 'You have been logged out successfully.');
+            
+        // Store the Google OAuth prompt parameter in session
+        $request->session()->put('google_prompt', 'select_account');
+
+        return $response;
     }
 }

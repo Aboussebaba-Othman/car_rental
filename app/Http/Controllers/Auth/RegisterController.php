@@ -130,27 +130,27 @@ public function registerCompany(Request $request)
         'lastName' => 'required|string|min:3|max:255',
         'email' => 'required|string|email|max:255|unique:users,email',
         'password' => [
-        'required',
-        'string',
-        'min:8',
-        'confirmed'
-        // 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/'
+            'required',
+            'string',
+            'min:8',
+            'confirmed'
+            // 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/'
         ],
         'phone' => [
-        'nullable',
-        'string',
-        'max:20',
-        // 'regex:/^(?:\+212|0)([6-7])\d{8}$/'
+            'nullable',
+            'string',
+            'max:20',
+            // 'regex:/^(?:\+212|0)([6-7])\d{8}$/'
         ],
         'company_name' => 'required|string|min:3|max:255',
         'address' => 'required|string|min:10|max:255',
         'city' => 'required|string|max:255',
         'registre_commerce' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
         'carte_fiscale' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
-            'cnas_casnos' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
-            'autorisation_exploitation' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
-            'contrat_location' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
-            'assurance_entreprise' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
+        'cnas_casnos' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
+        'autorisation_exploitation' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
+        'contrat_location' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
+        'assurance_entreprise' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
     ]);
 
     if ($validator->fails()) {
@@ -170,26 +170,37 @@ public function registerCompany(Request $request)
         'is_active' => true,
     ]);
 
-    // Create company profile with basic info
+    // Process and store each document
+    $documents = [];
+    $documentFields = [
+        'registre_commerce',
+        'carte_fiscale',
+        'cnas_casnos',
+        'autorisation_exploitation',
+        'contrat_location',
+        'assurance_entreprise'
+    ];
+    
+    foreach ($documentFields as $field) {
+        if ($request->hasFile($field)) {
+            $path = $request->file($field)->store('company_documents/' . $user->id, 'public');
+            $documents[$field] = $path;
+        }
+    }
+
+    // Create company profile with basic info and documents
     $this->companyRepository->create([
         'user_id' => $user->id,
         'company_name' => $request->company_name,
         'address' => $request->address,
         'city' => $request->city,
-        'registre_commerce' => $request->registre_commerce,
-        'carte_fiscale' => $request->carte_fiscale,
-        'cnas_casnos' => $request->cnas_casnos,
-        'autorisation_exploitation' => $request->autorisation_exploitation,
-        'contrat_location' => $request->contrat_location,
-        'assurance_entreprise' => $request->assurance_entreprise,
+        'legal_documents' => json_encode($documents),
         'is_validated' => false,
     ]);
 
-    // Log the user in
-    // Auth::login($user);
-
-    // Redirect to document upload page
+    // Redirect to login page
     return redirect()->route('login')
         ->with('success', 'Account registered successfully! Please login to continue.');
+
 }
 }

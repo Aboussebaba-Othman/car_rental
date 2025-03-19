@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-6xl mx-auto">
         <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 p-6 rounded-t-xl shadow-lg text-center">
             <h2 class="text-3xl font-bold text-white">Connexion à votre compte</h2>
             <p class="text-white mt-2">Accédez à votre espace personnel pour gérer vos réservations</p>
@@ -13,8 +13,8 @@
             <div class="w-full md:w-1/2 relative">
                 <img src="{{ asset('images/car-rental-sign.webp') }}" alt="Location de voiture" class="w-full h-full object-cover">
                 <div class="absolute inset-0 bg-black bg-opacity-40 flex flex-col justify-end p-6 text-white">
-                    <h3 class="text-2xl font-bold mb-2">Bienvenue sur AutoLocPro</h3>
-                    <ul class="space-y-2">
+                    <h3 class="text-4xl font-bold mb-2">Bienvenue sur AutoLocPro</h3>
+                    <ul class="space-y-2 text-xl">
                         <li class="flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />

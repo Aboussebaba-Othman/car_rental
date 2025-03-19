@@ -14,21 +14,21 @@ use Laravel\Socialite\Facades\Socialite;
 
 class GoogleController extends Controller
 {
-    /**
-     * Redirect the user to the Google authentication page.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function redirectToGoogle()
+    
+    public function redirectToGoogle(Request $request)
     {
+        // Check if we need to prompt for account selection
+        if ($request->session()->has('google_prompt')) {
+            $request->session()->forget('google_prompt');
+            return Socialite::driver('google')
+                ->scopes(['openid', 'profile', 'email'])
+                ->with(['prompt' => 'select_account'])
+                ->redirect();
+        }
+        
         return Socialite::driver('google')->redirect();
     }
 
-    /**
-     * Obtain the user information from Google.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function handleGoogleCallback()
     {
         try {
@@ -41,7 +41,7 @@ class GoogleController extends Controller
                 
                 if ($user->isCompany()) {
                     return redirect()->route('company.dashboard');
-                }else {
+                } else {
                     return redirect()->route('home');
                 }
             }
