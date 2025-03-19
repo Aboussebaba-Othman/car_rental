@@ -13,6 +13,6 @@
     <p>This password reset link will expire in 60 minutes.</p>
     <p>If you did not request a password reset, no further action is required.</p>
     
-    <p>Regards,<br>Car Rental System</p>
+    <p>Regards,<br>AuthoLoc<span class="text-yellow-500">Pro</span> System</p>
 </body>
 </html>

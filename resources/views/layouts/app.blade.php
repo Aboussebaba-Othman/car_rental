@@ -72,7 +72,7 @@
                                  x-transition:leave-start="transform opacity-100 scale-100" 
                                  x-transition:leave-end="transform opacity-0 scale-95" 
                                  class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg">
-                                <div class="py-1 rounded-md bg-white shadow-xs">
+                                <div class="py-1 rounded-md bg-white shadow-xs hidden">
                                     <a href="" class="block px-4 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600">
                                         Mon profil
                                     </a>

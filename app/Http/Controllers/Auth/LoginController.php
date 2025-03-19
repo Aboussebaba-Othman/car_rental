@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
     use App\Http\Controllers\Controller;
-    // use App\Models\Role;
-    // use App\Models\User;
     use Illuminate\Http\Request;
     use Illuminate\Support\Facades\Auth;
     use Illuminate\Support\Facades\Validator;
@@ -44,7 +42,7 @@ class LoginController extends Controller
             }
 
             if ($user->isCompany() && !$user->company->is_validated) {
-                return redirect()->route('company.documents.upload')
+                return redirect()->route('login')
                     ->with('info', 'Your company account is pending approval from administrators.');
             }
 
