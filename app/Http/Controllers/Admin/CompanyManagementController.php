@@ -7,7 +7,7 @@ use App\Repositories\Interfaces\CompanyRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use Illuminate\Http\Request;
 
-class CompanyManagementController extends Controller
+class CompanyManagementController extends Controller 
 {
     protected $companyRepository;
     protected $userRepository;
