@@ -50,6 +50,15 @@ Route::middleware(['auth', 'role:company'])->group(function () {
     Route::post('/company/documents/upload', [App\Http\Controllers\Company\DocumentController::class, 'uploadDocuments'])->name('company.documents.store');
     Route::get('/company/complete-registration', [App\Http\Controllers\Company\RegistrationController::class, 'showCompleteRegistration'])->name('company.complete-registration');
     Route::post('/company/complete-registration', [App\Http\Controllers\Company\RegistrationController::class, 'completeRegistration'])->name('company.complete-registration.process');
+    Route::get('/company/vehicles', 'App\Http\Controllers\Company\VehicleController@index')->name('company.vehicles.index');
+    Route::get('/company/vehicles/create', 'App\Http\Controllers\Company\VehicleController@create')->name('company.vehicles.create');
+    Route::post('/company/vehicles', 'App\Http\Controllers\Company\VehicleController@store')->name('company.vehicles.store');
+    Route::get('/company/vehicles/{vehicle}', 'App\Http\Controllers\Company\VehicleController@show')->name('company.vehicles.show');
+    Route::get('/company/vehicles/{vehicle}/edit', 'App\Http\Controllers\Company\VehicleController@edit')->name('company.vehicles.edit');
+    Route::put('/company/vehicles/{vehicle}', 'App\Http\Controllers\Company\VehicleController@update')->name('company.vehicles.update');
+    Route::delete('/company/vehicles/{vehicle}', 'App\Http\Controllers\Company\VehicleController@destroy')->name('company.vehicles.destroy');
+    Route::patch('/company/vehicles/{vehicle}/toggle-active', 'App\Http\Controllers\Company\VehicleController@toggleActive')->name('company.vehicles.toggle-active');
+    Route::patch('/company/vehicles/{vehicle}/toggle-availability', 'App\Http\Controllers\Company\VehicleController@toggleAvailability')->name('company.vehicles.toggle-availability');
 });
 
 // Route::middleware(['auth', 'role:admin'])->group(function () {
