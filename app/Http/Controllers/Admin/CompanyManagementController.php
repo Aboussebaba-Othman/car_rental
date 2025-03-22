@@ -87,4 +87,5 @@ class CompanyManagementController extends Controller
         return redirect()->route('admin.companies.index')
             ->with('success', "L'entreprise '{$company->company_name}' a été réactivée.");
     }
+    
 }

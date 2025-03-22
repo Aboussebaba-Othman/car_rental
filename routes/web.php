@@ -59,10 +59,14 @@ Route::middleware(['auth', 'role:company'])->group(function () {
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/companies', [App\Http\Controllers\Admin\CompanyManagementController::class, 'index'])->name('companies.index');
-    Route::get('/companies/{id}', [App\Http\Controllers\Admin\CompanyManagementController::class, 'show'])->name('companies.show');
+    // Route::get('/companies/{id}', [App\Http\Controllers\Admin\CompanyManagementController::class, 'show'])->name('companies.show');
     Route::post('/companies/{id}/validate', [App\Http\Controllers\Admin\CompanyManagementController::class, 'validate'])->name('companies.validate');
     Route::post('/companies/{id}/suspend', [App\Http\Controllers\Admin\CompanyManagementController::class, 'suspend'])->name('companies.suspend');
     Route::post('/companies/{id}/reactivate', [App\Http\Controllers\Admin\CompanyManagementController::class, 'reactivate'])->name('companies.reactivate');
+    Route::get('/companies/filter', [App\Http\Controllers\Admin\CompanyManagementController::class, 'filter'])->name('companies.filter');
+    Route::get('/companies/{id}', [App\Http\Controllers\Admin\CompanyManagementController::class, 'show'])->name('companies.show');
+
+    
 
     Route::get('/users', [App\Http\Controllers\Admin\UserManagementController::class, 'index'])->name('users.index');
     Route::get('/users/{id}', [App\Http\Controllers\Admin\UserManagementController::class, 'show'])->name('users.show');
