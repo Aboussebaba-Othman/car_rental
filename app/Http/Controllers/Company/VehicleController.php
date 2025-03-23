@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Company;
 use App\Http\Controllers\Controller;
 use App\Models\Vehicle;
 use App\Models\VehiclePhoto;
+use App\Repositories\Interfaces\VehicleRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -12,31 +13,28 @@ use Illuminate\Support\Str;
 
 class VehicleController extends Controller
 {
-    /**
-     * Display a listing of the vehicles.
-     */
+   
+    private $vehicleRepository;
+    
+    public function __construct(VehicleRepositoryInterface $vehicleRepository)
+    {
+        $this->vehicleRepository = $vehicleRepository;
+    }
+
     public function index()
     {
         $company = Auth::user()->company;
-        $vehicles = Vehicle::where('company_id', $company->id)
-                        ->with('photos')
-                        ->latest()
-                        ->paginate(10);
+        $vehicles = $this->vehicleRepository->getAllForCompany($company->id);
 
         return view('company.vehicles.index', compact('vehicles'));
     }
 
-    /**
-     * Show the form for creating a new vehicle.
-     */
     public function create()
     {
         return view('company.vehicles.create');
     }
 
-    /**
-     * Store a newly created vehicle in storage.
-     */
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -54,22 +52,14 @@ class VehicleController extends Controller
             'photos.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        // Create vehicle
-        $vehicle = new Vehicle();
-        $vehicle->company_id = Auth::user()->company->id;
-        $vehicle->brand = $validated['brand'];
-        $vehicle->model = $validated['model'];
-        $vehicle->year = $validated['year'];
-        $vehicle->license_plate = $validated['license_plate'];
-        $vehicle->transmission = $validated['transmission'];
-        $vehicle->fuel_type = $validated['fuel_type'];
-        $vehicle->seats = $validated['seats'];
-        $vehicle->price_per_day = $validated['price_per_day'];
-        $vehicle->description = $validated['description'] ?? null;
-        $vehicle->features = $validated['features'] ?? null;
-        $vehicle->is_active = true;
-        $vehicle->is_available = true;
-        $vehicle->save();
+        // Create vehicle with repository
+        $vehicleData = array_merge($validated, [
+            'company_id' => Auth::user()->company->id,
+            'is_active' => true,
+            'is_available' => true
+        ]);
+        
+        $vehicle = $this->vehicleRepository->create($vehicleData);
 
         // Handle photos upload
         if ($request->hasFile('photos')) {
@@ -92,29 +82,25 @@ class VehicleController extends Controller
             ->with('success', 'Vehicle added successfully.');
     }
 
-    /**
-     * Display the specified vehicle.
-     */
-    public function show(Vehicle $vehicle)
+    public function show($id)
     {
+        $vehicle = $this->vehicleRepository->findWithRelations($id);
         $this->authorizeVehicle($vehicle);
+        
         return view('company.vehicles.show', compact('vehicle'));
     }
 
-    /**
-     * Show the form for editing the specified vehicle.
-     */
-    public function edit(Vehicle $vehicle)
+    public function edit($id)
     {
+        $vehicle = $this->vehicleRepository->findWithRelations($id);
         $this->authorizeVehicle($vehicle);
+        
         return view('company.vehicles.edit', compact('vehicle'));
     }
 
-    /**
-     * Update the specified vehicle in storage.
-     */
-    public function update(Request $request, Vehicle $vehicle)
+    public function update(Request $request, $id)
     {
+        $vehicle = $this->vehicleRepository->find($id);
         $this->authorizeVehicle($vehicle);
 
         $validated = $request->validate([
@@ -137,33 +123,27 @@ class VehicleController extends Controller
             'primary_photo_id' => 'nullable|integer|exists:vehicle_photos,id',
         ]);
 
-        // Update vehicle
-        $vehicle->brand = $validated['brand'];
-        $vehicle->model = $validated['model'];
-        $vehicle->year = $validated['year'];
-        $vehicle->license_plate = $validated['license_plate'];
-        $vehicle->transmission = $validated['transmission'];
-        $vehicle->fuel_type = $validated['fuel_type'];
-        $vehicle->seats = $validated['seats'];
-        $vehicle->price_per_day = $validated['price_per_day'];
-        $vehicle->description = $validated['description'] ?? null;
-        $vehicle->features = $validated['features'] ?? null;
-        $vehicle->is_active = $request->has('is_active');
-        $vehicle->is_available = $request->has('is_available');
-        $vehicle->save();
+        // Update vehicle data
+        $vehicleData = [
+            'brand' => $validated['brand'],
+            'model' => $validated['model'],
+            'year' => $validated['year'],
+            'license_plate' => $validated['license_plate'],
+            'transmission' => $validated['transmission'],
+            'fuel_type' => $validated['fuel_type'],
+            'seats' => $validated['seats'],
+            'price_per_day' => $validated['price_per_day'],
+            'description' => $validated['description'] ?? null,
+            'features' => $validated['features'] ?? null,
+            'is_active' => $request->has('is_active'),
+            'is_available' => $request->has('is_available'),
+        ];
+        
+        $this->vehicleRepository->update($id, $vehicleData);
 
         // Delete photos if requested
         if ($request->has('photos_to_delete') && is_array($request->photos_to_delete)) {
-            foreach ($request->photos_to_delete as $photoId) {
-                $photo = VehiclePhoto::find($photoId);
-                if ($photo && $photo->vehicle_id == $vehicle->id) {
-                    // Delete file from storage
-                    if (Storage::disk('public')->exists($photo->path)) {
-                        Storage::disk('public')->delete($photo->path);
-                    }
-                    $photo->delete();
-                }
-            }
+            $this->vehicleRepository->deletePhotos($vehicle->id, $request->photos_to_delete);
         }
 
         // Add new photos if uploaded
@@ -185,27 +165,16 @@ class VehicleController extends Controller
 
         // Update primary photo if requested
         if ($request->has('primary_photo_id')) {
-            $primaryPhotoId = $request->input('primary_photo_id');
-            
-            // Reset all photos to non-primary
-            VehiclePhoto::where('vehicle_id', $vehicle->id)
-                ->update(['is_primary' => false]);
-            
-            // Set the selected photo as primary
-            VehiclePhoto::where('id', $primaryPhotoId)
-                ->where('vehicle_id', $vehicle->id)
-                ->update(['is_primary' => true]);
+            $this->vehicleRepository->setPrimaryPhoto($vehicle->id, $request->input('primary_photo_id'));
         }
 
         return redirect()->route('company.vehicles.index')
             ->with('success', 'Vehicle updated successfully.');
     }
 
-    /**
-     * Remove the specified vehicle from storage.
-     */
-    public function destroy(Vehicle $vehicle)
+    public function destroy($id)
     {
+        $vehicle = $this->vehicleRepository->findWithRelations($id);
         $this->authorizeVehicle($vehicle);
 
         // Check if vehicle has reservations
@@ -222,47 +191,44 @@ class VehicleController extends Controller
         }
 
         // Delete vehicle and related photos (via foreign key constraint)
-        $vehicle->delete();
+        $this->vehicleRepository->delete($id);
 
         return redirect()->route('company.vehicles.index')
             ->with('success', 'Vehicle deleted successfully.');
     }
 
-    /**
-     * Toggle vehicle active status.
-     */
-    public function toggleActive(Vehicle $vehicle)
+    public function toggleActive($id)
     {
+        $vehicle = $this->vehicleRepository->find($id);
         $this->authorizeVehicle($vehicle);
         
-        $vehicle->is_active = !$vehicle->is_active;
-        $vehicle->save();
+        $this->vehicleRepository->update($id, [
+            'is_active' => !$vehicle->is_active
+        ]);
 
         return redirect()->route('company.vehicles.index')
             ->with('success', 'Vehicle status updated successfully.');
     }
 
-    /**
-     * Toggle vehicle availability.
-     */
-    public function toggleAvailability(Vehicle $vehicle)
+    public function toggleAvailability($id)
     {
+        $vehicle = $this->vehicleRepository->find($id);
         $this->authorizeVehicle($vehicle);
         
-        $vehicle->is_available = !$vehicle->is_available;
-        $vehicle->save();
+        $this->vehicleRepository->update($id, [
+            'is_available' => !$vehicle->is_available
+        ]);
 
         return redirect()->route('company.vehicles.index')
             ->with('success', 'Vehicle availability updated successfully.');
     }
 
-    /**
-     * Check if the authenticated company owns the vehicle.
-     */
-    private function authorizeVehicle(Vehicle $vehicle)
+    private function authorizeVehicle($vehicle)
     {
         if ($vehicle->company_id !== Auth::user()->company->id) {
             abort(403, 'Unauthorized action.');
         }
+        
+        return true;
     }
 }
