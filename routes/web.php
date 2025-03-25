@@ -59,6 +59,15 @@ Route::middleware(['auth', 'role:company'])->group(function () {
     Route::delete('/company/vehicles/{vehicle}', 'App\Http\Controllers\Company\VehicleController@destroy')->name('company.vehicles.destroy');
     Route::patch('/company/vehicles/{vehicle}/toggle-active', 'App\Http\Controllers\Company\VehicleController@toggleActive')->name('company.vehicles.toggle-active');
     Route::patch('/company/vehicles/{vehicle}/toggle-availability', 'App\Http\Controllers\Company\VehicleController@toggleAvailability')->name('company.vehicles.toggle-availability');
+
+    Route::get('/company/promotions', 'App\Http\Controllers\Company\PromotionController@index')->name('company.promotions.index');
+    Route::get('/company/promotions/create', 'App\Http\Controllers\Company\PromotionController@create')->name('company.promotions.create');
+    Route::post('/company/promotions', 'App\Http\Controllers\Company\PromotionController@store')->name('company.promotions.store');
+    Route::get('/company/promotions/{promotion}', 'App\Http\Controllers\Company\PromotionController@show')->name('company.promotions.show');
+    Route::get('/company/promotions/{promotion}/edit', 'App\Http\Controllers\Company\PromotionController@edit')->name('company.promotions.edit');
+    Route::put('/company/promotions/{promotion}', 'App\Http\Controllers\Company\PromotionController@update')->name('company.promotions.update');
+    Route::delete('/company/promotions/{promotion}', 'App\Http\Controllers\Company\PromotionController@destroy')->name('company.promotions.destroy');
+    Route::patch('/company/promotions/{promotion}/toggle-active', 'App\Http\Controllers\Company\PromotionController@toggleActive')->name('company.promotions.toggle-active');
 });
 
 // Route::middleware(['auth', 'role:admin'])->group(function () {
@@ -84,6 +93,4 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 });
 
 // Public Routes
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+Route::get('/', [App\Http\Controllers\WelcomeController::class, 'index'])->name('home');

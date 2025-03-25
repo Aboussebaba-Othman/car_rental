@@ -10,19 +10,13 @@ use Illuminate\Support\Facades\Storage;
 
 class VehicleRepository extends BaseRepository implements VehicleRepositoryInterface
 {
-    /**
-     * VehicleRepository constructor.
-     *
-     * @param Vehicle $model
-     */
+   
     public function __construct(Vehicle $model)
     {
         parent::__construct($model);
     }
     
-    /**
-     * {@inheritdoc}
-     */
+ 
     public function getAllForCompany($companyId)
     {
         return $this->model->where('company_id', $companyId)
@@ -33,10 +27,7 @@ class VehicleRepository extends BaseRepository implements VehicleRepositoryInter
             ->latest()
             ->paginate(10);
     }
-    
-    /**
-     * {@inheritdoc}
-     */
+
     public function findWithRelations($id)
     {
         return $this->model->with([
@@ -47,9 +38,7 @@ class VehicleRepository extends BaseRepository implements VehicleRepositoryInter
             ->findOrFail($id);
     }
     
-    /**
-     * {@inheritdoc}
-     */
+
     public function getAvailableVehicles(array $criteria)
     {
         $query = $this->model->where('is_active', true)
@@ -121,9 +110,7 @@ class VehicleRepository extends BaseRepository implements VehicleRepositoryInter
         return $query->paginate(isset($criteria['per_page']) ? $criteria['per_page'] : 12);
     }
     
-    /**
-     * {@inheritdoc}
-     */
+
     public function getWithUpcomingReservations($companyId)
     {
         return $this->model->where('company_id', $companyId)
@@ -140,9 +127,7 @@ class VehicleRepository extends BaseRepository implements VehicleRepositoryInter
             ->get();
     }
     
-    /**
-     * {@inheritdoc}
-     */
+    
     public function setPrimaryPhoto($vehicleId, $photoId)
     {
         // First, reset all vehicle photos to non-primary
@@ -237,5 +222,33 @@ class VehicleRepository extends BaseRepository implements VehicleRepositoryInter
             'total_revenue' => $totalRevenue,
             'most_popular_vehicle' => $mostPopularVehicle
         ];
+    }
+    public function countVehiclesByCompanyAndIds($companyId, array $vehicleIds)
+    {
+        return $this->model
+            ->where('company_id', $companyId)
+            ->whereIn('id', $vehicleIds)
+            ->count();
+    }
+
+    public function getFeaturedVehicles($limit = 6)
+    {
+        return $this->model
+            ->where('is_active', true)
+            ->where('is_available', true)
+            ->with('photos')
+            ->orderBy('created_at', 'desc')
+            ->take($limit)
+            ->get();
+    }
+
+    /**
+     * Get the model instance
+     *
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function getModel()
+    {
+        return $this->model;
     }
 }

@@ -49,7 +49,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                 </svg>
                             </div>
-                            <span class="text-xl font-bold tracking-wider">{{ config('app.name', 'Car Rental') }}</span>
+                            <span class="text-xl font-bold tracking-wider">AutoLoc<span class="text-yellow-500">Pro</span> </span>
                         </div>
                     </a>
                 </div>
@@ -96,7 +96,7 @@
                         
                         <!-- Offers & Promotions -->
                         <li>
-                            <a href="#" 
+                            <a href="{{ route('company.promotions.index') }}" 
                                class="flex items-center px-4 py-3 text-white rounded-lg transition-all duration-200 menu-item-hover hover:bg-blue-700/30">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
@@ -300,7 +300,7 @@
                                     <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
                                     </svg>
-                                    Home
+                                    Tableau de bord
                                 </a>
                             </li>
                             <li aria-current="page">
@@ -355,6 +355,6 @@ document.addEventListener('click', (event) => {
     });
 });
 
-    </script>
+</script>
 </body>
 </html>

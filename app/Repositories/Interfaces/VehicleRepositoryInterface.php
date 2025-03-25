@@ -61,4 +61,10 @@ interface VehicleRepositoryInterface extends RepositoryInterface
      * @return array
      */
     public function getCompanyVehicleStats($companyId);
+
+    public function countVehiclesByCompanyAndIds($companyId, array $vehicleIds);
+
+
+    public function getFeaturedVehicles($limit = 6);
+
 }
