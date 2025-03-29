@@ -29,9 +29,7 @@ class PromotionRepository extends BaseRepository implements PromotionRepositoryI
             ->paginate(10);
     }
     
-    /**
-     * {@inheritdoc}
-     */
+    
     public function findWithRelations($id)
     {
         return $this->model->with(['reservations', 'company'])
@@ -40,16 +38,20 @@ class PromotionRepository extends BaseRepository implements PromotionRepositoryI
     }
     
    
-public function getActivePromotions($companyId, $limit = null)
+public function getActivePromotions($companyId = null, $limit = null)
 {
     $today = now()->startOfDay();
     
     $query = $this->model
-        ->where('company_id', $companyId)
         ->where('is_active', true)
         ->where('start_date', '<=', $today)
         ->where('end_date', '>=', $today)
         ->orderBy('discount_percentage', 'desc');
+    
+    // Only add the company_id condition if a specific company is requested
+    if ($companyId !== null) {
+        $query->where('company_id', $companyId);
+    }
     
     if ($limit) {
         $query->take($limit);
@@ -58,9 +60,7 @@ public function getActivePromotions($companyId, $limit = null)
     return $query->get();
 }
     
-    /**
-     * {@inheritdoc}
-     */
+    
     public function getApplicableToVehicle($vehicleId)
     {
         $today = now()->startOfDay();
@@ -80,9 +80,7 @@ public function getActivePromotions($companyId, $limit = null)
             ->get();
     }
     
-    /**
-     * {@inheritdoc}
-     */
+    
     public function getUpcomingPromotions($companyId)
     {
         $today = now()->startOfDay();
@@ -94,9 +92,7 @@ public function getActivePromotions($companyId, $limit = null)
             ->get();
     }
     
-    /**
-     * {@inheritdoc}
-     */
+   
     public function getExpiredPromotions($companyId)
     {
         $today = now()->startOfDay();
@@ -107,9 +103,6 @@ public function getActivePromotions($companyId, $limit = null)
             ->get();
     }
     
-    /**
-     * {@inheritdoc}
-     */
     public function getPromotionStats($companyId)
     {
         $today = now()->startOfDay();

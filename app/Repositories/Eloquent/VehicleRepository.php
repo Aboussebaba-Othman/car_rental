@@ -251,4 +251,70 @@ class VehicleRepository extends BaseRepository implements VehicleRepositoryInter
     {
         return $this->model;
     }
+
+    public function getPaginatedVehicles(array $filters = [], string $sort = 'newest', int $perPage = 10)
+    {
+        $query = $this->model->query()
+            ->with(['photos', 'company'])
+            ->where('is_active', true)
+            ->where('is_available', true);
+        
+        // Apply filters
+        if (!empty($filters['brand'])) {
+            $query->where('brand', $filters['brand']);
+        }
+        
+        if (!empty($filters['fuel_type'])) {
+            $query->where('fuel_type', $filters['fuel_type']);
+        }
+        
+        if (!empty($filters['seats'])) {
+            $query->where('seats', $filters['seats']);
+        }
+        
+        if (!empty($filters['price_min'])) {
+            $query->where('price_per_day', '>=', $filters['price_min']);
+        }
+        
+        if (!empty($filters['price_max'])) {
+            $query->where('price_per_day', '<=', $filters['price_max']);
+        }
+        
+        // Apply sorting
+        switch ($sort) {
+            case 'price_asc':
+                $query->orderBy('price_per_day', 'asc');
+                break;
+                
+            case 'price_desc':
+                $query->orderBy('price_per_day', 'desc');
+                break;
+                
+            case 'oldest':
+                $query->orderBy('created_at', 'asc');
+                break;
+                
+            case 'newest':
+            default:
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
+        
+        return $query->paginate($perPage)->withQueryString();
+    }
+    
+    /**
+     * Get all unique brands
+     *
+     * @return array
+     */
+    public function getAllBrands()
+    {
+        return $this->model
+            ->select('brand')
+            ->where('is_active', true)
+            ->groupBy('brand')
+            ->pluck('brand')
+            ->toArray();
+    }
 }

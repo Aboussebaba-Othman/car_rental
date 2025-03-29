@@ -5,15 +5,15 @@ namespace App\Repositories\Interfaces;
 interface VehicleRepositoryInterface extends RepositoryInterface
 {
     /**
-     * Get all vehicles for a specific company with their photos
+     * Get all vehicles for a specific company with pagination
      *
      * @param int $companyId
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public function getAllForCompany($companyId);
     
     /**
-     * Get a vehicle by ID with its photos and related data
+     * Get a vehicle by ID with related data
      *
      * @param int $id
      * @return \App\Models\Vehicle
@@ -21,32 +21,24 @@ interface VehicleRepositoryInterface extends RepositoryInterface
     public function findWithRelations($id);
     
     /**
-     * Get vehicles based on availability and filter criteria
+     * Get featured vehicles (active and available)
      *
-     * @param array $criteria
+     * @param int $limit
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function getAvailableVehicles(array $criteria);
+    public function getFeaturedVehicles($limit = 6);
     
     /**
-     * Get vehicles with upcoming reservations for a company
+     * Count vehicles by company ID and array of vehicle IDs
      *
      * @param int $companyId
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @param array $vehicleIds
+     * @return int
      */
-    public function getWithUpcomingReservations($companyId);
+    public function countVehiclesByCompanyAndIds($companyId, array $vehicleIds);
     
     /**
-     * Set the primary photo for a vehicle
-     *
-     * @param int $vehicleId
-     * @param int $photoId
-     * @return bool
-     */
-    public function setPrimaryPhoto($vehicleId, $photoId);
-    
-    /**
-     * Delete multiple photos for a vehicle
+     * Delete photos for a vehicle
      *
      * @param int $vehicleId
      * @param array $photoIds
@@ -55,16 +47,28 @@ interface VehicleRepositoryInterface extends RepositoryInterface
     public function deletePhotos($vehicleId, array $photoIds);
     
     /**
-     * Get vehicles statistics for a company
+     * Set primary photo for a vehicle
      *
-     * @param int $companyId
+     * @param int $vehicleId
+     * @param int $photoId
+     * @return bool
+     */
+    public function setPrimaryPhoto($vehicleId, $photoId);
+    
+    /**
+     * Get paginated vehicles with filters and sorting
+     *
+     * @param array $filters
+     * @param string $sort
+     * @param int $perPage
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public function getPaginatedVehicles(array $filters = [], string $sort = 'newest', int $perPage = 10);
+    
+    /**
+     * Get all unique brands
+     *
      * @return array
      */
-    public function getCompanyVehicleStats($companyId);
-
-    public function countVehiclesByCompanyAndIds($companyId, array $vehicleIds);
-
-
-    public function getFeaturedVehicles($limit = 6);
-
+    public function getAllBrands();
 }
