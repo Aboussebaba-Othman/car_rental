@@ -26,7 +26,20 @@ class VehicleController extends Controller
         $company = Auth::user()->company;
         $vehicles = $this->vehicleRepository->getAllForCompany($company->id);
 
-        return view('company.vehicles.index', compact('vehicles'));
+        $vehicles = Vehicle::with(['photos', 'reservations'])
+        ->where('company_id', Auth::user()->company->id)
+        ->withCount('reservations')
+        ->paginate(10);
+
+        // Récupérer les marques uniques pour le filtre
+        $uniqueBrands = Vehicle::where('company_id', Auth::user()->company->id)
+            ->select('brand')
+            ->distinct()
+            ->orderBy('brand')
+            ->pluck('brand');
+        
+
+        return view('company.vehicles.index', compact('vehicles', 'uniqueBrands'));
     }
 
     public function create()
@@ -34,53 +47,52 @@ class VehicleController extends Controller
         return view('company.vehicles.create');
     }
 
-
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'brand' => 'required|string|max:255',
-            'model' => 'required|string|max:255',
-            'year' => 'required|integer|min:1900|max:' . (date('Y') + 1),
-            'license_plate' => 'required|string|max:20|unique:vehicles',
-            'transmission' => 'required|in:automatic,manual',
-            'fuel_type' => 'required|in:gasoline,diesel,electric,hybrid',
-            'seats' => 'required|integer|min:1|max:50',
-            'price_per_day' => 'required|numeric|min:0',
-            'description' => 'nullable|string',
-            'features' => 'nullable|array',
-            'photos' => 'nullable|array',
-            'photos.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+{
+    $validated = $request->validate([
+        'brand' => 'required|string|max:255',
+        'model' => 'required|string|max:255',
+        'year' => 'required|integer|min:1900|max:' . (date('Y') + 1),
+        'license_plate' => 'required|string|max:20|unique:vehicles',
+        'transmission' => 'required|in:automatic,manual',
+        'fuel_type' => 'required|in:gasoline,diesel,electric,hybrid',
+        'seats' => 'required|integer|min:1|max:50',
+        'price_per_day' => 'required|numeric|min:0',
+        'description' => 'nullable|string',
+        'features' => 'nullable|array',
+        'photos' => 'nullable|array',
+        'photos.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+    ]);
 
-        // Create vehicle with repository
-        $vehicleData = array_merge($validated, [
-            'company_id' => Auth::user()->company->id,
-            'is_active' => true,
-            'is_available' => true
-        ]);
+    // Create vehicle with repository
+    $vehicleData = array_merge($validated, [
+        'company_id' => Auth::user()->company->id,
+        'is_active' => true,
+        'is_available' => true
+    ]);
+    
+    $vehicle = $this->vehicleRepository->create($vehicleData);
+
+    // Handle photos upload
+    if ($request->hasFile('photos')) {
+        $photos = $request->file('photos');
+        $displayOrder = 1;
         
-        $vehicle = $this->vehicleRepository->create($vehicleData);
-
-        // Handle photos upload
-        if ($request->hasFile('photos')) {
-            $photos = $request->file('photos');
-            $displayOrder = 1;
+        foreach ($photos as $photo) {
+            $path = $photo->store('vehicles/' . $vehicle->id, 'public');
             
-            foreach ($photos as $photo) {
-                $path = $photo->store('vehicles/' . $vehicle->id, 'public');
-                
-                $vehiclePhoto = new VehiclePhoto();
-                $vehiclePhoto->vehicle_id = $vehicle->id;
-                $vehiclePhoto->path = $path;
-                $vehiclePhoto->is_primary = ($displayOrder === 1); // First photo is primary
-                $vehiclePhoto->display_order = $displayOrder++;
-                $vehiclePhoto->save();
-            }
+            VehiclePhoto::create([
+                'vehicle_id' => $vehicle->id,
+                'path' => $path,
+                'is_primary' => ($displayOrder === 1), 
+                'display_order' => $displayOrder++
+            ]);
         }
-
-        return redirect()->route('company.vehicles.index')
-            ->with('success', 'Vehicle added successfully.');
     }
+
+    return redirect()->route('company.vehicles.index')
+        ->with('success', 'Véhicule ajouté avec succès.');
+}
 
     public function show($id)
     {

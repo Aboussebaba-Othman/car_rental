@@ -47,16 +47,16 @@ bg-gradient-sidebar bg-gradient-sidebar rounded-xl shadow-lg p-6 mb-6">
     <!-- Filtres rapides -->
     <div class="flex flex-wrap items-center space-x-2 mb-6">
         <span class="text-sm font-medium text-gray-700">Filtres rapides:</span>
-        <a href="#" class="px-3 py-1 bg-white border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200">
+        <a href="#" id="quickFilterAll" class="px-3 py-1 bg-yellow-500 text-white border border-transparent rounded-full text-sm font-medium hover:bg-yellow-600 transition-colors duration-200">
             Tous ({{ $vehicles->total() }})
         </a>
-        <a href="#" class="px-3 py-1 bg-white border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200">
+        <a href="#" id="quickFilterActive" class="px-3 py-1 bg-white border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200">
             Actifs
         </a>
-        <a href="#" class="px-3 py-1 bg-white border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200">
+        <a href="#" id="quickFilterAvailable" class="px-3 py-1 bg-white border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200">
             Disponibles
         </a>
-        <a href="#" class="px-3 py-1 bg-white border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200">
+        <a href="#" id="quickFilterReserved" class="px-3 py-1 bg-white border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200">
             Réservés
         </a>
     </div>
@@ -65,25 +65,48 @@ bg-gradient-sidebar bg-gradient-sidebar rounded-xl shadow-lg p-6 mb-6">
         <!-- En-tête et options du tableau -->
         <div class="p-5 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-                <h3 class="text-lg font-semibold text-gray-800">Vos véhicules ({{ $vehicles->total() }})</h3>
+                <h3 class="text-lg font-semibold text-gray-800">Vos véhicules (<span id="resultsCounter">{{ $vehicles->total() }}</span>)</h3>
                 <p class="text-sm text-gray-500 mt-1">Gérez facilement votre flotte de location</p>
             </div>
-            <div class="flex items-center space-x-3">
-                <div class="relative">
-                    <input type="text" placeholder="Rechercher..." class="pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition duration-200">
+            <div class="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
+                <div class="relative w-full sm:w-64">
+                    <input type="text" id="searchVehicles" placeholder="Rechercher..." class="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 absolute left-3 top-2.5" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
                     </svg>
                 </div>
-                <div class="relative">
-                    <select class="pl-3 pr-8 py-2 border border-gray-300 rounded-lg text-sm appearance-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition duration-200">
-                        <option>Tous les statuts</option>
-                        <option>Actifs uniquement</option>
-                        <option>Disponibles uniquement</option>
-                    </select>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 absolute right-3 top-2.5 -translate-y-1/2 pointer-events-none" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                    </svg>
+                <div class="flex space-x-2 w-full sm:w-auto">
+                    <div class="relative flex-1 sm:flex-none">
+                        <select id="brandFilter" class="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-lg text-sm appearance-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition duration-200">
+                            <option value="">Toutes les marques</option>
+                            @foreach($uniqueBrands as $brand)
+                                <option value="{{ $brand }}">{{ $brand }}</option>
+                            @endforeach
+                        </select>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="relative flex-1 sm:flex-none">
+                        <select id="statusFilter" class="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-lg text-sm appearance-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition duration-200">
+                            <option value="">Tous les statuts</option>
+                            <option value="active">Actifs</option>
+                            <option value="inactive">Inactifs</option>
+                        </select>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="relative flex-1 sm:flex-none">
+                        <select id="availabilityFilter" class="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-lg text-sm appearance-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition duration-200">
+                            <option value="">Toutes disponibilités</option>
+                            <option value="available">Disponibles</option>
+                            <option value="reserved">Réservés</option>
+                        </select>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
                 </div>
             </div>
         </div>
@@ -112,7 +135,12 @@ bg-gradient-sidebar bg-gradient-sidebar rounded-xl shadow-lg p-6 mb-6">
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @foreach($vehicles as $vehicle)
-                        <tr class="hover:bg-gray-50 transition-colors duration-200">
+                        <tr class="vehicle-row hover:bg-gray-50 transition-colors duration-200" 
+                            data-brand="{{ strtolower($vehicle->brand) }}" 
+                            data-model="{{ strtolower($vehicle->model) }}" 
+                            data-license-plate="{{ strtolower($vehicle->license_plate) }}"
+                            data-status="{{ $vehicle->is_active ? 'active' : 'inactive' }}"
+                            data-availability="{{ $vehicle->is_available ? 'available' : 'reserved' }}">
                             <td class="px-6 py-4">
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0 h-16 w-16 bg-gray-100 rounded-lg overflow-hidden">
@@ -259,7 +287,12 @@ bg-gradient-sidebar bg-gradient-sidebar rounded-xl shadow-lg p-6 mb-6">
         <!-- Vue mobile - cartes -->
         <div class="md:hidden">
             @foreach($vehicles as $vehicle)
-                <div class="border-b border-gray-200 p-4">
+                <div class="vehicle-card border-b border-gray-200 p-4"
+                     data-brand="{{ strtolower($vehicle->brand) }}" 
+                     data-model="{{ strtolower($vehicle->model) }}" 
+                     data-license-plate="{{ strtolower($vehicle->license_plate) }}"
+                     data-status="{{ $vehicle->is_active ? 'active' : 'inactive' }}"
+                     data-availability="{{ $vehicle->is_available ? 'available' : 'reserved' }}">
                     <div class="flex items-start">
                         <div class="flex-shrink-0 w-24 h-24 bg-gray-100 rounded-lg overflow-hidden">
                             @if($vehicle->photos->where('is_primary', true)->first())
@@ -379,6 +412,17 @@ bg-gradient-sidebar bg-gradient-sidebar rounded-xl shadow-lg p-6 mb-6">
         @endforeach
     </div>
 
+    <!-- Message de "Aucun résultat" pour la recherche -->
+    <div id="noResultsMessage" class="hidden py-12 px-6 text-center">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+            </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900">Aucun véhicule ne correspond à votre recherche</h3>
+        <p class="mt-1 text-sm text-gray-500 max-w-sm mx-auto">Essayez de modifier vos critères de recherche ou de filtrage.</p>
+    </div>
+
     <!-- États vides et chargement -->
     @if($vehicles->count() == 0)
         <div class="py-12 px-6 text-center">
@@ -427,7 +471,7 @@ bg-gradient-sidebar bg-gradient-sidebar rounded-xl shadow-lg p-6 mb-6">
         <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
             <div>
                 <p class="text-sm text-gray-700">
-                    Affichage de <span class="font-medium">{{ $vehicles->firstItem() ?? 0 }}</span> à <span class="font-medium">{{ $vehicles->lastItem() ?? 0 }}</span> sur <span class="font-medium">{{ $vehicles->total() }}</span> véhicules
+                    Affichage de <span class="font-medium">{{ $vehicles->firstItem() ?? 0 }}</span> à <span class="font-medium">{{ $vehicles->lastItem() ?? 0 }}</span> sur <span class="font-medium">{{ $vehicles ->total() }}</span> véhicules
                 </p>
             </div>
             <div>
@@ -436,12 +480,6 @@ bg-gradient-sidebar bg-gradient-sidebar rounded-xl shadow-lg p-6 mb-6">
         </div>
     </div>
 </div>
-
-<!-- Alpine.js pour les menus déroulants -->
-
-
-
-
 
 
 
@@ -466,4 +504,223 @@ bg-gradient-sidebar bg-gradient-sidebar rounded-xl shadow-lg p-6 mb-6">
         </div>
     </div>
 @endif
+
+<!-- Ajoutez cette balise script à la fin de votre fichier -->
+<script>
+    // vehicles-filter.js - Gestion des filtres et recherches pour les véhicules
+document.addEventListener('DOMContentLoaded', function() {
+    // Éléments du DOM pour la recherche et les filtres
+    const searchInput = document.getElementById('searchVehicles');
+    const brandFilter = document.getElementById('brandFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    const availabilityFilter = document.getElementById('availabilityFilter');
+    
+    // Éléments pour les filtres rapides
+    const quickFilterAll = document.getElementById('quickFilterAll');
+    const quickFilterActive = document.getElementById('quickFilterActive');
+    const quickFilterAvailable = document.getElementById('quickFilterAvailable');
+    const quickFilterReserved = document.getElementById('quickFilterReserved');
+    
+    // Éléments de la liste des véhicules
+    const vehicleRows = document.querySelectorAll('.vehicle-row');
+    const vehicleCards = document.querySelectorAll('.vehicle-card');
+    const resultsCounter = document.getElementById('resultsCounter');
+    const noResultsMessage = document.getElementById('noResultsMessage');
+    
+    // Variables de suivi des filtres
+    let activeFilters = {
+        search: '',
+        brand: '',
+        status: '',
+        availability: ''
+    };
+    
+    // Fonction principale pour filtrer les véhicules
+    function filterVehicles() {
+        let visibleCount = 0;
+        
+        // Fonction pour vérifier si un véhicule correspond aux critères de filtrage
+        function matchesFilters(vehicle) {
+            const brand = vehicle.dataset.brand ? vehicle.dataset.brand.toLowerCase() : '';
+            const model = vehicle.dataset.model ? vehicle.dataset.model.toLowerCase() : '';
+            const licensePlate = vehicle.dataset.licensePlate ? vehicle.dataset.licensePlate.toLowerCase() : '';
+            const status = vehicle.dataset.status ? vehicle.dataset.status.toLowerCase() : '';
+            const availability = vehicle.dataset.availability ? vehicle.dataset.availability.toLowerCase() : '';
+            
+            // Vérifier la correspondance avec la recherche
+            const searchMatch = !activeFilters.search || 
+                brand.includes(activeFilters.search) || 
+                model.includes(activeFilters.search) || 
+                licensePlate.includes(activeFilters.search);
+            
+            // Vérifier la correspondance avec les filtres
+            const brandMatch = !activeFilters.brand || brand === activeFilters.brand.toLowerCase();
+            const statusMatch = !activeFilters.status || status === activeFilters.status.toLowerCase();
+            const availabilityMatch = !activeFilters.availability || availability === activeFilters.availability.toLowerCase();
+            
+            return searchMatch && brandMatch && statusMatch && availabilityMatch;
+        }
+        
+        // Filtrer les lignes du tableau (vue desktop)
+        vehicleRows.forEach(row => {
+            const isVisible = matchesFilters(row);
+            row.classList.toggle('hidden', !isVisible);
+            if (isVisible) visibleCount++;
+        });
+        
+        // Filtrer les cartes (vue mobile)
+        vehicleCards.forEach(card => {
+            const isVisible = matchesFilters(card);
+            card.classList.toggle('hidden', !isVisible);
+        });
+        
+        // Mettre à jour le compteur de résultats
+        if (resultsCounter) {
+            resultsCounter.textContent = visibleCount;
+        }
+        
+        // Afficher/masquer le message "Aucun résultat"
+        if (noResultsMessage) {
+            noResultsMessage.classList.toggle('hidden', visibleCount > 0);
+        }
+    }
+    
+    // Fonction debounce pour éviter trop d'appels lors de la saisie
+    function debounce(func, wait) {
+        let timeout;
+        return function() {
+            const context = this;
+            const args = arguments;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), wait);
+        };
+    }
+    
+    // Écouteurs d'événements pour la recherche
+    if (searchInput) {
+        searchInput.addEventListener('input', debounce(function() {
+            activeFilters.search = this.value.toLowerCase().trim();
+            filterVehicles();
+        }, 300));
+    }
+    
+    // Écouteurs d'événements pour les filtres select
+    if (brandFilter) {
+        brandFilter.addEventListener('change', function() {
+            activeFilters.brand = this.value;
+            filterVehicles();
+        });
+    }
+    
+    if (statusFilter) {
+        statusFilter.addEventListener('change', function() {
+            activeFilters.status = this.value;
+            filterVehicles();
+        });
+    }
+    
+    if (availabilityFilter) {
+        availabilityFilter.addEventListener('change', function() {
+            activeFilters.availability = this.value;
+            filterVehicles();
+        });
+    }
+    
+    // Écouteurs d'événements pour les filtres rapides
+    function setQuickFilter(filterType, value) {
+        // Réinitialiser tous les filtres
+        activeFilters = {
+            search: activeFilters.search, // Conserver la recherche textuelle
+            brand: '',
+            status: '',
+            availability: ''
+        };
+        
+        // Définir le filtre correspondant
+        if (filterType === 'status') {
+            activeFilters.status = value;
+            if (statusFilter) statusFilter.value = value;
+        } else if (filterType === 'availability') {
+            activeFilters.availability = value;
+            if (availabilityFilter) availabilityFilter.value = value;
+        }
+        
+        // Réinitialiser les sélecteurs non concernés
+        if (filterType !== 'brand' && brandFilter) brandFilter.value = '';
+        if (filterType !== 'status' && statusFilter) statusFilter.value = '';
+        if (filterType !== 'availability' && availabilityFilter) availabilityFilter.value = '';
+        
+        // Appliquer les filtres
+        filterVehicles();
+        
+        // Mettre à jour l'apparence des filtres rapides
+        updateQuickFilterStyles();
+    }
+    
+    function updateQuickFilterStyles() {
+        // Supprimer la classe active de tous les filtres rapides
+        [quickFilterAll, quickFilterActive, quickFilterAvailable, quickFilterReserved].forEach(filter => {
+            if (filter) {
+                filter.classList.remove('bg-yellow-500', 'text-white');
+                filter.classList.add('bg-white', 'text-gray-700', 'border-gray-300');
+            }
+        });
+        
+        // Ajouter la classe active au filtre actif
+        if (activeFilters.status === '' && activeFilters.availability === '' && activeFilters.brand === '') {
+            if (quickFilterAll) {
+                quickFilterAll.classList.remove('bg-white', 'text-gray-700', 'border-gray-300');
+                quickFilterAll.classList.add('bg-yellow-500', 'text-white');
+            }
+        } else if (activeFilters.status === 'active') {
+            if (quickFilterActive) {
+                quickFilterActive.classList.remove('bg-white', 'text-gray-700', 'border-gray-300');
+                quickFilterActive.classList.add('bg-yellow-500', 'text-white');
+            }
+        } else if (activeFilters.availability === 'available') {
+            if (quickFilterAvailable) {
+                quickFilterAvailable.classList.remove('bg-white', 'text-gray-700', 'border-gray-300');
+                quickFilterAvailable.classList.add('bg-yellow-500', 'text-white');
+            }
+        } else if (activeFilters.availability === 'reserved') {
+            if (quickFilterReserved) {
+                quickFilterReserved.classList.remove('bg-white', 'text-gray-700', 'border-gray-300');
+                quickFilterReserved.classList.add('bg-yellow-500', 'text-white');
+            }
+        }
+    }
+    
+    // Configurer les filtres rapides
+    if (quickFilterAll) {
+        quickFilterAll.addEventListener('click', function(e) {
+            e.preventDefault();
+            setQuickFilter('all', '');
+        });
+    }
+    
+    if (quickFilterActive) {
+        quickFilterActive.addEventListener('click', function(e) {
+            e.preventDefault();
+            setQuickFilter('status', 'active');
+        });
+    }
+    
+    if (quickFilterAvailable) {
+        quickFilterAvailable.addEventListener('click', function(e) {
+            e.preventDefault();
+            setQuickFilter('availability', 'available');
+        });
+    }
+    
+    if (quickFilterReserved) {
+        quickFilterReserved.addEventListener('click', function(e) {
+            e.preventDefault();
+            setQuickFilter('availability', 'reserved');
+        });
+    }
+    
+    // Initialiser l'apparence des filtres rapides
+    updateQuickFilterStyles();
+});
+</script>
 @endsection

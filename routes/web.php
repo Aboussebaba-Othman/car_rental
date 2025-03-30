@@ -53,6 +53,7 @@ Route::middleware(['auth', 'role:company'])->group(function () {
     Route::get('/company/vehicles', 'App\Http\Controllers\Company\VehicleController@index')->name('company.vehicles.index');
     Route::get('/company/vehicles/create', 'App\Http\Controllers\Company\VehicleController@create')->name('company.vehicles.create');
     Route::post('/company/vehicles', 'App\Http\Controllers\Company\VehicleController@store')->name('company.vehicles.store');
+    
     Route::get('/company/vehicles/{vehicle}', 'App\Http\Controllers\Company\VehicleController@show')->name('company.vehicles.show');
     Route::get('/company/vehicles/{vehicle}/edit', 'App\Http\Controllers\Company\VehicleController@edit')->name('company.vehicles.edit');
     Route::put('/company/vehicles/{vehicle}', 'App\Http\Controllers\Company\VehicleController@update')->name('company.vehicles.update');
