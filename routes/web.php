@@ -93,6 +93,21 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::post('/users/{id}/deactivate', [App\Http\Controllers\Admin\UserManagementController::class, 'deactivate'])->name('users.deactivate');
 });
 
+// Reservation Routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/reservations', [App\Http\Controllers\ReservationController::class, 'index'])->name('reservations.index');
+    Route::get('/reservations/create/{vehicleId}', [App\Http\Controllers\ReservationController::class, 'create'])->name('reservations.create');
+    Route::post('/reservations', [App\Http\Controllers\ReservationController::class, 'store'])->name('reservations.store');
+    Route::get('/reservations/{reservation}', [App\Http\Controllers\ReservationController::class, 'show'])->name('reservations.show');
+    Route::get('/reservations/{reservation}/payment', [App\Http\Controllers\ReservationController::class, 'payment'])->name('reservations.payment');
+    Route::post('/reservations/{reservation}/cancel', [App\Http\Controllers\ReservationController::class, 'cancel'])->name('reservations.cancel');
+    
+    // PayPal Routes
+    Route::post('/reservations/{reservation}/paypal', [App\Http\Controllers\ReservationController::class, 'processPayPal'])->name('reservations.paypal.process');
+    Route::get('/reservations/{reservation}/paypal/success', [App\Http\Controllers\ReservationController::class, 'paypalSuccess'])->name('reservations.paypal.success');
+    Route::get('/reservations/{reservation}/paypal/cancel', [App\Http\Controllers\ReservationController::class, 'paypalCancel'])->name('reservations.paypal.cancel');
+});
+
 // Public Routes
 Route::get('/', [App\Http\Controllers\WelcomeController::class, 'index'])->name('home');
 Route::get('/vehicles', [App\Http\Controllers\VehicleController::class, 'index'])->name('vehicles.index');

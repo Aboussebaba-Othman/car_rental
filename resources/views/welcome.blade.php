@@ -26,8 +26,16 @@
                         <a href="#" class="font-medium hover:text-yellow-500 transition duration-300">Contact</a>
                     </nav>
                     <div class="flex items-center space-x-4">
-                        <a href="{{ route('login') }}" class="text-gray-600 hover:text-yellow-600 font-medium transition duration-300">Connexion</a>
-                        <a href="{{ route('register') }}" class="bg-yellow-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-yellow-600 transition duration-300">S'inscrire</a>
+                        @auth
+                            <a href="{{ route('reservations.index') }}" class="text-gray-600 hover:text-yellow-600 font-medium transition duration-300">Mes réservations</a>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="text-gray-600 hover:text-yellow-600 font-medium transition duration-300">Déconnexion</button>
+                            </form>
+                        @else
+                            <a href="{{ route('login') }}" class="text-gray-600 hover:text-yellow-600 font-medium transition duration-300">Connexion</a>
+                            <a href="{{ route('register') }}" class="bg-yellow-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-yellow-600 transition duration-300">S'inscrire</a>
+                        @endauth
                     </div>
                 </div>
                 <!-- Mobile menu button -->
@@ -389,8 +397,8 @@
                             </div>
                             @endif
                         </div>
-                        <a href="" class="block w-full py-2 px-4 text-center border border-yellow-500 rounded-lg text-yellow-500 font-medium hover:bg-yellow-500 hover:text-white transition duration-200">
-                            Voir les détails
+                        <a href="{{ route('reservations.create', $vehicle->id) }}" class="block w-full py-2 px-4 text-center border border-yellow-500 rounded-lg text-yellow-500 font-medium hover:bg-yellow-500 hover:text-white transition duration-200">
+                            Réserver maintenant
                         </a>
                     </div>
                 </div>
