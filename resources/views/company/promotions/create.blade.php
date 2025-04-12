@@ -340,7 +340,11 @@
                                 >
                                     <div class="relative h-32 bg-gray-200">
                                        
-                                        <img src="{{ asset('storage/' . $vehicle->photos->where('is_primary', true)->first()->path ?? $vehicle->photos->first()->path) }}" alt="{{ $vehicle->brand }} {{ $vehicle->model }}" class="h-full w-full object-cover">
+                                        <img src="{{ 
+                                            $vehicle->photos && $vehicle->photos->isNotEmpty() 
+                                                ? asset('storage/' . ($vehicle->photos->where('is_primary', true)->first()?->path ?? $vehicle->photos->first()->path))
+                                                : asset('images/default-vehicle.jpg') 
+                                        }}" alt="{{ $vehicle->brand }} {{ $vehicle->model }}" class="h-full w-full object-cover">
                                             
                                         <div class="absolute top-3 right-3">
                                             <div class="rounded-full bg-white p-1 shadow-sm">

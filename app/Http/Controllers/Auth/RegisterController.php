@@ -51,7 +51,7 @@ class RegisterController extends Controller
             'nullable',
             'string',
             'max:20',
-            'regex:/^(?:\+212|0)([6-7])\d{8}$/'
+            // 'regex:/^(?:\+212|0)([6-7])\d{8}$/'
             ],
         ]);
 

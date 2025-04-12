@@ -61,7 +61,7 @@ class VehicleController extends Controller
         'description' => 'nullable|string',
         'features' => 'nullable|array',
         'photos' => 'nullable|array',
-        'photos.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+        'photos.*' => 'image|mimes:jpeg,png,jpg,gif',
     ]);
 
     // Create vehicle with repository

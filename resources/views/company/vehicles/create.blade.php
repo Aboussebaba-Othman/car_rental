@@ -578,6 +578,9 @@
         const backToStep1Button = document.getElementById('back-to-step-1');
         const toStep3Button = document.getElementById('to-step-3');
         const backToStep2Button = document.getElementById('back-to-step-2');
+
+        const vehicleForm = document.getElementById('vehicleForm');
+        const submitButton = document.getElementById('submit-button');
         
         // Navigation entre les étapes
         toStep2Button.addEventListener('click', function() {
@@ -833,27 +836,61 @@
             });
         });
         
-        // Validation du formulaire avant soumission
-        const vehicleForm = document.getElementById('vehicleForm');
-        const submitButton = document.getElementById('submit-button');
+        vehicleForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Vérifier qu'il y a au moins une photo
+    if (files.length === 0) {
+        alert('Veuillez ajouter au moins une photo du véhicule.');
+        return;
+    }
+    
+    // Animation du bouton
+    submitButton.disabled = true;
+    submitButton.innerHTML = `
+        <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Enregistrement en cours...
+    `;
+    
+    // Supprimer l'input photos[] existant
+    const originalInput = document.getElementById('photos');
+    originalInput.value = '';
+    
+    // Supprimer les anciens input photos[] supplémentaires s'ils existent
+    document.querySelectorAll('input[name="photos[]"]:not(#photos)').forEach(el => el.remove());
+    
+    // Créer un nouveau FormData
+    const formData = new FormData();
+    
+    // Créer des inputs file pour chaque fichier sélectionné
+    files.forEach((file, index) => {
+        // Créer un conteneur de fichier
+        const fileContainer = document.createElement('div');
+        fileContainer.style.display = 'none';
+        fileContainer.className = 'photo-input-container';
+        vehicleForm.appendChild(fileContainer);
         
-        // submitButton.addEventListener('click', function(e) {
-        //     if (files.length === 0) {
-        //         e.preventDefault();
-        //         alert('Veuillez ajouter au moins une photo du véhicule.');
-        //         return;
-        //     }
-            
-        //     // Animation du bouton lors de la soumission
-        //     submitButton.disabled = true;
-        //     submitButton.innerHTML = `
-        //         <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        //             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        //             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        //         </svg>
-        //         Enregistrement en cours...
-        //     `;
-        // });
+        // Créer un nouvel input file pour ce fichier spécifique
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.name = 'photos[]';
+        fileInput.style.display = 'none';
+        
+        // Attacher le fichier à l'input (en utilisant une autre approche)
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        fileInput.files = dt.files;
+        
+        fileContainer.appendChild(fileInput);
+        vehicleForm.appendChild(fileContainer);
+    });
+    
+    // Soumettre le formulaire normalement
+    this.submit();
+});
     });
 </script>
 
