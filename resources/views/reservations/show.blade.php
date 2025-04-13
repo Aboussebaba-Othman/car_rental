@@ -47,8 +47,28 @@
                 <div class="flex flex-col md:flex-row">
                     <div class="w-full md:w-1/3 mb-4 md:mb-0">
                         @if($reservation->vehicle->photos->count() > 0)
-                            @php $primaryPhoto = $reservation->vehicle->photos->firstWhere('is_primary', true) ?? $reservation->vehicle->photos->first(); @endphp
-                            <img src="{{ asset('storage/' . $primaryPhoto->path) }}" alt="{{ $reservation->vehicle->brand }} {{ $reservation->vehicle->model }}" class="w-full rounded-lg object-cover h-48">
+                            <!-- Photo Gallery -->
+                            <div class="vehicle-gallery relative">
+                                <div class="main-photo mb-2">
+                                    @php $primaryPhoto = $reservation->vehicle->photos->firstWhere('is_primary', true) ?? $reservation->vehicle->photos->first(); @endphp
+                                    <img src="{{ asset('storage/' . $primaryPhoto->path) }}" alt="{{ $reservation->vehicle->brand }} {{ $reservation->vehicle->model }}" 
+                                        class="w-full rounded-lg object-cover h-48" id="main-vehicle-photo">
+                                </div>
+                                
+                                @if($reservation->vehicle->photos->count() > 1)
+                                    <div class="thumbnails flex space-x-2 overflow-x-auto pb-2">
+                                        @foreach($reservation->vehicle->photos as $photo)
+                                            <div class="thumbnail-container flex-shrink-0">
+                                                <img src="{{ asset('storage/' . $photo->path) }}" 
+                                                    alt="{{ $reservation->vehicle->brand }} {{ $reservation->vehicle->model }}" 
+                                                    class="h-16 w-20 object-cover rounded cursor-pointer hover:opacity-75 transition 
+                                                    {{ $photo->id == $primaryPhoto->id ? 'border-2 border-yellow-500' : 'opacity-70' }}"
+                                                    onclick="changeMainPhoto('{{ asset('storage/' . $photo->path) }}', this)">
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
                         @else
                             <div class="w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -201,6 +221,83 @@
                     </div>
                 </div>
                 
+                <!-- Driver Information Display -->
+                @if($reservation->driver_name || $reservation->license_number)
+                <div class="mt-6">
+                    <h3 class="text-lg font-medium text-gray-700 mb-3 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                        </svg>
+                        Informations du conducteur
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="grid grid-cols-1 gap-3">
+                                <div>
+                                    <span class="text-gray-600 text-sm">Conducteur principal:</span>
+                                    <p class="font-medium">{{ $reservation->driver_name ?? 'Non spécifié' }}</p>
+                                </div>
+                                
+                                <div>
+                                    <span class="text-gray-600 text-sm">Téléphone:</span>
+                                    <p class="font-medium">{{ $reservation->driver_phone ?? 'Non spécifié' }}</p>
+                                </div>
+                                
+                                <div>
+                                    <span class="text-gray-600 text-sm">Numéro de permis:</span>
+                                    <p class="font-medium">{{ $reservation->license_number ?? 'Non spécifié' }}</p>
+                                </div>
+                                
+                                @if($reservation->license_country)
+                                <div>
+                                    <span class="text-gray-600 text-sm">Pays d'émission:</span>
+                                    <p class="font-medium">
+                                        @switch($reservation->license_country)
+                                            @case('FR') France @break
+                                            @case('BE') Belgique @break
+                                            @case('CH') Suisse @break
+                                            @case('ES') Espagne @break
+                                            @case('DE') Allemagne @break
+                                            @case('IT') Italie @break
+                                            @case('UK') Royaume-Uni @break
+                                            @default {{ $reservation->license_country }} @break
+                                        @endswitch
+                                    </p>
+                                </div>
+                                @endif
+                                
+                                @if($reservation->license_expiry)
+                                <div>
+                                    <span class="text-gray-600 text-sm">Expiration du permis:</span>
+                                    <p class="font-medium">{{ \Carbon\Carbon::parse($reservation->license_expiry)->format('d/m/Y') }}</p>
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                        
+                        @if($reservation->additional_driver_name)
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h4 class="font-medium text-gray-700 mb-2">Conducteur additionnel</h4>
+                            <div class="grid grid-cols-1 gap-3">
+                                <div>
+                                    <span class="text-gray-600 text-sm">Nom:</span>
+                                    <p class="font-medium">{{ $reservation->additional_driver_name }}</p>
+                                </div>
+                                
+                                @if($reservation->additional_driver_license)
+                                <div>
+                                    <span class="text-gray-600 text-sm">Numéro de permis:</span>
+                                    <p class="font-medium">{{ $reservation->additional_driver_license }}</p>
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+                @endif
+                
                 @if($reservation->notes)
                 <div class="mt-4">
                     <h3 class="text-lg font-medium text-gray-700 mb-2">Notes</h3>
@@ -313,4 +410,23 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    function changeMainPhoto(src, thumbnail) {
+        // Update main photo
+        document.getElementById('main-vehicle-photo').src = src;
+        
+        // Update active thumbnail styling
+        const thumbnails = document.querySelectorAll('.thumbnails img');
+        thumbnails.forEach(thumb => {
+            thumb.classList.remove('border-2', 'border-yellow-500');
+            thumb.classList.add('opacity-70');
+        });
+        
+        thumbnail.classList.remove('opacity-70');
+        thumbnail.classList.add('border-2', 'border-yellow-500');
+    }
+</script>
 @endsection

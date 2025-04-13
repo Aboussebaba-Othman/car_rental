@@ -24,10 +24,51 @@
             <!-- Vehicle details -->
             <div class="md:col-span-1">
                 <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                    <div class="aspect-w-16 aspect-h-9">
+                    <div class="relative">
                         @if($vehicle->photos->count() > 0)
-                            @php $primaryPhoto = $vehicle->photos->firstWhere('is_primary', true) ?? $vehicle->photos->first(); @endphp
-                            <img src="{{ asset('storage/' . $primaryPhoto->path) }}" alt="{{ $vehicle->brand }} {{ $vehicle->model }}" class="w-full h-48 object-cover">
+                            <div class="aspect-w-16 aspect-h-9">
+                                <!-- Main Photo Display -->
+                                <div id="mainPhotoContainer" class="w-full h-48 relative">
+                                    @foreach($vehicle->photos as $index => $photo)
+                                        <img 
+                                            src="{{ asset('storage/' . $photo->path) }}" 
+                                            alt="{{ $vehicle->brand }} {{ $vehicle->model }}" 
+                                            class="w-full h-48 object-cover absolute top-0 left-0 transition-opacity duration-300 ease-in-out {{ $index === 0 ? 'opacity-100' : 'opacity-0' }}"
+                                            id="vehiclePhoto-{{ $index }}"
+                                            data-index="{{ $index }}">
+                                    @endforeach
+
+                                    <!-- Photo Controls -->
+                                    @if($vehicle->photos->count() > 1)
+                                        <button type="button" id="prevPhoto" class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 rounded-r-md hover:bg-opacity-70">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                            </svg>
+                                        </button>
+                                        <button type="button" id="nextPhoto" class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 rounded-l-md hover:bg-opacity-70">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </button>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <!-- Thumbnails Navigation -->
+                            @if($vehicle->photos->count() > 1)
+                                <div class="flex overflow-x-auto py-2 px-1 bg-gray-100">
+                                    @foreach($vehicle->photos as $index => $photo)
+                                        <div 
+                                            class="w-14 h-14 flex-shrink-0 mx-1 cursor-pointer rounded-md overflow-hidden thumbnail-item {{ $index === 0 ? 'ring-2 ring-yellow-500' : '' }}"
+                                            data-index="{{ $index }}">
+                                            <img 
+                                                src="{{ asset('storage/' . $photo->path) }}" 
+                                                alt="Thumbnail" 
+                                                class="w-full h-full object-cover">
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
                         @else
                             <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -206,6 +247,56 @@
         const startDateInput = document.getElementById('start_date');
         const endDateInput = document.getElementById('end_date');
         
+        // Photo Gallery Functionality
+        const photoCount = {{ $vehicle->photos->count() }};
+        if (photoCount > 1) {
+            let currentPhotoIndex = 0;
+            const photoElements = document.querySelectorAll('#mainPhotoContainer img');
+            const thumbnailItems = document.querySelectorAll('.thumbnail-item');
+            const prevButton = document.getElementById('prevPhoto');
+            const nextButton = document.getElementById('nextPhoto');
+            
+            function showPhoto(index) {
+                // Hide all photos
+                photoElements.forEach(photo => {
+                    photo.classList.remove('opacity-100');
+                    photo.classList.add('opacity-0');
+                });
+                
+                // Show selected photo
+                photoElements[index].classList.remove('opacity-0');
+                photoElements[index].classList.add('opacity-100');
+                
+                // Update thumbnails
+                thumbnailItems.forEach(thumb => {
+                    thumb.classList.remove('ring-2', 'ring-yellow-500');
+                });
+                thumbnailItems[index].classList.add('ring-2', 'ring-yellow-500');
+                
+                currentPhotoIndex = index;
+            }
+            
+            // Next photo button
+            nextButton.addEventListener('click', function() {
+                const newIndex = (currentPhotoIndex + 1) % photoCount;
+                showPhoto(newIndex);
+            });
+            
+            // Previous photo button
+            prevButton.addEventListener('click', function() {
+                const newIndex = (currentPhotoIndex - 1 + photoCount) % photoCount;
+                showPhoto(newIndex);
+            });
+            
+            // Thumbnail click
+            thumbnailItems.forEach(thumb => {
+                thumb.addEventListener('click', function() {
+                    const index = parseInt(this.dataset.index);
+                    showPhoto(index);
+                });
+            });
+        }
+
         // Ensure end date is always after start date
         startDateInput.addEventListener('change', function() {
             if (endDateInput.value && new Date(startDateInput.value) >= new Date(endDateInput.value)) {
