@@ -5,6 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AutoLocPro - Location de véhicules</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <!-- Ajout de style pour la galerie photos -->
+    <style>
+        .vehicle-gallery {
+            position: relative;
+            overflow: hidden;
+        }
+        .gallery-container {
+            display: flex;
+            transition: transform 0.3s ease;
+        }
+        .gallery-slide {
+            min-width: 100%;
+        }
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .gallery-nav:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        .gallery-prev {
+            left: 0.5rem;
+        }
+        .gallery-next {
+            right: 0.5rem;
+        }
+        .gallery-indicators {
+            position: absolute;
+            bottom: 0.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.25rem;
+        }
+        .gallery-indicator {
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+        .gallery-indicator.active {
+            background-color: white;
+            transform: scale(1.2);
+        }
+    </style>
 </head>
 <body class="bg-gray-50">
 
@@ -273,10 +329,41 @@
                     </div>
                     @endif
                     
-                    <div class="relative h-48">
+                    <div class="relative h-48 vehicle-gallery">
                         @if($vehicle->photos->count() > 0)
-                            @php $primaryPhoto = $vehicle->photos->firstWhere('is_primary', true) ?? $vehicle->photos->first(); @endphp
-                            <img src="{{ asset('storage/' . $primaryPhoto->path) }}" alt="{{ $vehicle->brand }} {{ $vehicle->model }}" class="w-full h-full object-cover">
+                            <div class="gallery-container" data-index="0">
+                                @foreach($vehicle->photos as $index => $photo)
+                                    <div class="gallery-slide">
+                                        <img src="{{ asset('storage/' . $photo->path) }}" alt="{{ $vehicle->brand }} {{ $vehicle->model }} - Photo {{ $index + 1 }}" class="w-full h-48 object-cover">
+                                    </div>
+                                @endforeach
+                            </div>
+                            
+                            @if($vehicle->photos->count() > 1)
+                                <!-- Navigation buttons -->
+                                <button class="gallery-nav gallery-prev" onclick="moveGallery(this.parentNode, -1)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                                <button class="gallery-nav gallery-next" onclick="moveGallery(this.parentNode, 1)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                                
+                                <!-- Indicators -->
+                                <div class="gallery-indicators">
+                                    @foreach($vehicle->photos as $index => $photo)
+                                        <div class="gallery-indicator {{ $index === 0 ? 'active' : '' }}" data-index="{{ $index }}"></div>
+                                    @endforeach
+                                </div>
+                                
+                                <!-- Photo counter -->
+                                <div class="absolute top-0 right-0 bg-black bg-opacity-50 text-white text-xs px-2 py-1 m-2 rounded-lg">
+                                    <span class="current-photo">1</span>/<span>{{ $vehicle->photos->count() }}</span>
+                                </div>
+                            @endif
                         @else
                             <div class="w-full h-full flex items-center justify-center bg-gray-200">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -293,6 +380,8 @@
                             @endif
                         </div>
                     </div>
+                    
+                    <!-- Rest of vehicle card content -->
                     <div class="p-6">
                         <div class="flex justify-between items-start mb-2">
                             <h3 class="text-xl font-bold text-gray-800">{{ $vehicle->brand }} {{ $vehicle->model }}</h3>
@@ -330,7 +419,7 @@
                             </div>
                             <div class="flex items-center mr-4 mb-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+                                    <path d="M9 6a3 3 0 11-6 0 3 3 0 006 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
                                 </svg>
                                 {{ $vehicle->seats }} places
                             </div>
@@ -586,5 +675,54 @@
             </div>
         </div>
     </footer>
+
+    <!-- Script for gallery functionality -->
+    <script>
+        function moveGallery(gallery, direction) {
+            const container = gallery.querySelector('.gallery-container');
+            const currentIndex = parseInt(container.dataset.index);
+            const slides = container.querySelectorAll('.gallery-slide');
+            const totalSlides = slides.length;
+            
+            // Calculate new index
+            let newIndex = currentIndex + direction;
+            if (newIndex < 0) newIndex = totalSlides - 1;
+            if (newIndex >= totalSlides) newIndex = 0;
+            
+            // Update container position
+            container.style.transform = `translateX(-${newIndex * 100}%)`;
+            container.dataset.index = newIndex;
+            
+            // Update indicators
+            const indicators = gallery.querySelectorAll('.gallery-indicator');
+            indicators.forEach(indicator => {
+                indicator.classList.remove('active');
+                if (parseInt(indicator.dataset.index) === newIndex) {
+                    indicator.classList.add('active');
+                }
+            });
+            
+            // Update counter
+            const counter = gallery.querySelector('.current-photo');
+            if (counter) counter.textContent = newIndex + 1;
+        }
+        
+        // Initialize click handlers for indicators
+        document.addEventListener('DOMContentLoaded', function() {
+            const indicators = document.querySelectorAll('.gallery-indicator');
+            indicators.forEach(indicator => {
+                indicator.addEventListener('click', function() {
+                    const gallery = this.closest('.vehicle-gallery');
+                    const container = gallery.querySelector('.gallery-container');
+                    const currentIndex = parseInt(container.dataset.index);
+                    const targetIndex = parseInt(this.dataset.index);
+                    
+                    // Move gallery to clicked indicator
+                    const direction = targetIndex - currentIndex;
+                    moveGallery(gallery, direction);
+                });
+            });
+        });
+    </script>
 </body>
-<html>
+</html>

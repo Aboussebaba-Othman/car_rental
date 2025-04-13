@@ -11,7 +11,8 @@ use App\Repositories\Interfaces\VehicleRepositoryInterface;
 use App\Repositories\Eloquent\VehicleRepository;
 use App\Repositories\Interfaces\PromotionRepositoryInterface;
 use App\Repositories\Eloquent\PromotionRepository;
-
+use App\Repositories\Interfaces\ReservationRepositoryInterface;
+use App\Repositories\Eloquent\ReservationRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -24,7 +25,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(CompanyRepositoryInterface::class, CompanyRepository::class);
         $this->app->bind(VehicleRepositoryInterface::class, VehicleRepository::class);
         $this->app->bind(PromotionRepositoryInterface::class, PromotionRepository::class);
-
+        $this->app->bind(ReservationRepositoryInterface::class, ReservationRepository::class);
     }
 
     /**

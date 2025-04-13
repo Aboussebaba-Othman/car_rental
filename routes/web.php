@@ -69,6 +69,23 @@ Route::middleware(['auth', 'role:company'])->group(function () {
     Route::put('/company/promotions/{promotion}', 'App\Http\Controllers\Company\PromotionController@update')->name('company.promotions.update');
     Route::delete('/company/promotions/{promotion}', 'App\Http\Controllers\Company\PromotionController@destroy')->name('company.promotions.destroy');
     Route::patch('/company/promotions/{promotion}/toggle-active', 'App\Http\Controllers\Company\PromotionController@toggleActive')->name('company.promotions.toggle-active');
+
+    // Ajout des routes de gestion des réservations
+    Route::prefix('company')->group(function () {
+        Route::get('/reservations', [App\Http\Controllers\Company\ReservationController::class, 'index'])->name('company.reservations.index');
+        Route::get('/reservations/export', [App\Http\Controllers\Company\ReservationController::class, 'export'])->name('company.reservations.export');
+        Route::get('/reservations/{reservation}', [App\Http\Controllers\Company\ReservationController::class, 'show'])->name('company.reservations.show');
+        Route::post('/reservations/{reservation}/confirm', [App\Http\Controllers\Company\ReservationController::class, 'confirm'])->name('company.reservations.confirm');
+        Route::post('/reservations/{reservation}/cancel', [App\Http\Controllers\Company\ReservationController::class, 'cancel'])->name('company.reservations.cancel');
+        Route::post('/reservations/{reservation}/complete', [App\Http\Controllers\Company\ReservationController::class, 'complete'])->name('company.reservations.complete');
+        Route::post('/reservations/{reservation}/mark-paid', [App\Http\Controllers\Company\ReservationController::class, 'markPaid'])->name('company.reservations.mark-paid');
+        Route::post('/reservations/{reservation}/add-note', [App\Http\Controllers\Company\ReservationController::class, 'addNote'])->name('company.reservations.add-note');
+        Route::get('/reservations/{reservation}/invoice', [App\Http\Controllers\Company\ReservationController::class, 'generateInvoice'])->name('company.reservations.invoice');
+    });
+    
+    // Routes pour les clients (si vous souhaitez les implémenter)
+    // Route::get('/customers', [App\Http\Controllers\Company\CustomerController::class, 'index'])->name('customers.index');
+    // Route::get('/customers/{user}', [App\Http\Controllers\Company\CustomerController::class, 'show'])->name('customers.show');
 });
 
 // Route::middleware(['auth', 'role:admin'])->group(function () {
