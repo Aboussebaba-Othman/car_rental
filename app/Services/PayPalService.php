@@ -7,6 +7,40 @@ use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * PayPal Payment Processing Service
+ * 
+ * SANDBOX TESTING CONFIGURATION:
+ * ------------------------------
+ * 1. Create a PayPal Developer account at https://developer.paypal.com
+ * 2. Create a Sandbox Business account (to receive payments) and Personal account (to make payments)
+ * 3. Create a REST API app in the Developer Dashboard to get your client_id and client_secret
+ * 4. Configure your .env file with:
+ *    - PAYPAL_MODE=sandbox (use 'live' for production)
+ *    - PAYPAL_SANDBOX_CLIENT_ID=your_sandbox_client_id
+ *    - PAYPAL_SANDBOX_CLIENT_SECRET=your_sandbox_client_secret
+ * 
+ * TEST CREDENTIALS (Sandbox):
+ * ---------------------------
+ * Business Account (Merchant): Create in PayPal Developer Dashboard
+ * Personal Account (Customer): Create in PayPal Developer Dashboard
+ *   Sample Test Account: sb-47bdi25749497@personal.example.com / 12345678
+ *
+ * TESTING WORKFLOW:
+ * ----------------
+ * 1. Make sure app is configured to use 'sandbox' mode
+ * 2. Create a reservation and proceed to payment
+ * 3. Click "Pay with PayPal" button
+ * 4. Use the sandbox personal account credentials to log in
+ * 5. Complete the test payment process
+ * 6. You will be redirected back to your application
+ * 
+ * COMMON SANDBOX ISSUES:
+ * ---------------------
+ * - Make sure your return URLs are publicly accessible (use ngrok for local testing)
+ * - Sandbox may occasionally be slow or unresponsive
+ * - Ensure your reservation has a positive total_price value (min 0.01)
+ */
 class PayPalService
 {
     private $clientId;
@@ -158,40 +192,228 @@ class PayPalService
 
     public function capturePayment($orderId, Reservation $reservation)
     {
-        $token = $this->getAccessToken();
+        try {
+            // Validate order ID
+            if (empty($orderId)) {
+                Log::error('PayPal Capture Error: Empty order ID', [
+                    'reservation_id' => $reservation->id,
+                    'payment_id' => $reservation->payment_id
+                ]);
+                
+                // If the payment_id exists but wasn't passed, use it
+                if (!empty($reservation->payment_id)) {
+                    $orderId = $reservation->payment_id;
+                    Log::info('Using payment_id from reservation', ['payment_id' => $orderId]);
+                } else {
+                    return [
+                        'success' => false,
+                        'message' => 'Missing PayPal order ID',
+                    ];
+                }
+            }
 
-        $response = Http::withToken($token)
-            ->post("{$this->baseUrl}/v2/checkout/orders/{$orderId}/capture");
+            $token = $this->getAccessToken();
 
-        if ($response->successful()) {
-            $data = $response->json();
+            // Log capture attempt
+            Log::info('Attempting to capture PayPal payment', [
+                'order_id' => $orderId,
+                'reservation_id' => $reservation->id
+            ]);
 
-            // Update reservation with payment details
-            $reservation->payment_status = $data['status'];
-            $reservation->status = ($data['status'] === 'COMPLETED') ? 'confirmed' : 'payment_pending';
-            $reservation->amount_paid = $data['purchase_units'][0]['payments']['captures'][0]['amount']['value'];
-            $reservation->payment_date = now();
-            $reservation->transaction_id = $data['purchase_units'][0]['payments']['captures'][0]['id'];
+            // Make request with proper headers and empty object as the body
+            $response = Http::withToken($token)
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                    'PayPal-Request-Id' => 'capture-' . $reservation->id . '-' . time(),
+                ])
+                ->post("{$this->baseUrl}/v2/checkout/orders/{$orderId}/capture", json_decode('{}'));
+
+            // Log full response for debugging
+            Log::info('PayPal capture response', [
+                'status' => $response->status(),
+                'body' => $response->json(),
+                'headers' => $response->headers()
+            ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+
+                // Update reservation with payment details
+                $reservation->payment_status = $data['status'];
+                $reservation->status = ($data['status'] === 'COMPLETED') ? 'confirmed' : 'payment_pending';
+                $reservation->amount_paid = $data['purchase_units'][0]['payments']['captures'][0]['amount']['value'];
+                $reservation->payment_date = now();
+                $reservation->transaction_id = $data['purchase_units'][0]['payments']['captures'][0]['id'];
+                
+                if (isset($data['payer'])) {
+                    $reservation->payer_id = $data['payer']['payer_id'];
+                    $reservation->payer_email = $data['payer']['email_address'];
+                }
+                
+                $reservation->save();
+
+                return [
+                    'success' => true,
+                    'status' => $data['status'],
+                    'transaction_id' => $reservation->transaction_id,
+                ];
+            }
+
+            // Enhanced error logging with detailed information
+            Log::error('PayPal Capture Payment Error', [
+                'status_code' => $response->status(),
+                'response_body' => $response->json(),
+                'order_id' => $orderId,
+                'reservation_id' => $reservation->id,
+                'url' => "{$this->baseUrl}/v2/checkout/orders/{$orderId}/capture"
+            ]);
             
-            if (isset($data['payer'])) {
-                $reservation->payer_id = $data['payer']['payer_id'];
-                $reservation->payer_email = $data['payer']['email_address'];
+            // Extract meaningful error message if available
+            $errorMessage = 'Failed to capture PayPal payment';
+            if ($response->json() && isset($response->json()['message'])) {
+                $errorMessage .= ': ' . $response->json()['message'];
+            } elseif ($response->json() && isset($response->json()['error_description'])) {
+                $errorMessage .= ': ' . $response->json()['error_description'];
+            } elseif ($response->json() && isset($response->json()['details'][0]['description'])) {
+                $errorMessage .= ': ' . $response->json()['details'][0]['description'];
             }
             
-            $reservation->save();
-
             return [
-                'success' => true,
-                'status' => $data['status'],
-                'transaction_id' => $reservation->transaction_id,
+                'success' => false,
+                'message' => $errorMessage,
+                'error' => $response->json(),
+                'status_code' => $response->status()
+            ];
+        } catch (\Exception $e) {
+            Log::error('PayPal Capture Exception', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'order_id' => $orderId,
+                'reservation_id' => $reservation->id
+            ]);
+            
+            return [
+                'success' => false,
+                'message' => 'Exception during payment capture: ' . $e->getMessage(),
             ];
         }
+    }
 
-        Log::error('PayPal Capture Payment Error', $response->json());
-        return [
-            'success' => false,
-            'message' => 'Failed to capture PayPal payment',
-            'error' => $response->json(),
-        ];
+    /**
+     * Alternative implementation to capture payment
+     * This method uses cURL directly which can sometimes avoid formatting issues
+     */
+    public function capturePaymentWithCurl($orderId, Reservation $reservation)
+    {
+        try {
+            if (empty($orderId)) {
+                if (!empty($reservation->payment_id)) {
+                    $orderId = $reservation->payment_id;
+                    Log::info('Using payment_id from reservation', ['payment_id' => $orderId]);
+                } else {
+                    return [
+                        'success' => false,
+                        'message' => 'Missing PayPal order ID',
+                    ];
+                }
+            }
+
+            $token = $this->getAccessToken();
+            
+            // Initialize cURL session
+            $ch = curl_init("{$this->baseUrl}/v2/checkout/orders/{$orderId}/capture");
+            
+            // Set cURL options
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+                'Authorization: Bearer ' . $token,
+                'PayPal-Request-Id: capture-' . $reservation->id . '-' . time()
+            ]);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, '{}'); // Empty JSON object
+            
+            // Execute cURL request
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            
+            // Check for cURL errors
+            if (curl_errno($ch)) {
+                Log::error('cURL Error', ['error' => curl_error($ch), 'order_id' => $orderId]);
+                curl_close($ch);
+                return [
+                    'success' => false,
+                    'message' => 'Connection error: ' . curl_error($ch)
+                ];
+            }
+            
+            curl_close($ch);
+            
+            // Parse response
+            $data = json_decode($response, true);
+            
+            // Log full response
+            Log::info('PayPal capture response (cURL)', [
+                'status' => $httpCode,
+                'body' => $data
+            ]);
+            
+            if ($httpCode >= 200 && $httpCode < 300) {
+                // Update reservation with payment details
+                $reservation->payment_status = $data['status'];
+                $reservation->status = ($data['status'] === 'COMPLETED') ? 'confirmed' : 'payment_pending';
+                $reservation->amount_paid = $data['purchase_units'][0]['payments']['captures'][0]['amount']['value'];
+                $reservation->payment_date = now();
+                $reservation->transaction_id = $data['purchase_units'][0]['payments']['captures'][0]['id'];
+                
+                if (isset($data['payer'])) {
+                    $reservation->payer_id = $data['payer']['payer_id'];
+                    $reservation->payer_email = $data['payer']['email_address'];
+                }
+                
+                $reservation->save();
+                
+                return [
+                    'success' => true,
+                    'status' => $data['status'],
+                    'transaction_id' => $reservation->transaction_id,
+                ];
+            } else {
+                // Extract error message
+                $errorMessage = 'Failed to capture PayPal payment';
+                if (isset($data['message'])) {
+                    $errorMessage .= ': ' . $data['message'];
+                } elseif (isset($data['error_description'])) {
+                    $errorMessage .= ': ' . $data['error_description'];
+                } elseif (isset($data['details'][0]['description'])) {
+                    $errorMessage .= ': ' . $data['details'][0]['description'];
+                }
+                
+                Log::error('PayPal Capture Payment Error (cURL)', [
+                    'status_code' => $httpCode,
+                    'response' => $data,
+                    'order_id' => $orderId
+                ]);
+                
+                return [
+                    'success' => false,
+                    'message' => $errorMessage,
+                    'error' => $data,
+                    'status_code' => $httpCode
+                ];
+            }
+        } catch (\Exception $e) {
+            Log::error('PayPal Capture Exception (cURL)', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'order_id' => $orderId
+            ]);
+            
+            return [
+                'success' => false,
+                'message' => 'Exception during payment capture: ' . $e->getMessage(),
+            ];
+        }
     }
 }

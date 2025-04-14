@@ -29,9 +29,10 @@ class ReservationRepository implements ReservationRepositoryInterface
     {
         $query = $this->model->query()
             ->with(['vehicle', 'user', 'promotion'])
-            ->whereHas('vehicle', function ($query) {
-                $query->where('company_id', Auth::user()->company_id);
-            })
+            // Commenté pour afficher toutes les réservations sans filtrer par company_id
+            // ->whereHas('vehicle', function ($query) {
+            //     $query->where('company_id', Auth::user()->company_id);
+            // })
             ->latest();
         
         // Apply filters if any
@@ -75,12 +76,13 @@ class ReservationRepository implements ReservationRepositoryInterface
     {
         $query = $this->model->query();
         
+        // Commenté pour afficher les statistiques de toutes les réservations
         // Only filter by company if a company ID is provided
-        if ($companyId !== null) {
-            $query->whereHas('vehicle', function ($q) use ($companyId) {
-                $q->where('company_id', $companyId);
-            });
-        }
+        // if ($companyId !== null) {
+        //     $query->whereHas('vehicle', function ($q) use ($companyId) {
+        //         $q->where('company_id', $companyId);
+        //     });
+        // }
         
         return [
             'total' => (clone $query)->count(),

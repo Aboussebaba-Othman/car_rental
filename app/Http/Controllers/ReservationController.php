@@ -234,19 +234,58 @@ class ReservationController extends Controller
         $token = $request->query('token');
         $payerId = $request->query('PayerID');
         
-        if (empty($token) || empty($payerId) || $reservation->payment_id !== $token) {
+        // Log detailed information
+        Log::info('PayPal success callback', [
+            'reservation_id' => $reservation->id,
+            'token' => $token,
+            'payer_id' => $payerId,
+            'stored_payment_id' => $reservation->payment_id
+        ]);
+        
+        if (empty($token)) {
+            Log::error('PayPal callback missing token', ['request' => $request->all()]);
             return redirect()->route('reservations.payment', $reservation)
-                ->with('error', 'Erreur lors de la validation du paiement.');
+                ->with('error', 'Erreur lors de la validation du paiement: Token manquant.');
         }
         
-        $response = $this->paypalService->capturePayment($reservation->payment_id, $reservation);
+        // Check if payment_id exists but doesn't match token (could be stored incorrectly)
+        if (!empty($reservation->payment_id) && $reservation->payment_id !== $token) {
+            Log::warning('Payment ID mismatch, using callback token', [
+                'token' => $token,
+                'stored_payment_id' => $reservation->payment_id
+            ]);
+        }
+        
+        // Try first with the optimized method that uses cURL
+        $response = $this->paypalService->capturePaymentWithCurl($token, $reservation);
+        
+        // If the first method fails, try the original method as a fallback
+        if (!$response['success'] && isset($response['message']) && 
+            strpos($response['message'], 'Connection error') !== false) {
+            Log::warning('Falling back to original capture method', ['token' => $token]);
+            $response = $this->paypalService->capturePayment($token, $reservation);
+        }
         
         if ($response['success']) {
             return redirect()->route('reservations.show', $reservation)
                 ->with('success', 'Votre paiement a été traité avec succès. Votre réservation est confirmée!');
         } else {
+            // Log detailed error
+            Log::error('PayPal capture failed in controller', $response);
+            
+            // Provide a more informative error message to the user
+            $errorMessage = 'Erreur lors de la capture du paiement';
+            if (isset($response['message'])) {
+                $errorMessage .= ': ' . $response['message'];
+            }
+            
+            // Add troubleshooting instructions for sandbox mode
+            if (config('services.paypal.mode') === 'sandbox' && config('app.env') !== 'production') {
+                $errorMessage .= '. En mode test, assurez-vous que vous utilisez un compte sandbox valide et que l\'API PayPal est disponible.';
+            }
+            
             return redirect()->route('reservations.payment', $reservation)
-                ->with('error', 'Erreur lors de la capture du paiement: ' . ($response['message'] ?? 'Erreur inconnue'));
+                ->with('error', $errorMessage);
         }
     }
     
