@@ -81,11 +81,13 @@ Route::middleware(['auth', 'role:company'])->group(function () {
         Route::post('/reservations/{reservation}/mark-paid', [App\Http\Controllers\Company\ReservationController::class, 'markPaid'])->name('company.reservations.mark-paid');
         Route::post('/reservations/{reservation}/add-note', [App\Http\Controllers\Company\ReservationController::class, 'addNote'])->name('company.reservations.add-note');
         Route::get('/reservations/{reservation}/invoice', [App\Http\Controllers\Company\ReservationController::class, 'generateInvoice'])->name('company.reservations.invoice');
+
+        // Fix the customer routes with proper prefix
+        Route::get('/customers', [App\Http\Controllers\Company\CustomerController::class, 'index'])->name('company.customers.index');
+        Route::get('/customers/{user}', [App\Http\Controllers\Company\CustomerController::class, 'show'])->name('company.customers.show');
+        Route::post('/customers/{user}/send-promotion', [App\Http\Controllers\Company\CustomerController::class, 'sendPromotion'])->name('company.customers.send-promotion');
+        Route::get('/customers/{user}/report', [App\Http\Controllers\Company\CustomerController::class, 'generateReport'])->name('company.customers.report');
     });
-    
-    // Routes pour les clients (si vous souhaitez les implémenter)
-    // Route::get('/customers', [App\Http\Controllers\Company\CustomerController::class, 'index'])->name('customers.index');
-    // Route::get('/customers/{user}', [App\Http\Controllers\Company\CustomerController::class, 'show'])->name('customers.show');
 });
 
 // Route::middleware(['auth', 'role:admin'])->group(function () {
