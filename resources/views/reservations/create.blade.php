@@ -1,4 +1,3 @@
-<!-- filepath: c:\Users\Youcode\Gestion-de-Location-des-Voitures\resources\views\reservations\create.blade.php -->
 @extends('layouts.app')
 
 @section('content')
@@ -120,6 +119,46 @@
                                 <p class="font-medium">{{ $vehicle->license_plate }}</p>
                             </div>
                         </div>
+                        
+                        <!-- Features/Amenities -->
+                        @php
+                            $features = is_array($vehicle->features) 
+                                ? $vehicle->features 
+                                : (is_string($vehicle->features) ? json_decode($vehicle->features, true) : []);
+                        @endphp
+
+                        @if(!empty($features))
+                            <div class="mt-4">
+                                <h4 class="text-sm font-medium text-gray-700 mb-2">Équipements</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    @foreach($features as $feature)
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                            {{ $feature }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+                
+                <!-- Availability Calendar Preview -->
+                <div class="mt-6 bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="p-4 bg-gradient-to-r from-blue-400 to-blue-500 text-white">
+                        <h3 class="font-bold">Disponibilité</h3>
+                    </div>
+                    <div class="p-4">
+                        <div id="availability-calendar" class="text-center text-sm"></div>
+                        <div class="mt-2 flex justify-center items-center gap-4 text-sm">
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 bg-green-500 rounded-full mr-1"></div>
+                                <span>Disponible</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 bg-red-500 rounded-full mr-1"></div>
+                                <span>Indisponible</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -132,9 +171,11 @@
                         <p>Tous les champs marqués d'un * sont obligatoires</p>
                     </div>
                     
-                    <form method="POST" action="{{ route('reservations.store') }}" class="p-6">
+                    <form method="POST" action="{{ route('reservations.store') }}" class="p-6" id="reservation-form">
                         @csrf
                         <input type="hidden" name="vehicle_id" value="{{ $vehicle->id }}">
+                        <input type="hidden" id="price_per_day" value="{{ $vehicle->price_per_day }}">
+                        <input type="hidden" id="hidden_total_price" name="total_price" value="{{ $totalPrice }}">
 
                         <div class="mb-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -148,6 +189,14 @@
                                     <input type="date" id="end_date" name="end_date" value="{{ $endDate }}" 
                                         class="w-full rounded-lg border-gray-300 focus:border-yellow-500 focus:ring focus:ring-yellow-200" required>
                                 </div>
+                            </div>
+                            
+                            <!-- Date selection helper -->
+                            <div class="mt-1 text-sm text-gray-500 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                                </svg>
+                                <span>Vous pouvez louer ce véhicule pour un minimum de 1 jour et un maximum de 30 jours.</span>
                             </div>
                         </div>
 
@@ -166,6 +215,19 @@
                                         class="w-full rounded-lg border-gray-300 focus:border-yellow-500 focus:ring focus:ring-yellow-200" required>
                                 </div>
                             </div>
+                            
+                            <!-- Quick address buttons -->
+                            <div class="mt-2 flex flex-wrap gap-2">
+                                <button type="button" id="same-address-btn" class="text-xs px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-700 transition-colors">
+                                    Même adresse pour le retour
+                                </button>
+                                <button type="button" id="home-address-btn" class="text-xs px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-700 transition-colors">
+                                    Utiliser mon adresse
+                                </button>
+                                <button type="button" id="agency-address-btn" class="text-xs px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-700 transition-colors">
+                                    À l'agence
+                                </button>
+                            </div>
                         </div>
 
                         <div class="mb-6">
@@ -175,7 +237,20 @@
                                 class="w-full rounded-lg border-gray-300 focus:border-yellow-500 focus:ring focus:ring-yellow-200">{{ old('notes') }}</textarea>
                         </div>
 
-                        @if(isset($promotion))
+                        <!-- Promotion selection -->
+                        @if(isset($availablePromotions) && count($availablePromotions) > 0)
+                        <div class="mb-6">
+                            <label for="promotion_id" class="block text-sm font-medium text-gray-700 mb-1">Promotion</label>
+                            <select id="promotion_id" name="promotion_id" class="w-full rounded-lg border-gray-300 focus:border-yellow-500 focus:ring focus:ring-yellow-200">
+                                <option value="">Aucune promotion</option>
+                                @foreach($availablePromotions as $promo)
+                                    <option value="{{ $promo->id }}" {{ isset($promotion) && $promotion->id == $promo->id ? 'selected' : '' }}>
+                                        {{ $promo->name }} ({{ $promo->discount_percentage }}% de réduction)
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @elseif(isset($promotion))
                         <input type="hidden" name="promotion_id" value="{{ $promotion->id }}">
                         <div class="mb-6 bg-yellow-50 p-4 rounded-lg border border-yellow-100">
                             <div class="flex items-center">
@@ -199,23 +274,42 @@
                             </div>
                             <div class="flex justify-between items-center mb-2">
                                 <span class="text-gray-600">Nombre de jours:</span>
-                                <span>{{ $numberOfDays }}</span>
+                                <span id="number_of_days">{{ $numberOfDays }}</span>
                             </div>
                             
-                            @if(isset($promotion))
                             <div class="flex justify-between items-center mb-2">
                                 <span class="text-gray-600">Sous-total:</span>
-                                <span>{{ number_format($pricePerDay * $numberOfDays, 2) }}€</span>
+                                <span id="subtotal">{{ number_format($pricePerDay * $numberOfDays, 2) }}€</span>
                             </div>
-                            <div class="flex justify-between items-center mb-2 text-green-600">
-                                <span>Promotion ({{ $promotion->discount_percentage }}%):</span>
-                                <span>-{{ number_format(($pricePerDay * $numberOfDays) * ($promotion->discount_percentage / 100), 2) }}€</span>
+                            
+                            <div class="flex justify-between items-center mb-2 text-green-600 discount-row" 
+                                 style="{{ isset($promotion) ? '' : 'display: none;' }}">
+                                <span>Promotion:</span>
+                                <span id="discount">
+                                    @if(isset($promotion))
+                                        -{{ number_format(($pricePerDay * $numberOfDays) * ($promotion->discount_percentage / 100), 2) }}€ (-{{ $promotion->discount_percentage }}%)
+                                    @else
+                                        0.00€
+                                    @endif
+                                </span>
                             </div>
-                            @endif
                             
                             <div class="border-t border-gray-300 my-2 pt-2 flex justify-between items-center font-semibold">
                                 <span>Total:</span>
-                                <span class="text-xl">{{ number_format($totalPrice, 2) }}€</span>
+                                <span id="total_price" class="text-xl">{{ number_format($totalPrice, 2) }}€</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Terms and conditions -->
+                        <div class="mb-6">
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <input id="terms" name="terms" type="checkbox" class="h-4 w-4 text-yellow-500 focus:ring-yellow-400 border-gray-300 rounded" required>
+                                </div>
+                                <div class="ml-3 text-sm">
+                                    <label for="terms" class="font-medium text-gray-700">J'accepte les <a href="#" class="text-yellow-500 hover:text-yellow-600">conditions générales</a></label>
+                                    <p class="text-gray-500">En cochant cette case, vous acceptez les conditions de location et notre politique de confidentialité.</p>
+                                </div>
                             </div>
                         </div>
                         
@@ -227,7 +321,7 @@
                                 Retour
                             </a>
                             <button type="submit" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
-                                Continuer
+                                Continuer vers le paiement
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
                                 </svg>
@@ -239,91 +333,318 @@
         </div>
     </div>
 </div>
-@endsection
 
-@section('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const startDateInput = document.getElementById('start_date');
-        const endDateInput = document.getElementById('end_date');
+    /**
+ * Calculateur de prix en temps réel pour les réservations
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    // Éléments du formulaire
+    const startDateInput = document.getElementById('start_date');
+    const endDateInput = document.getElementById('end_date');
+    const pricePerDay = parseFloat(document.getElementById('price_per_day').value || 0);
+    const promotionElement = document.getElementById('promotion_id');
+    const hiddenTotalPriceInput = document.getElementById('hidden_total_price');
+    
+    // Éléments d'affichage
+    const numberOfDaysElement = document.getElementById('number_of_days');
+    const subtotalElement = document.getElementById('subtotal');
+    const discountElement = document.getElementById('discount');
+    const totalPriceElement = document.getElementById('total_price');
+    
+    // Données des promotions
+    const promotions = window.promotionsData || {};
+    
+    // Boutons d'adresse
+    const pickupLocationInput = document.getElementById('pickup_location');
+    const returnLocationInput = document.getElementById('return_location');
+    const sameAddressBtn = document.getElementById('same-address-btn');
+    const homeAddressBtn = document.getElementById('home-address-btn');
+    const agencyAddressBtn = document.getElementById('agency-address-btn');
+    const agencyAddress = "123 Rue de l'Agence, 75001 Paris";
+    
+    /**
+     * Calcule le prix de la réservation et met à jour l'affichage
+     */
+    function calculatePrice() {
+        if (!startDateInput || !endDateInput || !pricePerDay) {
+            return;
+        }
         
-        // Photo Gallery Functionality
-        const photoCount = {{ $vehicle->photos->count() }};
-        if (photoCount > 1) {
-            let currentPhotoIndex = 0;
-            const photoElements = document.querySelectorAll('#mainPhotoContainer img');
-            const thumbnailItems = document.querySelectorAll('.thumbnail-item');
-            const prevButton = document.getElementById('prevPhoto');
-            const nextButton = document.getElementById('nextPhoto');
-            
-            function showPhoto(index) {
-                // Hide all photos
-                photoElements.forEach(photo => {
-                    photo.classList.remove('opacity-100');
-                    photo.classList.add('opacity-0');
-                });
-                
-                // Show selected photo
-                photoElements[index].classList.remove('opacity-0');
-                photoElements[index].classList.add('opacity-100');
-                
-                // Update thumbnails
-                thumbnailItems.forEach(thumb => {
-                    thumb.classList.remove('ring-2', 'ring-yellow-500');
-                });
-                thumbnailItems[index].classList.add('ring-2', 'ring-yellow-500');
-                
-                currentPhotoIndex = index;
+        // Obtenir les dates avec le temps réglé à minuit pour un calcul précis
+        let startDate = new Date(startDateInput.value);
+        let endDate = new Date(endDateInput.value);
+        
+        // Si les dates sont invalides, sortir
+        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+            return;
+        }
+        
+        // Normaliser à minuit UTC pour un calcul cohérent
+        startDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+        endDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+        
+        // Calculer le nombre de jours (au moins 1 jour)
+        const diffTime = Math.abs(endDate - startDate);
+        const numberOfDays = Math.max(Math.ceil(diffTime / (1000 * 60 * 60 * 24)), 1);
+        
+        // Calculer le sous-total
+        const subtotal = parseFloat((pricePerDay * numberOfDays).toFixed(2));
+        
+        // Vérifier promotion
+        let discount = 0;
+        let discountText = '';
+        let promotionApplied = false;
+        
+        if (promotionElement && promotionElement.value) {
+            const promotionId = parseInt(promotionElement.value);
+            if (promotions[promotionId]) {
+                const discountPercentage = promotions[promotionId].discount_percentage;
+                discount = parseFloat(((subtotal * discountPercentage) / 100).toFixed(2));
+                discountText = `(-${discountPercentage}%)`;
+                promotionApplied = true;
             }
+        }
+        
+        // Calculer le total (minimum 0.01)
+        const totalPrice = Math.max(parseFloat((subtotal - discount).toFixed(2)), 0.01);
+        
+        // Mettre à jour l'affichage avec effet d'animation
+        if (numberOfDaysElement) {
+            const currentDays = parseInt(numberOfDaysElement.textContent) || 0;
+            if (currentDays !== numberOfDays) {
+                numberOfDaysElement.classList.add('text-yellow-600');
+                numberOfDaysElement.textContent = numberOfDays;
+                setTimeout(() => numberOfDaysElement.classList.remove('text-yellow-600'), 500);
+            }
+        }
+        
+        if (subtotalElement) {
+            subtotalElement.textContent = formatCurrency(subtotal);
+        }
+        
+        if (discountElement) {
+            discountElement.textContent = discount > 0 ? 
+                `${formatCurrency(discount)} ${discountText}` : 
+                '0,00€';
             
-            // Next photo button
+            // Afficher/masquer ligne de remise
+            const discountRow = discountElement.closest('.discount-row');
+            if (discountRow) {
+                if (promotionApplied) {
+                    discountRow.style.display = 'flex';
+                    discountRow.style.opacity = '1';
+                } else {
+                    discountRow.style.opacity = '0';
+                    setTimeout(() => discountRow.style.display = 'none', 300);
+                }
+            }
+        }
+        
+        if (totalPriceElement) {
+            const currentPrice = parseFloat(totalPriceElement.textContent.replace('€', '').replace(',', '.')) || 0;
+            if (Math.abs(currentPrice - totalPrice) > 0.01) {
+                totalPriceElement.classList.add('text-yellow-600');
+                totalPriceElement.textContent = formatCurrency(totalPrice);
+                setTimeout(() => totalPriceElement.classList.remove('text-yellow-600'), 500);
+            }
+        }
+        
+        // Mettre à jour champ caché
+        if (hiddenTotalPriceInput) {
+            hiddenTotalPriceInput.value = totalPrice.toFixed(2);
+        }
+    }
+    
+    /**
+     * Formater un montant en devise
+     */
+    function formatCurrency(amount) {
+        return amount.toFixed(2).replace('.', ',') + '€';
+    }
+    
+    /**
+     * S'assurer que la date de fin est après la date de début
+     */
+    function validateDates() {
+        if (!startDateInput || !endDateInput) return;
+        
+        const startDate = new Date(startDateInput.value);
+        const endDate = new Date(endDateInput.value);
+        
+        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return;
+        
+        // Normaliser les dates
+        const startMidnight = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+        const endMidnight = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+        
+        if (endMidnight <= startMidnight) {
+            // Ajouter un jour à la date de début
+            const nextDay = new Date(startMidnight);
+            nextDay.setDate(nextDay.getDate() + 1);
+            
+            // Formatage YYYY-MM-DD
+            const year = nextDay.getFullYear();
+            const month = String(nextDay.getMonth() + 1).padStart(2, '0');
+            const day = String(nextDay.getDate()).padStart(2, '0');
+            
+            endDateInput.value = `${year}-${month}-${day}`;
+        }
+        
+        calculatePrice();
+    }
+    
+    /**
+     * Définir les dates minimales
+     */
+    function setMinDates() {
+        if (!startDateInput || !endDateInput) return;
+        
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        
+        const formatDate = (date) => {
+            return date.toISOString().split('T')[0];
+        };
+        
+        startDateInput.min = formatDate(today);
+        endDateInput.min = formatDate(tomorrow);
+    }
+    
+    // Configuration des écouteurs d'événements
+    
+    // Dates
+    if (startDateInput) {
+        ['change', 'input'].forEach(event => {
+            startDateInput.addEventListener(event, validateDates);
+        });
+    }
+    
+    if (endDateInput) {
+        ['change', 'input'].forEach(event => {
+            endDateInput.addEventListener(event, validateDates);
+        });
+    }
+    
+    // Promotion
+    if (promotionElement) {
+        promotionElement.addEventListener('change', calculatePrice);
+    }
+    
+    // Boutons d'adresse
+    if (sameAddressBtn) {
+        sameAddressBtn.addEventListener('click', function() {
+            if (pickupLocationInput.value) {
+                returnLocationInput.value = pickupLocationInput.value;
+            }
+        });
+    }
+    
+    if (homeAddressBtn) {
+        homeAddressBtn.addEventListener('click', function() {
+            const userAddress = userAddressData || '';
+            if (userAddress) {
+                pickupLocationInput.value = userAddress;
+                returnLocationInput.value = userAddress;
+            } else {
+                alert('Aucune adresse trouvée dans votre profil. Veuillez la saisir manuellement.');
+            }
+        });
+    }
+    
+    if (agencyAddressBtn) {
+        agencyAddressBtn.addEventListener('click', function() {
+            pickupLocationInput.value = agencyAddress;
+            returnLocationInput.value = agencyAddress;
+        });
+    }
+    
+    // Galerie photos
+    setupPhotoGallery();
+    
+    // Initialiser
+    setMinDates();
+    validateDates();
+    
+    // Recalculer à l'ouverture/focus de la page
+    window.addEventListener('focus', calculatePrice);
+    
+    /**
+     * Configure la galerie de photos
+     */
+    function setupPhotoGallery() {
+        const photoCount = document.querySelectorAll('#mainPhotoContainer img').length;
+        if (photoCount <= 1) return;
+        
+        let currentPhotoIndex = 0;
+        const photoElements = document.querySelectorAll('#mainPhotoContainer img');
+        const thumbnailItems = document.querySelectorAll('.thumbnail-item');
+        const prevButton = document.getElementById('prevPhoto');
+        const nextButton = document.getElementById('nextPhoto');
+        
+        function showPhoto(index) {
+            // Masquer toutes les photos
+            photoElements.forEach(photo => {
+                photo.classList.remove('opacity-100');
+                photo.classList.add('opacity-0');
+            });
+            
+            // Afficher la photo sélectionnée
+            photoElements[index].classList.remove('opacity-0');
+            photoElements[index].classList.add('opacity-100');
+            
+            // Mettre à jour les vignettes
+            thumbnailItems.forEach(thumb => {
+                thumb.classList.remove('ring-2', 'ring-yellow-500');
+            });
+            thumbnailItems[index].classList.add('ring-2', 'ring-yellow-500');
+            
+            currentPhotoIndex = index;
+        }
+        
+        if (nextButton) {
             nextButton.addEventListener('click', function() {
                 const newIndex = (currentPhotoIndex + 1) % photoCount;
                 showPhoto(newIndex);
             });
-            
-            // Previous photo button
+        }
+        
+        if (prevButton) {
             prevButton.addEventListener('click', function() {
                 const newIndex = (currentPhotoIndex - 1 + photoCount) % photoCount;
                 showPhoto(newIndex);
             });
-            
-            // Thumbnail click
-            thumbnailItems.forEach(thumb => {
-                thumb.addEventListener('click', function() {
-                    const index = parseInt(this.dataset.index);
-                    showPhoto(index);
-                });
-            });
         }
-
-        // Ensure end date is always after start date
-        startDateInput.addEventListener('change', function() {
-            if (endDateInput.value && new Date(startDateInput.value) >= new Date(endDateInput.value)) {
-                // Set end date to start date + 1 day
-                const nextDay = new Date(startDateInput.value);
-                nextDay.setDate(nextDay.getDate() + 1);
-                endDateInput.valueAsDate = nextDay;
-            }
+        
+        thumbnailItems.forEach(thumb => {
+            thumb.addEventListener('click', function() {
+                const index = parseInt(this.dataset.index);
+                showPhoto(index);
+            });
         });
         
-        endDateInput.addEventListener('change', function() {
-            if (new Date(endDateInput.value) <= new Date(startDateInput.value)) {
-                alert('La date de fin doit être postérieure à la date de début.');
-                // Set end date to start date + 1 day
-                const nextDay = new Date(startDateInput.value);
-                nextDay.setDate(nextDay.getDate() + 1);
-                endDateInput.valueAsDate = nextDay;
-            }
-        });
-
-        // Set minimum dates to today
-        const today = new Date();
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        
-        startDateInput.min = today.toISOString().split('T')[0];
-        endDateInput.min = tomorrow.toISOString().split('T')[0];
-    });
+        // Rotation automatique des photos
+        setInterval(function() {
+            const newIndex = (currentPhotoIndex + 1) % photoCount;
+            showPhoto(newIndex);
+        }, 5000);
+    }
+    
+    // Ajouter du CSS pour les effets de transition
+    const style = document.createElement('style');
+    style.textContent = `
+        #number_of_days, #total_price {
+            transition: color 0.3s ease;
+        }
+        .discount-row {
+            transition: opacity 0.3s ease;
+        }
+        .text-yellow-600 {
+            color: #d97706;
+        }
+    `;
+    document.head.appendChild(style);
+});
 </script>
 @endsection

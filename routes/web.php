@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Admin\DashboardController;
 
+
 // Authentication Routes
 Route::middleware('guest')->group(function () {
     // Registration Routes
