@@ -126,6 +126,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/reservations/{reservation}/paypal', [App\Http\Controllers\ReservationController::class, 'processPayPal'])->name('reservations.paypal.process');
     Route::get('/reservations/{reservation}/paypal/success', [App\Http\Controllers\ReservationController::class, 'paypalSuccess'])->name('reservations.paypal.success');
     Route::get('/reservations/{reservation}/paypal/cancel', [App\Http\Controllers\ReservationController::class, 'paypalCancel'])->name('reservations.paypal.cancel');
+    Route::get('/reservations/{reservation}/payment/confirmation', [App\Http\Controllers\ReservationController::class, 'paymentConfirmation'])->name('reservations.payment.confirmation');
+
 });
 
 // Public Routes

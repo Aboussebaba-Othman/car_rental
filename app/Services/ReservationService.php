@@ -7,6 +7,7 @@ use App\Models\Vehicle;
 use App\Models\Promotion;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Service class for managing reservations and price calculations
@@ -27,6 +28,10 @@ class ReservationService
         // Ensure dates are Carbon instances
         $startDateTime = $startDate instanceof Carbon ? $startDate : Carbon::parse($startDate);
         $endDateTime = $endDate instanceof Carbon ? $endDate : Carbon::parse($endDate);
+        
+        // Normalize dates to midnight for consistent calculation
+        $startDateTime = $startDateTime->startOfDay();
+        $endDateTime = $endDateTime->startOfDay();
         
         // Calculate rental duration (minimum 1 day)
         $numberOfDays = max($endDateTime->diffInDays($startDateTime), 1);
@@ -56,6 +61,20 @@ class ReservationService
         $totalPrice = round($totalPrice, 2);
         $subtotal = round($subtotal, 2);
         $discount = round($discount, 2);
+        
+        // Log the calculation details for debugging
+        Log::info('Reservation price calculation', [
+            'vehicle_id' => $vehicle->id,
+            'start_date' => $startDateTime->format('Y-m-d'),
+            'end_date' => $endDateTime->format('Y-m-d'),
+            'number_of_days' => $numberOfDays,
+            'price_per_day' => $pricePerDay,
+            'subtotal' => $subtotal,
+            'promotion_id' => $promotionId,
+            'discount' => $discount,
+            'discount_percentage' => $discountPercentage,
+            'total_price' => $totalPrice
+        ]);
         
         return [
             'number_of_days' => $numberOfDays,
@@ -189,5 +208,43 @@ class ReservationService
         }
         
         Cache::flush();
+    }
+    
+    /**
+     * Recalculate and update the total price for a reservation
+     *
+     * @param Reservation $reservation
+     * @return float
+     */
+    public function recalculateAndUpdateReservationPrice(Reservation $reservation)
+    {
+        // Ensure the reservation is loaded with its vehicle and promotion
+        if (!$reservation->relationLoaded('vehicle')) {
+            $reservation->load('vehicle');
+        }
+        
+        // Calculate reservation details
+        $reservationDetails = $this->calculateReservationPrice(
+            $reservation->vehicle,
+            $reservation->start_date,
+            $reservation->end_date,
+            $reservation->promotion_id
+        );
+        
+        // Update reservation total price if different
+        if (abs($reservation->total_price - $reservationDetails['total_price']) > 0.01) {
+            $oldPrice = $reservation->total_price;
+            $reservation->total_price = $reservationDetails['total_price'];
+            $reservation->save();
+            
+            Log::info('Updated reservation price', [
+                'reservation_id' => $reservation->id,
+                'old_price' => $oldPrice,
+                'new_price' => $reservationDetails['total_price'],
+                'calculation_details' => $reservationDetails
+            ]);
+        }
+        
+        return $reservationDetails['total_price'];
     }
 }

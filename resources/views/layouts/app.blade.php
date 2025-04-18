@@ -125,5 +125,38 @@ document.addEventListener('DOMContentLoaded', function() {
             @yield('content')
         </main>
     </div>
+
+@if(isset($availablePromotions))
+<script>
+    // Make promotion data available to JavaScript
+    window.promotionsData = {
+        @foreach($availablePromotions as $promo)
+            {{ $promo->id }}: {
+                id: {{ $promo->id }},
+                name: "{{ $promo->name }}",
+                discount_percentage: {{ $promo->discount_percentage }}
+            },
+        @endforeach
+    };
+</script>
+@elseif(isset($promotion))
+<script>
+    // Make single promotion data available to JavaScript
+    window.promotionsData = {
+        {{ $promotion->id }}: {
+            id: {{ $promotion->id }},
+            name: "{{ $promotion->name }}",
+            discount_percentage: {{ $promotion->discount_percentage }}
+        }
+    };
+</script>
+@endif
+
+@if(auth()->check() && auth()->user()->address)
+<script>
+    // Make user address data available to JavaScript
+    window.userAddressData = "{{ auth()->user()->address }}";
+</script>
+@endif
 </body>
 </html>

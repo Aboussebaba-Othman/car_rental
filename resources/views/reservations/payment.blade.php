@@ -1,4 +1,3 @@
-<!-- filepath: c:\Users\Youcode\Gestion-de-Location-des-Voitures\resources\views\reservations\payment.blade.php -->
 @extends('layouts.app')
 
 @section('content')
@@ -86,6 +85,15 @@
                         <div>
                             <p class="text-sm text-gray-600 mb-1">Période de location:</p>
                             <p class="font-semibold">{{ \Carbon\Carbon::parse($reservation->start_date)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($reservation->end_date)->format('d/m/Y') }}</p>
+                            <p class="text-sm text-gray-500">
+                                @php
+                                    // Calcul uniforme du nombre de jours
+                                    $startDate = \Carbon\Carbon::parse($reservation->start_date)->startOfDay();
+                                    $endDate = \Carbon\Carbon::parse($reservation->end_date)->startOfDay();
+                                    $numberOfDays = max($endDate->diffInDays($startDate), 1);
+                                @endphp
+                                ({{ $numberOfDays }} jour(s))
+                            </p>
                         </div>
 
                         <div>
@@ -103,24 +111,64 @@
                 <div class="mb-8">
                     <h3 class="text-lg font-medium text-gray-700 mb-4">Récapitulatif du prix</h3>
                     <div class="bg-gray-50 p-4 rounded-lg">
+                        @php
+                            // Calcul uniforme du nombre de jours
+                            $startDate = \Carbon\Carbon::parse($reservation->start_date)->startOfDay();
+                            $endDate = \Carbon\Carbon::parse($reservation->end_date)->startOfDay();
+                            $numberOfDays = max($endDate->diffInDays($startDate), 1);
+                            
+                            // Calculer le sous-total correctement
+                            $pricePerDay = $reservation->vehicle->price_per_day;
+                            $subtotal = $pricePerDay * $numberOfDays;
+                            
+                            // Appliquer la promotion si présente
+                            $discount = 0;
+                            if ($reservation->promotion) {
+                                $discount = $subtotal * ($reservation->promotion->discount_percentage / 100);
+                            }
+                            
+                            // Calculer le total final
+                            $totalPrice = max($subtotal - $discount, 0.01);
+                            
+                            // S'assurer que le total de la réservation est correct
+                            if (abs($reservation->total_price - $totalPrice) > 0.01) {
+                                // Log seulement, car nous ne voulons pas modifier la BD ici
+                                \Illuminate\Support\Facades\Log::warning('Différence de prix détectée dans la vue', [
+                                    'reservation_id' => $reservation->id,
+                                    'reservation_total' => $reservation->total_price,
+                                    'calculated_total' => $totalPrice
+                                ]);
+                            }
+                        @endphp
+                        
                         <div class="flex justify-between items-center mb-2">
                             <span class="text-gray-600">Prix par jour:</span>
-                            <span>{{ number_format($reservation->vehicle->price_per_day, 2) }} €</span>
+                            <span>{{ number_format($pricePerDay, 2) }} €</span>
                         </div>
                         <div class="flex justify-between items-center mb-2">
                             <span class="text-gray-600">Durée de location:</span>
-                            <span>{{ \Carbon\Carbon::parse($reservation->start_date)->diffInDays(\Carbon\Carbon::parse($reservation->end_date)) ?: 1 }} jour(s)</span>
+                            <span>{{ $numberOfDays }} jour(s)</span>
+                        </div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-gray-600">Sous-total:</span>
+                            <span>{{ number_format($subtotal, 2) }} €</span>
                         </div>
                         @if($reservation->promotion)
                         <div class="flex justify-between items-center mb-2 text-green-600">
-                            <span>Promotion appliquée ({{ $reservation->promotion->name }}):</span>
-                            <span>-{{ $reservation->promotion->discount_percentage }}%</span>
+                            <span>Promotion ({{ $reservation->promotion->name }}):</span>
+                            <span>-{{ $reservation->promotion->discount_percentage }}% ({{ number_format($discount, 2) }} €)</span>
                         </div>
                         @endif
                         <div class="border-t border-gray-300 my-2 pt-2 flex justify-between items-center font-semibold">
                             <span>Total à payer:</span>
-                            <span class="text-xl">{{ number_format($reservation->total_price, 2) }} €</span>
+                            <span class="text-xl font-bold text-yellow-600">{{ number_format($totalPrice, 2) }} €</span>
                         </div>
+                        
+                        @if(abs($reservation->total_price - $totalPrice) > 0.01)
+                        <div class="bg-yellow-100 p-2 rounded-lg mt-2 text-xs text-yellow-800">
+                            <strong>Note:</strong> Le prix affiché peut différer du prix final. Le montant correct de {{ number_format($totalPrice, 2) }} € sera utilisé pour le paiement.
+                        </div>
+                        @endif
                     </div>
                 </div>
 
@@ -137,6 +185,8 @@
                             <p class="text-sm text-gray-600 mb-4">Payez de façon sécurisée avec votre compte PayPal ou votre carte bancaire via PayPal.</p>
                             <form action="{{ route('reservations.paypal.process', $reservation) }}" method="POST">
                                 @csrf
+                                <!-- Champ caché pour forcer le montant total correct -->
+                                <input type="hidden" name="confirmed_total_price" value="{{ $totalPrice }}">
                                 <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded flex items-center justify-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -144,6 +194,7 @@
                                     Payer avec PayPal
                                 </button>
                             </form>
+                            <p class="text-xs text-gray-500 mt-2 text-center">Montant à payer: {{ number_format($totalPrice, 2) }} €</p>
                         </div>
                         
                         <!-- Carte Bancaire Payment Option (Placeholder) -->

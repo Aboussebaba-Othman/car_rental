@@ -336,6 +336,7 @@
 
 <script>
     /**
+/**
  * Calculateur de prix en temps réel pour les réservations
  */
 document.addEventListener('DOMContentLoaded', function() {
@@ -409,6 +410,16 @@ document.addEventListener('DOMContentLoaded', function() {
         // Calculer le total (minimum 0.01)
         const totalPrice = Math.max(parseFloat((subtotal - discount).toFixed(2)), 0.01);
         
+        console.log('Price calculation:', {
+            startDate: startDate,
+            endDate: endDate,
+            numberOfDays: numberOfDays,
+            pricePerDay: pricePerDay,
+            subtotal: subtotal,
+            discount: discount,
+            total: totalPrice
+        });
+        
         // Mettre à jour l'affichage avec effet d'animation
         if (numberOfDaysElement) {
             const currentDays = parseInt(numberOfDaysElement.textContent) || 0;
@@ -465,6 +476,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     /**
      * S'assurer que la date de fin est après la date de début
+     * et calcule le prix après validation
      */
     function validateDates() {
         if (!startDateInput || !endDateInput) return;
@@ -474,10 +486,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return;
         
-        // Normaliser les dates
+        // Normaliser les dates pour un calcul cohérent
         const startMidnight = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
         const endMidnight = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
         
+        // Si la date de fin est avant ou égale à la date de début, ajouter un jour
         if (endMidnight <= startMidnight) {
             // Ajouter un jour à la date de début
             const nextDay = new Date(startMidnight);
@@ -489,8 +502,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const day = String(nextDay.getDate()).padStart(2, '0');
             
             endDateInput.value = `${year}-${month}-${day}`;
+            
+            console.log('Corrected end date:', endDateInput.value);
         }
         
+        // Recalculer le prix après validation des dates
         calculatePrice();
     }
     
@@ -532,6 +548,24 @@ document.addEventListener('DOMContentLoaded', function() {
         promotionElement.addEventListener('change', calculatePrice);
     }
     
+    // Ajouter écouteur au formulaire pour vérifier le prix avant soumission
+    const reservationForm = document.getElementById('reservation-form');
+    if (reservationForm) {
+        reservationForm.addEventListener('submit', function(e) {
+            // Recalculer le prix une dernière fois avant la soumission
+            calculatePrice();
+            
+            console.log('Form submission - final price:', hiddenTotalPriceInput.value);
+            
+            // Si le prix est 0 ou non défini, empêcher la soumission
+            if (!hiddenTotalPriceInput.value || parseFloat(hiddenTotalPriceInput.value) <= 0) {
+                e.preventDefault();
+                alert('Erreur de calcul du prix. Veuillez réessayer ou contacter l\'assistance.');
+                return false;
+            }
+        });
+    }
+    
     // Boutons d'adresse
     if (sameAddressBtn) {
         sameAddressBtn.addEventListener('click', function() {
@@ -543,7 +577,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (homeAddressBtn) {
         homeAddressBtn.addEventListener('click', function() {
-            const userAddress = userAddressData || '';
+            const userAddress = window.userAddressData || '';
             if (userAddress) {
                 pickupLocationInput.value = userAddress;
                 returnLocationInput.value = userAddress;
@@ -598,7 +632,10 @@ document.addEventListener('DOMContentLoaded', function() {
             thumbnailItems.forEach(thumb => {
                 thumb.classList.remove('ring-2', 'ring-yellow-500');
             });
-            thumbnailItems[index].classList.add('ring-2', 'ring-yellow-500');
+            
+            if (thumbnailItems[index]) {
+                thumbnailItems[index].classList.add('ring-2', 'ring-yellow-500');
+            }
             
             currentPhotoIndex = index;
         }
@@ -624,11 +661,28 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
         
-        // Rotation automatique des photos
-        setInterval(function() {
+        // Rotation automatique des photos (toutes les 5 secondes)
+        const autoRotateInterval = setInterval(function() {
+            // Vérifier que les éléments existent toujours (en cas de navigation)
+            if (!document.body.contains(photoElements[0])) {
+                clearInterval(autoRotateInterval);
+                return;
+            }
+            
             const newIndex = (currentPhotoIndex + 1) % photoCount;
             showPhoto(newIndex);
         }, 5000);
+        
+        // Arrêter la rotation automatique si l'utilisateur interagit avec les photos
+        const stopAutoRotate = () => {
+            clearInterval(autoRotateInterval);
+        };
+        
+        if (prevButton) prevButton.addEventListener('click', stopAutoRotate);
+        if (nextButton) nextButton.addEventListener('click', stopAutoRotate);
+        thumbnailItems.forEach(thumb => {
+            thumb.addEventListener('click', stopAutoRotate);
+        });
     }
     
     // Ajouter du CSS pour les effets de transition

@@ -4,68 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AutoLocPro - Location de véhicules</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <!-- Ajout de style pour la galerie photos -->
-    <style>
-        .vehicle-gallery {
-            position: relative;
-            overflow: hidden;
+    <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        yellow: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            200: '#fde68a',
+                            300: '#fcd34d',
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309',
+                            800: '#92400e',
+                            900: '#78350f',
+                        }
+                    }
+                }
+            }
         }
-        .gallery-container {
-            display: flex;
-            transition: transform 0.3s ease;
-        }
-        .gallery-slide {
-            min-width: 100%;
-        }
-        .gallery-nav {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 10;
-            background-color: rgba(255, 255, 255, 0.7);
-            border-radius: 50%;
-            width: 2rem;
-            height: 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .gallery-nav:hover {
-            background-color: rgba(255, 255, 255, 0.9);
-        }
-        .gallery-prev {
-            left: 0.5rem;
-        }
-        .gallery-next {
-            right: 0.5rem;
-        }
-        .gallery-indicators {
-            position: absolute;
-            bottom: 0.5rem;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 0.25rem;
-        }
-        .gallery-indicator {
-            width: 0.5rem;
-            height: 0.5rem;
-            border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.5);
-        }
-        .gallery-indicator.active {
-            background-color: white;
-            transform: scale(1.2);
-        }
-    </style>
+    </script>
 </head>
 <body class="bg-gray-50">
 
     <!-- Header/Navigation -->
-    <header class="bg-white shadow">
+    <header class="bg-white shadow sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
@@ -106,24 +73,47 @@
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="relative h-screen flex items-center bg-gradient-to-r from-yellow-400 to-yellow-500 text-white">
-        <div class="container mx-auto px-6 text-center">
-            <h1 class="text-5xl md:text-6xl font-extrabold leading-tight mb-4">Trouvez la voiture idéale pour tous vos déplacements</h1>
-            <p class="text-xl md:text-2xl mb-8">Réservez facilement et rapidement parmi notre large gamme de véhicules disponibles partout en France.</p>
+    <!-- Hero Section with Layered Design -->
+    <section class="relative h-screen flex items-center text-white">
+        <!-- Background Image with Yellow Overlay -->
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" 
+                 alt="Luxury car" 
+                 class="w-full h-full object-cover">
+            <!-- Yellow Overlay with Diaper-like Pattern -->
+            <div class="absolute inset-0 bg-gradient-to-b from-yellow-500/90 to-yellow-600/80"></div>
+            <!-- Diagonal Pattern Overlay -->
+            <div class="absolute inset-0 opacity-10" 
+                 style="background-image: repeating-linear-gradient(45deg, #fff, #fff 10px, transparent 10px, transparent 20px);"></div>
+        </div>
+        
+        <div class="container mx-auto px-6 text-center relative z-10">
+            <h1 class="text-5xl md:text-6xl font-extrabold leading-tight mb-4 drop-shadow-md">Trouvez la voiture idéale pour tous vos déplacements</h1>
+            <p class="text-xl md:text-2xl mb-8 drop-shadow">Réservez facilement et rapidement parmi notre large gamme de véhicules disponibles partout en France.</p>
             <div class="flex justify-center space-x-4">
-                <a href="#search" class="bg-white text-yellow-500 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition duration-200">Réserver maintenant</a>
-                <a href="#vehicles" class="border-2 border-white text-white px-8 py-3 rounded-lg font-bold hover:bg-white hover:text-yellow-500 transition duration-200">Voir nos véhicules</a>
+                <a href="#search" class="bg-white text-yellow-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition duration-200">Réserver maintenant</a>
+                <a href="#vehicles" class="border-2 border-white text-white px-8 py-3 rounded-lg font-bold hover:bg-white hover:text-yellow-600 transition duration-200">Voir nos véhicules</a>
             </div>
         </div>
+        
+        <!-- Curved Bottom Edge -->
+        <div class="absolute bottom-0 left-0 right-0">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" class="fill-white">
+                <path d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z"></path>
+            </svg>
+        </div>
     </section>
+
     <!-- Search Form -->
-    <section id="search" class="py-12 bg-white">
+    <section id="search" class="py-12 bg-white relative">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="bg-white shadow-lg rounded-xl overflow-hidden -mt-24 z-10">
-                <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 p-6 text-center rounded-t-xl">
-                    <h2 class="text-2xl font-bold text-white">Recherchez un véhicule disponible</h2>
-                    <p class="text-white">Entrez vos dates et votre lieu pour trouver les meilleures options</p>
+            <div class="bg-white shadow-lg rounded-xl overflow-hidden -mt-32 z-10 border border-yellow-100">
+                <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 p-6 text-center rounded-t-xl relative overflow-hidden">
+                    <!-- Diaper-like Pattern in Header -->
+                    <div class="absolute inset-0 opacity-10" 
+                         style="background-image: repeating-linear-gradient(45deg, #fff, #fff 10px, transparent 10px, transparent 20px);"></div>
+                    <h2 class="text-2xl font-bold text-white relative z-10">Recherchez un véhicule disponible</h2>
+                    <p class="text-white relative z-10">Entrez vos dates et votre lieu pour trouver les meilleures options</p>
                 </div>
                 <form action="{{ route('home') }}" method="GET" class="p-6 md:p-8 grid grid-cols-1 md:grid-cols-4 gap-6">
                     <div>
@@ -179,8 +169,12 @@
 
     <!-- Active Promotions Section -->
     @if(isset($activePromotions) && count($activePromotions) > 0)
-        <section id="promotions" class="py-16 bg-gradient-to-r from-yellow-50 to-orange-50">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <section id="promotions" class="py-16 bg-gradient-to-r from-yellow-50 to-amber-50 relative">
+            <!-- Subtle Diagonal Pattern -->
+            <div class="absolute inset-0 opacity-5" 
+                 style="background-image: repeating-linear-gradient(45deg, #f59e0b, #f59e0b 10px, transparent 10px, transparent 20px);"></div>
+            
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div class="text-center mb-12">
                     <h2 class="text-3xl font-bold text-gray-800 mb-4">Promotions en cours</h2>
                     <p class="text-lg text-gray-600 max-w-3xl mx-auto">Profitez de nos offres spéciales pour économiser sur votre prochaine location.</p>
@@ -236,7 +230,7 @@
     @endif
 
     <!-- Vehicles Section with Filtering and Pagination -->
-    <section id="vehicles" class="py-16 bg-gray-50">
+    <section id="vehicles" class="py-16 bg-gray-50 relative">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-10">
                 <h2 class="text-3xl font-bold text-gray-800 mb-4">
@@ -256,7 +250,7 @@
             </div>
 
             <!-- Filters and Sorting -->
-            <div class="mb-8 bg-white rounded-lg shadow p-4">
+            <div class="mb-8 bg-white rounded-lg shadow p-4 border border-yellow-100">
                 <form action="{{ route('home') }}" method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                     @if(isset($selectedPromotion))
                         <input type="hidden" name="promo" value="{{ $selectedPromotion->id }}">
@@ -321,7 +315,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 @forelse($vehicles as $vehicle)
                 <!-- Vehicle Card -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden transition-transform duration-300 hover:shadow-lg transform hover:-translate-y-1 relative">
+                <div class="bg-white rounded-xl shadow-md overflow-hidden transition-transform duration-300 hover:shadow-lg transform hover:-translate-y-1 relative border border-yellow-100">
                     <!-- Promotion Badge (if applicable) -->
                     @if(isset($selectedPromotion) && ($selectedPromotion->applicable_vehicles === null || (is_array($selectedPromotion->applicable_vehicles) && in_array($vehicle->id, $selectedPromotion->applicable_vehicles))))
                     <div class="absolute top-0 left-0 z-20 bg-red-500 text-white font-bold px-3 py-1 rounded-br-lg">
@@ -329,41 +323,10 @@
                     </div>
                     @endif
                     
-                    <div class="relative h-48 vehicle-gallery">
+                    <div class="relative h-48">
                         @if($vehicle->photos->count() > 0)
-                            <div class="gallery-container" data-index="0">
-                                @foreach($vehicle->photos as $index => $photo)
-                                    <div class="gallery-slide">
-                                        <img src="{{ asset('storage/' . $photo->path) }}" alt="{{ $vehicle->brand }} {{ $vehicle->model }} - Photo {{ $index + 1 }}" class="w-full h-48 object-cover">
-                                    </div>
-                                @endforeach
-                            </div>
-                            
-                            @if($vehicle->photos->count() > 1)
-                                <!-- Navigation buttons -->
-                                <button class="gallery-nav gallery-prev" onclick="moveGallery(this.parentNode, -1)">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                    </svg>
-                                </button>
-                                <button class="gallery-nav gallery-next" onclick="moveGallery(this.parentNode, 1)">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                                    </svg>
-                                </button>
-                                
-                                <!-- Indicators -->
-                                <div class="gallery-indicators">
-                                    @foreach($vehicle->photos as $index => $photo)
-                                        <div class="gallery-indicator {{ $index === 0 ? 'active' : '' }}" data-index="{{ $index }}"></div>
-                                    @endforeach
-                                </div>
-                                
-                                <!-- Photo counter -->
-                                <div class="absolute top-0 right-0 bg-black bg-opacity-50 text-white text-xs px-2 py-1 m-2 rounded-lg">
-                                    <span class="current-photo">1</span>/<span>{{ $vehicle->photos->count() }}</span>
-                                </div>
-                            @endif
+                            @php $primaryPhoto = $vehicle->photos->firstWhere('is_primary', true) ?? $vehicle->photos->first(); @endphp
+                            <img src="{{ asset('storage/' . $primaryPhoto->path) }}" alt="{{ $vehicle->brand }} {{ $vehicle->model }}" class="w-full h-full object-cover">
                         @else
                             <div class="w-full h-full flex items-center justify-center bg-gray-200">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -380,8 +343,6 @@
                             @endif
                         </div>
                     </div>
-                    
-                    <!-- Rest of vehicle card content -->
                     <div class="p-6">
                         <div class="flex justify-between items-start mb-2">
                             <h3 class="text-xl font-bold text-gray-800">{{ $vehicle->brand }} {{ $vehicle->model }}</h3>
@@ -419,7 +380,7 @@
                             </div>
                             <div class="flex items-center mr-4 mb-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M9 6a3 3 0 11-6 0 3 3 0 006 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+                                    <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
                                 </svg>
                                 {{ $vehicle->seats }} places
                             </div>
@@ -577,8 +538,14 @@
             </div>
         </div>
     </section>
-    <section class="py-16 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <!-- Features Section -->
+    <section class="py-16 bg-white relative">
+        <!-- Subtle Diagonal Pattern -->
+        <div class="absolute inset-0 opacity-5" 
+             style="background-image: repeating-linear-gradient(45deg, #f59e0b, #f59e0b 10px, transparent 10px, transparent 20px);"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="text-center mb-12">
                 <h2 class="text-3xl font-bold text-gray-800 mb-4">Pourquoi choisir AutoLocPro?</h2>
                 <p class="text-lg text-gray-600 max-w-3xl mx-auto">Profitez d'une expérience de location simple, rapide et sécurisée avec tous les avantages AutoLocPro.</p>
@@ -586,7 +553,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <!-- Feature 1 -->
-                <div class="text-center bg-gray-50 rounded-xl p-8 hover:shadow-lg transition duration-300">
+                <div class="text-center bg-gray-50 rounded-xl p-8 hover:shadow-lg transition duration-300 border border-yellow-100">
                     <div class="inline-flex items-center justify-center p-3 bg-yellow-100 rounded-full text-yellow-500 mb-5">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
@@ -597,7 +564,7 @@
                 </div>
 
                 <!-- Feature 2 -->
-                <div class="text-center bg-gray-50 rounded-xl p-8 hover:shadow-lg transition duration-300">
+                <div class="text-center bg-gray-50 rounded-xl p-8 hover:shadow-lg transition duration-300 border border-yellow-100">
                     <div class="inline-flex items-center justify-center p-3 bg-yellow-100 rounded-full text-yellow-500 mb-5">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.532 1.532 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
@@ -608,7 +575,7 @@
                 </div>
 
                 <!-- Feature 3 -->
-                <div class="text-center bg-gray-50 rounded-xl p-8 hover:shadow-lg transition duration-300">
+                <div class="text-center bg-gray-50 rounded-xl p-8 hover:shadow-lg transition duration-300 border border-yellow-100">
                     <div class="inline-flex items-center justify-center p-3 bg-yellow-100 rounded-full text-yellow-500 mb-5">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z" clip-rule="evenodd" />
@@ -620,6 +587,7 @@
             </div>
         </div>
     </section>
+
     <!-- Footer -->
     <footer class="bg-gray-800 text-white py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -675,54 +643,5 @@
             </div>
         </div>
     </footer>
-
-    <!-- Script for gallery functionality -->
-    <script>
-        function moveGallery(gallery, direction) {
-            const container = gallery.querySelector('.gallery-container');
-            const currentIndex = parseInt(container.dataset.index);
-            const slides = container.querySelectorAll('.gallery-slide');
-            const totalSlides = slides.length;
-            
-            // Calculate new index
-            let newIndex = currentIndex + direction;
-            if (newIndex < 0) newIndex = totalSlides - 1;
-            if (newIndex >= totalSlides) newIndex = 0;
-            
-            // Update container position
-            container.style.transform = `translateX(-${newIndex * 100}%)`;
-            container.dataset.index = newIndex;
-            
-            // Update indicators
-            const indicators = gallery.querySelectorAll('.gallery-indicator');
-            indicators.forEach(indicator => {
-                indicator.classList.remove('active');
-                if (parseInt(indicator.dataset.index) === newIndex) {
-                    indicator.classList.add('active');
-                }
-            });
-            
-            // Update counter
-            const counter = gallery.querySelector('.current-photo');
-            if (counter) counter.textContent = newIndex + 1;
-        }
-        
-        // Initialize click handlers for indicators
-        document.addEventListener('DOMContentLoaded', function() {
-            const indicators = document.querySelectorAll('.gallery-indicator');
-            indicators.forEach(indicator => {
-                indicator.addEventListener('click', function() {
-                    const gallery = this.closest('.vehicle-gallery');
-                    const container = gallery.querySelector('.gallery-container');
-                    const currentIndex = parseInt(container.dataset.index);
-                    const targetIndex = parseInt(this.dataset.index);
-                    
-                    // Move gallery to clicked indicator
-                    const direction = targetIndex - currentIndex;
-                    moveGallery(gallery, direction);
-                });
-            });
-        });
-    </script>
 </body>
 </html>
