@@ -1,14 +1,14 @@
 @extends('layouts.company')
 
-@section('title', 'Dashboard')
-@section('header', 'Company Dashboard')
+@section('title', 'Tableau de Bord')
+@section('header', 'Tableau de Bord de l\'Entreprise')
 
 @section('content')
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
     <!-- Active Vehicles Card -->
     <div class="bg-white rounded-lg shadow p-6 flex justify-between items-center">
         <div>
-            <p class="text-sm font-medium text-gray-500">Active Vehicles</p>
+            <p class="text-sm font-medium text-gray-500">Véhicules Actifs</p>
             <p class="text-3xl font-bold text-gray-800">{{ $company->vehicles->where('is_active', true)->count() ?? 0 }}</p>
         </div>
         <div class="bg-blue-100 p-3 rounded-full">
@@ -21,7 +21,7 @@
     <!-- Pending Reservations Card -->
     <div class="bg-white rounded-lg shadow p-6 flex justify-between items-center">
         <div>
-            <p class="text-sm font-medium text-gray-500">Pending Reservations</p>
+            <p class="text-sm font-medium text-gray-500">Réservations en Attente</p>
             <p class="text-3xl font-bold text-gray-800">{{ $company->reservations->where('status', 'pending')->count() ?? 0 }}</p>
         </div>
         <div class="bg-yellow-100 p-3 rounded-full">
@@ -34,7 +34,7 @@
     <!-- Active Promotions Card -->
     <div class="bg-white rounded-lg shadow p-6 flex justify-between items-center">
         <div>
-            <p class="text-sm font-medium text-gray-500">Active Promotions</p>
+            <p class="text-sm font-medium text-gray-500">Promotions Actives</p>
             <p class="text-3xl font-bold text-gray-800">{{ $company->promotions->where('is_active', true)->count() ?? 0 }}</p>
         </div>
         <div class="bg-green-100 p-3 rounded-full">
@@ -47,7 +47,7 @@
     <!-- Total Revenue Card -->
     <div class="bg-white rounded-lg shadow p-6 flex justify-between items-center">
         <div>
-            <p class="text-sm font-medium text-gray-500">Total Revenue</p>
+            <p class="text-sm font-medium text-gray-500">Revenu Total</p>
             <p class="text-3xl font-bold text-gray-800">{{ number_format($company->reservations->where('status', 'completed')->sum('total_price'), 2) ?? 0 }} €</p>
         </div>
         <div class="bg-purple-100 p-3 rounded-full">
@@ -62,7 +62,7 @@
     <!-- Recent Reservations -->
     <div class="bg-white rounded-lg shadow col-span-2">
         <div class="px-6 py-4 border-b">
-            <h2 class="font-medium text-gray-700">Recent Reservations</h2>
+            <h2 class="font-medium text-gray-700">Réservations Récentes</h2>
         </div>
         <div class="p-6">
             @if($company->reservations && $company->reservations->count() > 0)
@@ -71,10 +71,10 @@
                         <thead>
                             <tr>
                                 <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Rental ID
+                                    ID Location
                                 </th>
                                 <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Vehicle
+                                    Véhicule
                                 </th>
                                 <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Client
@@ -83,7 +83,7 @@
                                     Date
                                 </th>
                                 <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Status
+                                    Statut
                                 </th>
                                 <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Action
@@ -108,24 +108,24 @@
                                     <td class="py-3 px-4 border-b border-gray-200 text-sm">
                                         @if($reservation->status == 'pending')
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                                Pending
+                                                En attente
                                             </span>
                                         @elseif($reservation->status == 'confirmed')
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                Confirmed
+                                                Confirmée
                                             </span>
                                         @elseif($reservation->status == 'canceled')
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                                Canceled
+                                                Annulée
                                             </span>
                                         @elseif($reservation->status == 'completed')
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                                Completed
+                                                Terminée
                                             </span>
                                         @endif
                                     </td>
                                     <td class="py-3 px-4 border-b border-gray-200 text-sm">
-                                        <a href="#" class="text-indigo-600 hover:text-indigo-900">View</a>
+                                        <a href="#" class="text-indigo-600 hover:text-indigo-900">Voir</a>
                                     </td>
                                 </tr>
                             @endforeach
@@ -133,16 +133,16 @@
                     </table>
                 </div>
                 <div class="mt-4 text-center">
-                    <a href="#" class="text-indigo-600 hover:text-indigo-900 text-sm font-medium">View All Reservations</a>
+                    <a href="#" class="text-indigo-600 hover:text-indigo-900 text-sm font-medium">Voir toutes les réservations</a>
                 </div>
             @else
                 <div class="text-center py-8">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                     </svg>
-                    <p class="mt-2 text-gray-500">No reservations found.</p>
+                    <p class="mt-2 text-gray-500">Aucune réservation trouvée.</p>
                     <button class="mt-4 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Add Your First Vehicle
+                        Ajouter votre premier véhicule
                     </button>
                 </div>
             @endif
@@ -154,8 +154,8 @@
         <!-- Recent Messages -->
         <div class="bg-white rounded-lg shadow">
             <div class="px-6 py-4 border-b flex justify-between items-center">
-                <h2 class="font-medium text-gray-700">Recent Messages</h2>
-                <span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">3 Unread</span>
+                <h2 class="font-medium text-gray-700">Messages Récents</h2>
+                <span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">3 Non lus</span>
             </div>
             <div class="p-6">
                 @if(isset($messages) && count($messages) > 0)
@@ -174,14 +174,14 @@
                         @endforeach
                     </ul>
                     <div class="mt-4 text-center">
-                        <a href="#" class="text-indigo-600 hover:text-indigo-900 text-sm font-medium">View All Messages</a>
+                        <a href="#" class="text-indigo-600 hover:text-indigo-900 text-sm font-medium">Voir tous les messages</a>
                     </div>
                 @else
                     <div class="text-center py-6">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                         </svg>
-                        <p class="mt-2 text-gray-500">No messages found.</p>
+                        <p class="mt-2 text-gray-500">Aucun message trouvé.</p>
                     </div>
                 @endif
             </div>
@@ -190,7 +190,7 @@
         <!-- Recent Reviews -->
         <div class="bg-white rounded-lg shadow">
             <div class="px-6 py-4 border-b">
-                <h2 class="font-medium text-gray-700">Recent Reviews</h2>
+                <h2 class="font-medium text-gray-700">Avis Récents</h2>
             </div>
             <div class="p-6">
                 @if(isset($reviews) && count($reviews) > 0)
@@ -225,14 +225,14 @@
                         @endforeach
                     </ul>
                     <div class="mt-4 text-center">
-                        <a href="#" class="text-indigo-600 hover:text-indigo-900 text-sm font-medium">View All Reviews</a>
+                        <a href="#" class="text-indigo-600 hover:text-indigo-900 text-sm font-medium">Voir tous les avis</a>
                     </div>
                 @else
                     <div class="text-center py-6">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                         </svg>
-                        <p class="mt-2 text-gray-500">No reviews yet.</p>
+                        <p class="mt-2 text-gray-500">Pas encore d'avis.</p>
                     </div>
                 @endif
             </div>
@@ -243,14 +243,14 @@
 <!-- Available & Rented Vehicles Overview -->
 <div class="mt-6 bg-white rounded-lg shadow">
     <div class="px-6 py-4 border-b">
-        <h2 class="font-medium text-gray-700">Vehicle Status Overview</h2>
+        <h2 class="font-medium text-gray-700">Aperçu de l'état des véhicules</h2>
     </div>
     <div class="p-6">
         @if(isset($company->vehicles) && $company->vehicles->count() > 0)
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Available Vehicles -->
                 <div>
-                    <h3 class="text-sm font-medium text-gray-500 mb-3">Available Vehicles</h3>
+                    <h3 class="text-sm font-medium text-gray-500 mb-3">Véhicules Disponibles</h3>
                     <div class="space-y-3">
                         @foreach($company->vehicles->where('is_available', true)->take(3) as $vehicle)
                             <div class="flex items-center p-3 bg-gray-50 rounded-lg">
@@ -268,7 +268,7 @@
                                 <div class="ml-4 flex-1">
                                     <div class="flex justify-between">
                                         <h4 class="text-sm font-medium text-gray-900">{{ $vehicle->brand }} {{ $vehicle->model }}</h4>
-                                        <p class="text-sm font-medium text-gray-900">{{ number_format($vehicle->price_per_day, 2) }} €/day</p>
+                                        <p class="text-sm font-medium text-gray-900">{{ number_format($vehicle->price_per_day, 2) }} €/jour</p>
                                     </div>
                                     <p class="text-xs text-gray-500">{{ $vehicle->year }} · {{ $vehicle->transmission }} · {{ $vehicle->fuel_type }}</p>
                                 </div>
@@ -279,7 +279,7 @@
                 
                 <!-- Currently Rented Vehicles -->
                 <div>
-                    <h3 class="text-sm font-medium text-gray-500 mb-3">Currently Rented</h3>
+                    <h3 class="text-sm font-medium text-gray-500 mb-3">Actuellement Loués</h3>
                     <div class="space-y-3">
                         @php
                             $rentedVehicles = $company->vehicles->filter(function($vehicle) {
@@ -314,18 +314,18 @@
                                         <div class="flex justify-between">
                                             <h4 class="text-sm font-medium text-gray-900">{{ $vehicle->brand }} {{ $vehicle->model }}</h4>
                                             <p class="text-xs text-gray-500">
-                                                Return: {{ $activeReservation->end_date->format('d/m/Y') }}
+                                                Retour: {{ $activeReservation->end_date->format('d/m/Y') }}
                                             </p>
                                         </div>
                                         <p class="text-xs text-gray-500">
-                                            Rented by: {{ $activeReservation->user->name }}
+                                            Loué par: {{ $activeReservation->user->name }}
                                         </p>
                                     </div>
                                 </div>
                             @endforeach
                         @else
                             <div class="flex items-center justify-center p-6 bg-gray-50 rounded-lg">
-                                <p class="text-sm text-gray-500">No vehicles currently rented.</p>
+                                <p class="text-sm text-gray-500">Aucun véhicule actuellement loué.</p>
                             </div>
                         @endif
                     </div>
@@ -336,9 +336,9 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
-                <p class="mt-2 text-gray-500">No vehicles added yet.</p>
+                <p class="mt-2 text-gray-500">Aucun véhicule ajouté pour le moment.</p>
                 <button class="mt-4 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Add Your First Vehicle
+                    Ajouter votre premier véhicule
                 </button>
             </div>
         @endif

@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 class ReservationRepository implements ReservationRepositoryInterface
 {
@@ -29,30 +30,26 @@ class ReservationRepository implements ReservationRepositoryInterface
     {
         $query = $this->model->query()
             ->with(['vehicle', 'user', 'promotion'])
-            // Commenté pour afficher toutes les réservations sans filtrer par company_id
-            // ->whereHas('vehicle', function ($query) {
-            //     $query->where('company_id', Auth::user()->company_id);
-            // })
             ->latest();
         
         // Apply filters if any
-        if ($request->has('status') && $request->status) {
+        if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
         
-        if ($request->has('vehicle_id') && $request->vehicle_id) {
+        if ($request->filled('vehicle_id')) {
             $query->where('vehicle_id', $request->vehicle_id);
         }
         
-        if ($request->has('date_from') && $request->date_from) {
+        if ($request->filled('date_from')) {
             $query->where('start_date', '>=', $request->date_from);
         }
         
-        if ($request->has('date_to') && $request->date_to) {
+        if ($request->filled('date_to')) {
             $query->where('end_date', '<=', $request->date_to);
         }
         
-        if ($request->has('search') && $request->search) {
+        if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('id', 'LIKE', "%{$search}%")
@@ -63,7 +60,7 @@ class ReservationRepository implements ReservationRepositoryInterface
             });
         }
         
-        return $query->paginate($perPage);
+        return $query->paginate($perPage)->appends($request->except('page'));
     }
     
     /**
@@ -75,14 +72,6 @@ class ReservationRepository implements ReservationRepositoryInterface
     public function getReservationStats(?int $companyId = null): array
     {
         $query = $this->model->query();
-        
-        // Commenté pour afficher les statistiques de toutes les réservations
-        // Only filter by company if a company ID is provided
-        // if ($companyId !== null) {
-        //     $query->whereHas('vehicle', function ($q) use ($companyId) {
-        //         $q->where('company_id', $companyId);
-        //     });
-        // }
         
         return [
             'total' => (clone $query)->count(),
@@ -120,8 +109,16 @@ class ReservationRepository implements ReservationRepositoryInterface
     public function confirmReservation(Reservation $reservation, int $confirmedBy): Reservation
     {
         $reservation->status = 'confirmed';
-        $reservation->confirmed_at = Carbon::now();
-        $reservation->confirmed_by = $confirmedBy;
+        
+        // Vérifier si les colonnes existent avant de les mettre à jour
+        if (Schema::hasColumn('reservations', 'confirmed_at')) {
+            $reservation->confirmed_at = Carbon::now();
+        }
+        
+        if (Schema::hasColumn('reservations', 'confirmed_by')) {
+            $reservation->confirmed_by = $confirmedBy;
+        }
+        
         $reservation->save();
         
         return $reservation;
@@ -138,10 +135,20 @@ class ReservationRepository implements ReservationRepositoryInterface
     public function cancelReservation(Reservation $reservation, int $canceledBy, ?string $reason = null): Reservation
     {
         $reservation->status = 'canceled';
-        $reservation->canceled_at = Carbon::now();
-        $reservation->canceled_by = $canceledBy;
         
-        if ($reason) {
+        // Vérifier si les colonnes existent avant de les mettre à jour
+        // Si les colonnes n'existent pas, on ne les met pas à jour
+        
+        // Pour les colonnes cancelled_at et cancelled_by
+        if (Schema::hasColumn('reservations', 'canceled_at')) {
+            $reservation->canceled_at = Carbon::now();
+        }
+        
+        if (Schema::hasColumn('reservations', 'canceled_by')) {
+            $reservation->canceled_by = $canceledBy;
+        }
+        
+        if ($reason && Schema::hasColumn('reservations', 'cancellation_reason')) {
             $reservation->cancellation_reason = $reason;
         }
         
@@ -160,8 +167,16 @@ class ReservationRepository implements ReservationRepositoryInterface
     public function completeReservation(Reservation $reservation, int $completedBy): Reservation
     {
         $reservation->status = 'completed';
-        $reservation->completed_at = Carbon::now();
-        $reservation->completed_by = $completedBy;
+        
+        // Vérifier si les colonnes existent avant de les mettre à jour
+        if (Schema::hasColumn('reservations', 'completed_at')) {
+            $reservation->completed_at = Carbon::now();
+        }
+        
+        if (Schema::hasColumn('reservations', 'completed_by')) {
+            $reservation->completed_by = $completedBy;
+        }
+        
         $reservation->save();
         
         return $reservation;
@@ -176,11 +191,28 @@ class ReservationRepository implements ReservationRepositoryInterface
     public function markReservationAsPaid(Reservation $reservation): Reservation
     {
         $reservation->status = 'paid';
-        $reservation->payment_method = 'manual';
-        $reservation->payment_status = 'COMPLETED';
-        $reservation->payment_date = Carbon::now();
-        $reservation->amount_paid = $reservation->total_price;
-        $reservation->transaction_id = 'MANUAL-' . strtoupper(substr(md5(uniqid()), 0, 10));
+        
+        // S'assurer que ces colonnes existent dans la table
+        if (Schema::hasColumn('reservations', 'payment_method')) {
+            $reservation->payment_method = 'manual';
+        }
+        
+        if (Schema::hasColumn('reservations', 'payment_status')) {
+            $reservation->payment_status = 'COMPLETED';
+        }
+        
+        if (Schema::hasColumn('reservations', 'payment_date')) {
+            $reservation->payment_date = Carbon::now();
+        }
+        
+        if (Schema::hasColumn('reservations', 'amount_paid')) {
+            $reservation->amount_paid = $reservation->total_price;
+        }
+        
+        if (Schema::hasColumn('reservations', 'transaction_id')) {
+            $reservation->transaction_id = 'MANUAL-' . strtoupper(substr(md5(uniqid()), 0, 10));
+        }
+        
         $reservation->save();
         
         return $reservation;
