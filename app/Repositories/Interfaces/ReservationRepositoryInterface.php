@@ -79,4 +79,12 @@ interface ReservationRepositoryInterface
      * @return bool
      */
     public function reservationBelongsToCompany(Reservation $reservation, int $companyId): bool;
+    
+    /**
+     * Authorize a vehicle belongs to user's company
+     *
+     * @param \App\Models\Vehicle $vehicle
+     * @return bool
+     */
+    public function authorizeVehicle($vehicle): bool;
 }
