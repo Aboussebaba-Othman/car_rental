@@ -1,4 +1,3 @@
-<!-- filepath: c:\Users\Youcode\Gestion-de-Location-des-Voitures\resources\views\vehicles\show.blade.php -->
 @extends('layouts.app')
 
 @section('content')
