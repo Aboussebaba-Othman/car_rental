@@ -143,7 +143,6 @@
         }
         
         .hover-card:hover {
-            transform: translateY(-8px);
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
         
@@ -197,24 +196,34 @@
         .btn-primary {
             background-image: linear-gradient(to right, #f59e0b, #d97706);
             transition: all 0.3s;
+            color: white; /* Ensuring text is white for better contrast */
+            font-weight: 600; /* Making text slightly bolder */
         }
         
         .btn-primary:hover {
             background-image: linear-gradient(to right, #d97706, #b45309);
-            transform: translateY(-2px);
             box-shadow: 0 10px 15px -3px rgba(245, 158, 11, 0.3);
         }
         
         .btn-outline {
             transition: all 0.3s;
-            border: 2px solid white;
+            border: 3px solid white;
+            color: white; 
+            font-weight: 700;
+            display: inline-block;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 10;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            background-color: rgba(0, 0, 0, 0.2); /* Add slight background for contrast */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         
         .btn-outline:hover {
             background-color: white;
             color: #f59e0b;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
         }
         
         /* Search form */
@@ -297,8 +306,8 @@
                 <div class="flex items-center space-x-6">
                     <nav class="hidden md:flex space-x-6 text-gray-600">
                         <a href="#" class="font-medium hover:text-yellow-500 transition duration-300 border-b-2 border-transparent hover:border-yellow-500 py-2">Accueil</a>
-                        <a href="#vehicles" class="font-medium hover:text-yellow-500 transition duration-300 border-b-2 border-transparent hover:border-yellow-500 py-2">Véhicules</a>
-                        <a href="#promotions" class="font-medium hover:text-yellow-500 transition duration-300 border-b-2 border-transparent hover:border-yellow-500 py-2">Promotions</a>
+                        <a href="{{ route('vehicles.index') }}" class="font-medium hover:text-yellow-500 transition duration-300 border-b-2 border-transparent hover:border-yellow-500 py-2">Véhicules</a>
+                        <a href="#vehicles" class="font-medium hover:text-yellow-500 transition duration-300 border-b-2 border-transparent hover:border-yellow-500 py-2">Promotions</a>
                         <a href="#" class="font-medium hover:text-yellow-500 transition duration-300 border-b-2 border-transparent hover:border-yellow-500 py-2">À propos</a>
                         <a href="#" class="font-medium hover:text-yellow-500 transition duration-300 border-b-2 border-transparent hover:border-yellow-500 py-2">Contact</a>
                     </nav>
@@ -342,7 +351,7 @@
         </div>
         <nav class="flex flex-col space-y-4">
             <a href="#" class="font-medium text-gray-800 hover:text-yellow-500 py-2 border-b border-gray-100">Accueil</a>
-            <a href="#vehicles" class="font-medium text-gray-800 hover:text-yellow-500 py-2 border-b border-gray-100">Véhicules</a>
+            <a href="{{ route('vehicles.index') }}" class="font-medium text-gray-800 hover:text-yellow-500 py-2 border-b border-gray-100">Véhicules</a>
             <a href="#promotions" class="font-medium text-gray-800 hover:text-yellow-500 py-2 border-b border-gray-100">Promotions</a>
             <a href="#" class="font-medium text-gray-800 hover:text-yellow-500 py-2 border-b border-gray-100">À propos</a>
             <a href="#" class="font-medium text-gray-800 hover:text-yellow-500 py-2 border-b border-gray-100">Contact</a>
@@ -377,7 +386,7 @@
                         <a href="#search" class="btn-primary bg-white text-yellow-500 px-8 py-4 rounded-full font-bold hover:bg-gray-100 transition duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
                             Réserver maintenant
                         </a>
-                        <a href="#vehicles" class="btn-outline border-2 border-white text-white px-8 py-4 rounded-full font-bold hover:bg-white hover:text-yellow-500 transition duration-300">
+                        <a href="{{ route('vehicles.index') }}" class="btn-outline border-2 border-white text-white px-8 py-4 rounded-full font-bold hover:bg-white hover:text-yellow-500 transition duration-300">
                             Voir nos véhicules
                         </a>
                     </div>
@@ -529,10 +538,11 @@
 
     <!-- Vehicles Section with Filtering and Pagination -->
     <section id="vehicles" class="py-16 bg-gray-50 relative">
-        <!-- Decorative pattern -->
+        <!-- Decorative pattern with road and car elements -->
         <div class="absolute inset-0 opacity-5" 
-             style="background-image: repeating-linear-gradient(45deg, #f59e0b, #f59e0b 10px, transparent 10px, transparent 20px);"></div>
-             
+             style="background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPgogIDxkZWZzPgogICAgPHBhdHRlcm4gaWQ9InJvYWRwYXR0ZXJuIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+CiAgICAgIDxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSJub25lIiAvPgogICAgICA8IS0tIFJvYWQgLS0+CiAgICAgIDxyZWN0IHg9IjEwIiB5PSI0MCIgd2lkdGg9IjgwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjZjU5ZTBiIiBvcGFjaXR5PSIwLjEiIHJ4PSIyIiAvPgogICAgICA8IS0tIERhc2hlZCBsaW5lcyAtLT4KICAgICAgPHJlY3QgeD0iMTUiIHk9IjQ5IiB3aWR0aD0iMTAiIGhlaWdodD0iMiIgZmlsbD0iI2Y1OWUwYiIgb3BhY2l0eT0iMC4zIiAvPgogICAgICA8cmVjdCB4PSIzNSIgeT0iNDkiIHdpZHRoPSIxMCIgaGVpZ2h0PSIyIiBmaWxsPSIjZjU5ZTBiIiBvcGFjaXR5PSIwLjMiIC8+CiAgICAgIDxyZWN0IHg9IjU1IiB5PSI0OSIgd2lkdGg9IjEwIiBoZWlnaHQ9IjIiIGZpbGw9IiNmNTllMGIiIG9wYWNpdHk9IjAuMyIgLz4KICAgICAgPHJlY3QgeD0iNzUiIHk9IjQ5IiB3aWR0aD0iMTAiIGhlaWdodD0iMiIgZmlsbD0iI2Y1OWUwYiIgb3BhY2l0eT0iMC4zIiAvPgogICAgICA8IS0tIENhciBzaWxob3VldHRlIC0tPgogICAgICA8cGF0aCBkPSJNNzAgMzVjLTEtMS41LTIuNS0yLTUtMmgtMTBjLTIuNSAwLTQgMC41LTUgMmwtMyAzYy0yIDAtNCAxLTQgM3YyYzAgMSAwLjUgMSAxIDFoMmMwIDIgMyAzIDQgMXMxLTMgMS0xaDE4YzAtMiAzLTMgNC0xczEgMyAxIDFoMmMwLjUgMCAxIDAuMyAxLTF2LTJjMC0yLTItMy00LTNsLTMtM3oiIGZpbGw9IiNmNTllMGIiIG9wYWNpdHk9IjAuMiIgLz4KICAgIDwvcGF0dGVybj4KICA8L2RlZnM+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNyb2FkcGF0dGVybikiIC8+Cjwvc3ZnPg==');
+                    background-size: 300px 300px;"></div>
+        
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="text-center mb-10">
                 <span class="badge badge-yellow inline-block mb-4">Notre flotte</span>
@@ -786,7 +796,7 @@
                             </div>
                             @endif
                         </div>
-                        <a href="{{ route('reservations.create', $vehicle->id) }}" class="btn-primary block w-full py-3 px-4 text-center border border-yellow-500 rounded-lg text-yellow-500 font-medium hover:bg-yellow-500 hover:text-white transition duration-300 shadow-sm hover:shadow-md transform hover:-translate-y-0.5">
+                        <a href="{{ route('reservations.create', $vehicle->id) }}" class="btn-primary block w-full py-3 px-4 text-center border border-yellow-500 rounded-lg text-white font-medium hover:bg-yellow-500 hover:text-white transition duration-300 shadow-sm hover:shadow-md">
                             Réserver maintenant
                         </a>
                     </div>
@@ -868,7 +878,7 @@
                     </a>
                 @endif
                 
-                <a href="" class="btn-primary inline-flex items-center px-6 py-3 border border-transparent rounded-lg text-white bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition duration-300 font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                <a href="" class="btn-primary inline-flex items-center px-6 py-3 border border-transparent rounded-lg text-white bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition duration-300 font-medium shadow-md hover:shadow-lg">
                     Voir tous nos véhicules
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Promotion extends Model
 {
@@ -62,5 +63,14 @@ class Promotion extends Model
     {
         return $this->applicable_vehicles === null || 
             (is_array($this->applicable_vehicles) && in_array($vehicleId, $this->applicable_vehicles));
+    }
+    
+    public function scopeActive($query)
+    {
+        $today = Carbon::now()->startOfDay();
+        
+        return $query->where('is_active', true)
+                     ->where('start_date', '<=', $today)
+                     ->where('end_date', '>=', $today);
     }
 }
