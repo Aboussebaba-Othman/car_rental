@@ -292,83 +292,7 @@
 </head>
 <body class="bg-gray-50">
 
-    <!-- Header/Navigation -->
-    <header class="bg-white shadow-md sticky top-0 z-50 transition-all duration-300">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 flex items-center">
-                        <span class="text-3xl font-extrabold">
-                            <span class="text-yellow-500">Auto</span><span class="text-gray-800">Loc</span><span class="text-yellow-500">Pro</span>
-                        </span>
-                    </div>
-                </div>
-                <div class="flex items-center space-x-6">
-                    <nav class="hidden md:flex space-x-6 text-gray-600">
-                        <a href="#" class="font-medium hover:text-yellow-500 transition duration-300 border-b-2 border-transparent hover:border-yellow-500 py-2">Accueil</a>
-                        <a href="{{ route('vehicles.index') }}" class="font-medium hover:text-yellow-500 transition duration-300 border-b-2 border-transparent hover:border-yellow-500 py-2">Véhicules</a>
-                        <a href="#vehicles" class="font-medium hover:text-yellow-500 transition duration-300 border-b-2 border-transparent hover:border-yellow-500 py-2">Promotions</a>
-                        <a href="#" class="font-medium hover:text-yellow-500 transition duration-300 border-b-2 border-transparent hover:border-yellow-500 py-2">À propos</a>
-                        <a href="#" class="font-medium hover:text-yellow-500 transition duration-300 border-b-2 border-transparent hover:border-yellow-500 py-2">Contact</a>
-                    </nav>
-                    <div class="flex items-center space-x-4">
-                        @auth
-                            <a href="{{ route('reservations.index') }}" class="text-gray-600 hover:text-yellow-600 font-medium transition duration-300">Mes réservations</a>
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" class="text-gray-600 hover:text-yellow-600 font-medium transition duration-300">Déconnexion</button>
-                            </form>
-                        @else
-                            <a href="{{ route('login') }}" class="text-gray-600 hover:text-yellow-600 font-medium transition duration-300">Connexion</a>
-                            <a href="{{ route('register') }}" class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white px-6 py-2 rounded-full font-medium hover:from-yellow-600 hover:to-yellow-700 transition duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">S'inscrire</a>
-                        @endauth
-                    </div>
-                </div>
-                <!-- Mobile menu button -->
-                <div class="md:hidden flex items-center">
-                    <button type="button" id="mobile-menu-button" class="text-gray-500 hover:text-gray-600 focus:outline-none" aria-label="Menu">
-                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Mobile Menu -->
-    <div id="menu-overlay" class="menu-overlay"></div>
-    <div id="mobile-menu" class="mobile-menu p-6">
-        <div class="flex justify-between items-center mb-8">
-            <span class="text-2xl font-bold">
-                <span class="text-yellow-500">Auto</span><span class="text-gray-800">Loc</span><span class="text-yellow-500">Pro</span>
-            </span>
-            <button id="close-menu-button" class="text-gray-500 hover:text-gray-800">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-        </div>
-        <nav class="flex flex-col space-y-4">
-            <a href="#" class="font-medium text-gray-800 hover:text-yellow-500 py-2 border-b border-gray-100">Accueil</a>
-            <a href="{{ route('vehicles.index') }}" class="font-medium text-gray-800 hover:text-yellow-500 py-2 border-b border-gray-100">Véhicules</a>
-            <a href="#promotions" class="font-medium text-gray-800 hover:text-yellow-500 py-2 border-b border-gray-100">Promotions</a>
-            <a href="#" class="font-medium text-gray-800 hover:text-yellow-500 py-2 border-b border-gray-100">À propos</a>
-            <a href="#" class="font-medium text-gray-800 hover:text-yellow-500 py-2 border-b border-gray-100">Contact</a>
-        </nav>
-        <div class="mt-8 space-y-4">
-            @auth
-                <a href="{{ route('reservations.index') }}" class="block w-full text-center py-2 px-4 bg-gray-100 rounded-lg text-gray-800 font-medium hover:bg-gray-200 transition duration-300">Mes réservations</a>
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="block w-full text-center py-2 px-4 bg-gray-100 rounded-lg text-gray-800 font-medium hover:bg-gray-200 transition duration-300">Déconnexion</button>
-                </form>
-            @else
-                <a href="{{ route('login') }}" class="block w-full text-center py-2 px-4 bg-gray-100 rounded-lg text-gray-800 font-medium hover:bg-gray-200 transition duration-300">Connexion</a>
-                <a href="{{ route('register') }}" class="block w-full text-center py-3 px-4 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg text-white font-medium hover:from-yellow-600 hover:to-yellow-700 transition duration-300 shadow-md">S'inscrire</a>
-            @endauth
-        </div>
-    </div>
+    @include('layouts.header')
 
     <!-- Hero Section -->
     <section class="relative min-h-screen flex items-center bg-gradient-to-r from-yellow-400 to-yellow-500 text-gray-900 overflow-hidden curved-bottom hero-pattern">
@@ -435,9 +359,9 @@
                             </div>
                         </div>
                         <div>
-                            <label for="pickup_date" class="block text-sm font-medium text-gray-700 mb-1">Date de départ</label>
+                            <label for="start_date" class="block text-sm font-medium text-gray-700 mb-1">Date de début</label>
                             <div class="relative">
-                                <input id="pickup_date" name="pickup_date" type="date" 
+                                <input type="date" id="start_date" name="start_date" value="{{ $startDate ?? '' }}" 
                                     class="pl-10 transition-all duration-200 block w-full border border-gray-300 rounded-lg shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -446,10 +370,11 @@
                                 </div>
                             </div>
                         </div>
+                        
                         <div>
-                            <label for="return_date" class="block text-sm font-medium text-gray-700 mb-1">Date de retour</label>
+                            <label for="end_date" class="block text-sm font-medium text-gray-700 mb-1">Date de fin</label>
                             <div class="relative">
-                                <input id="return_date" name="return_date" type="date" 
+                                <input type="date" id="end_date" name="end_date" value="{{ $endDate ?? '' }}" 
                                     class="pl-10 transition-all duration-200 block w-full border border-gray-300 rounded-lg shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -476,7 +401,6 @@
     <!-- Active Promotions Section -->
     @if(isset($activePromotions) && count($activePromotions) > 0)
         <section id="promotions" class="py-16 bg-gradient-to-r from-yellow-50 to-orange-50 relative">
-            <!-- Decorative elements -->
             <div class="absolute top-0 left-0 w-32 h-32 bg-yellow-200 rounded-full opacity-20 transform -translate-x-1/2 -translate-y-1/2"></div>
             <div class="absolute bottom-0 right-0 w-48 h-48 bg-yellow-300 rounded-full opacity-20 transform translate-x-1/3 translate-y-1/3"></div>
             
@@ -538,7 +462,6 @@
 
     <!-- Vehicles Section with Filtering and Pagination -->
     <section id="vehicles" class="py-16 bg-gray-50 relative">
-        <!-- Decorative pattern with road and car elements -->
         <div class="absolute inset-0 opacity-5" 
              style="background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPgogIDxkZWZzPgogICAgPHBhdHRlcm4gaWQ9InJvYWRwYXR0ZXJuIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+CiAgICAgIDxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSJub25lIiAvPgogICAgICA8IS0tIFJvYWQgLS0+CiAgICAgIDxyZWN0IHg9IjEwIiB5PSI0MCIgd2lkdGg9IjgwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjZjU5ZTBiIiBvcGFjaXR5PSIwLjEiIHJ4PSIyIiAvPgogICAgICA8IS0tIERhc2hlZCBsaW5lcyAtLT4KICAgICAgPHJlY3QgeD0iMTUiIHk9IjQ5IiB3aWR0aD0iMTAiIGhlaWdodD0iMiIgZmlsbD0iI2Y1OWUwYiIgb3BhY2l0eT0iMC4zIiAvPgogICAgICA8cmVjdCB4PSIzNSIgeT0iNDkiIHdpZHRoPSIxMCIgaGVpZ2h0PSIyIiBmaWxsPSIjZjU5ZTBiIiBvcGFjaXR5PSIwLjMiIC8+CiAgICAgIDxyZWN0IHg9IjU1IiB5PSI0OSIgd2lkdGg9IjEwIiBoZWlnaHQ9IjIiIGZpbGw9IiNmNTllMGIiIG9wYWNpdHk9IjAuMyIgLz4KICAgICAgPHJlY3QgeD0iNzUiIHk9IjQ5IiB3aWR0aD0iMTAiIGhlaWdodD0iMiIgZmlsbD0iI2Y1OWUwYiIgb3BhY2l0eT0iMC4zIiAvPgogICAgICA8IS0tIENhciBzaWxob3VldHRlIC0tPgogICAgICA8cGF0aCBkPSJNNzAgMzVjLTEtMS41LTIuNS0yLTUtMmgtMTBjLTIuNSAwLTQgMC41LTUgMmwtMyAzYy0yIDAtNCAxLTQgM3YyYzAgMSAwLjUgMSAxIDFoMmMwIDIgMyAzIDQgMXMxLTMgMS0xaDE4YzAtMiAzLTMgNC0xczEgMyAxIDFoMmMwLjUgMCAxIDAuMyAxLTF2LTJjMC0yLTItMy00LTNsLTMtM3oiIGZpbGw9IiNmNTllMGIiIG9wYWNpdHk9IjAuMiIgLz4KICAgIDwvcGF0dGVybj4KICA8L2RlZnM+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNyb2FkcGF0dGVybikiIC8+Cjwvc3ZnPg==');
                     background-size: 300px 300px;"></div>
@@ -630,9 +553,7 @@
             <!-- Vehicles Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 @forelse($vehicles as $vehicle)
-                <!-- Vehicle Card -->
                 <div class="hover-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 relative">
-                    <!-- Promotion Badge (if applicable) -->
                     @if(isset($selectedPromotion) && ($selectedPromotion->applicable_vehicles === null || (is_array($selectedPromotion->applicable_vehicles) && in_array($vehicle->id, $selectedPromotion->applicable_vehicles))))
                     <div class="absolute top-0 left-0 z-20 bg-red-500 text-white font-bold px-3 py-1 rounded-br-lg">
                         -{{ $selectedPromotion->discount_percentage }}%
@@ -650,7 +571,6 @@
                             </div>
                             
                             @if($vehicle->photos->count() > 1)
-                                <!-- Navigation buttons -->
                                 <button class="gallery-nav gallery-prev" onclick="moveGallery(this.parentNode, -1)">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                         <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
@@ -662,14 +582,12 @@
                                     </svg>
                                 </button>
                                 
-                                <!-- Indicators -->
                                 <div class="gallery-indicators">
                                     @foreach($vehicle->photos as $index => $photo)
                                         <div class="gallery-indicator {{ $index === 0 ? 'active' : '' }}" data-index="{{ $index }}"></div>
                                     @endforeach
                                 </div>
                                 
-                                <!-- Photo counter -->
                                 <div class="absolute top-0 right-0 bg-black bg-opacity-50 text-white text-xs px-2 py-1 m-2 rounded-lg">
                                     <span class="current-photo">1</span>/<span>{{ $vehicle->photos->count() }}</span>
                                 </div>
@@ -691,7 +609,6 @@
                         </div>
                     </div>
                     
-                    <!-- Rest of vehicle card content -->
                     <div class="p-6">
                         <div class="flex justify-between items-start mb-3">
                             <h3 class="text-xl font-bold text-gray-800">{{ $vehicle->brand }} {{ $vehicle->model }}</h3>
@@ -817,7 +734,6 @@
                 @endforelse
             </div>
 
-            <!-- Pagination -->
             @if(isset($vehicles) && method_exists($vehicles, 'hasPages') && $vehicles->hasPages())
             <div class="mt-8">
                 <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 rounded-lg shadow-sm">
@@ -838,7 +754,6 @@
                         </div>
                     </div>
                     
-                    <!-- Mobile pagination -->
                     <div class="flex items-center justify-between w-full sm:hidden">
                         @if($vehicles->onFirstPage())
                             <span class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 cursor-default rounded-md">
@@ -890,7 +805,6 @@
 
     <!-- Why Choose Us Section -->
     <section class="py-16 bg-white relative overflow-hidden">
-        <!-- Decorative elements -->
         <div class="absolute top-0 right-0 w-64 h-64 bg-yellow-100 rounded-full opacity-50 transform translate-x-1/3 -translate-y-1/3"></div>
         <div class="absolute bottom-0 left-0 w-64 h-64 bg-yellow-100 rounded-full opacity-50 transform -translate-x-1/3 translate-y-1/3"></div>
         
@@ -902,7 +816,6 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Feature 1 -->
                 <div class="text-center bg-gray-50 rounded-xl p-8 hover:shadow-lg transition duration-300 feature-card border border-gray-100">
                     <div class="inline-flex items-center justify-center p-4 bg-yellow-100 rounded-full text-yellow-500 mb-5 feature-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
@@ -913,7 +826,6 @@
                     <p class="text-gray-600">Trouvez le véhicule idéal parmi notre large sélection de voitures, camions et utilitaires pour tous vos besoins.</p>
                 </div>
 
-                <!-- Feature 2 -->
                 <div class="text-center bg-gray-50 rounded-xl p-8 hover:shadow-lg transition duration-300 feature-card border border-gray-100">
                     <div class="inline-flex items-center justify-center p-4 bg-yellow-100 rounded-full text-yellow-500 mb-5 feature-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
@@ -924,7 +836,6 @@
                     <p class="text-gray-600">Réservez en quelques clics et recevez une confirmation instantanée de votre location sans tracas.</p>
                 </div>
 
-                <!-- Feature 3 -->
                 <div class="text-center bg-gray-50 rounded-xl p-8 hover:shadow-lg transition duration-300 feature-card border border-gray-100">
                     <div class="inline-flex items-center justify-center p-4 bg-yellow-100 rounded-full text-yellow-500 mb-5 feature-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
@@ -938,253 +849,7 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-16 relative">
-        <div class="absolute inset-0 opacity-10 hero-pattern"></div>
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <div>
-                    <h3 class="text-2xl font-bold mb-6 text-yellow-400">AutoLocPro</h3>
-                    <p class="text-gray-400 mb-6">Votre partenaire de confiance pour la location de véhicules depuis 2010.</p>
-                    <div class="flex space-x-4">
-                        <a href="#" class="bg-gray-700 hover:bg-yellow-500 h-10 w-10 rounded-full flex items-center justify-center transition duration-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
-                            </svg>
-                        </a>
-                        <a href="#" class="bg-gray-700 hover:bg-yellow-500 h-10 w-10 rounded-full flex items-center justify-center transition duration-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"/>
-                            </svg>
-                        </a>
-                        <a href="#" class="bg-gray-700 hover:bg-yellow-500 h-10 w-10 rounded-full flex items-center justify-center transition duration-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                            </svg>
-                        </a>
-                    </div>
-                </div>
-                <div>
-                    <h3 class="text-lg font-semibold mb-6">Liens utiles</h3>
-                    <ul class="space-y-3">
-                        <li><a href="#" class="text-gray-400 hover:text-yellow-400 transition duration-300 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                            À propos de nous</a>
-                        </li>
-                        <li><a href="#" class="text-gray-400 hover:text-yellow-400 transition duration-300 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                            Nos services</a>
-                        </li>
-                        <li><a href="#" class="text-gray-400 hover:text-yellow-400 transition duration-300 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                            FAQ</a>
-                        </li>
-                        <li><a href="#" class="text-gray-400 hover:text-yellow-400 transition duration-300 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                            Contact</a>
-                        </li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="text-lg font-semibold mb-6">Conditions</h3>
-                    <ul class="space-y-3">
-                        <li><a href="#" class="text-gray-400 hover:text-yellow-400 transition duration-300 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                            Conditions générales</a>
-                        </li>
-                        <li><a href="#" class="text-gray-400 hover:text-yellow-400 transition duration-300 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                            Politique de confidentialité</a>
-                        </li>
-                        <li><a href="#" class="text-gray-400 hover:text-yellow-400 transition duration-300 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                            Conditions de location</a>
-                        </li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="text-lg font-semibold mb-6">Contactez-nous</h3>
-                    <ul class="space-y-3 text-gray-400">
-                        <li class="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
-                            </svg>
-                            123 Avenue de la République, 75011 Paris
-                        </li>
-                        <li class="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                            </svg>
-                            +212 123 456 789
-                        </li>
-                        <li class="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                            </svg>
-                            contact@autolocpro.fr
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div class="mt-12 pt-8 border-t border-gray-700 text-center text-gray-400">
-                <p>&copy; {{ date('Y') }} AutoLocPro. Tous droits réservés.</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Script for gallery functionality and animations -->
-    <script>
-        function moveGallery(gallery, direction) {
-            const container = gallery.querySelector('.gallery-container');
-            const currentIndex = parseInt(container.dataset.index);
-            const slides = container.querySelectorAll('.gallery-slide');
-            const totalSlides = slides.length;
-            
-            // Calculate new index
-            let newIndex = currentIndex + direction;
-            if (newIndex < 0) newIndex = totalSlides - 1;
-            if (newIndex >= totalSlides) newIndex = 0;
-            
-            // Update container position
-            container.style.transform = `translateX(-${newIndex * 100}%)`;
-            container.dataset.index = newIndex;
-            
-            // Update indicators
-            const indicators = gallery.querySelectorAll('.gallery-indicator');
-            indicators.forEach(indicator => {
-                indicator.classList.remove('active');
-                if (parseInt(indicator.dataset.index) === newIndex) {
-                    indicator.classList.add('active');
-                }
-            });
-            
-            // Update counter
-            const counter = gallery.querySelector('.current-photo');
-            if (counter) counter.textContent = newIndex + 1;
-        }
-        
-        // Initialize mobile menu and animations
-        document.addEventListener('DOMContentLoaded', function() {
-            // Gallery indicators click handlers
-            const indicators = document.querySelectorAll('.gallery-indicator');
-            indicators.forEach(indicator => {
-                indicator.addEventListener('click', function() {
-                    const gallery = this.closest('.vehicle-gallery');
-                    const container = gallery.querySelector('.gallery-container');
-                    const currentIndex = parseInt(container.dataset.index);
-                    const targetIndex = parseInt(this.dataset.index);
-                    
-                    // Move gallery to clicked indicator
-                    const direction = targetIndex - currentIndex;
-                    moveGallery(gallery, direction);
-                });
-            });
-            
-            // Mobile menu functionality
-            const mobileMenuButton = document.getElementById('mobile-menu-button');
-            const closeMenuButton = document.getElementById('close-menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
-            const menuOverlay = document.getElementById('menu-overlay');
-            
-            if (mobileMenuButton && closeMenuButton && mobileMenu && menuOverlay) {
-                mobileMenuButton.addEventListener('click', function() {
-                    mobileMenu.classList.add('active');
-                    menuOverlay.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                });
-                
-                closeMenuButton.addEventListener('click', function() {
-                    mobileMenu.classList.remove('active');
-                    menuOverlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                });
-                
-                menuOverlay.addEventListener('click', function() {
-                    mobileMenu.classList.remove('active');
-                    menuOverlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                });
-            }
-            
-            // Initialize date inputs with today's date and tomorrow
-            const today = new Date();
-            const tomorrow = new Date(today);
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            
-            const pickupDateInput = document.getElementById('pickup_date');
-            const returnDateInput = document.getElementById('return_date');
-            
-            if(pickupDateInput && returnDateInput) {
-                pickupDateInput.valueAsDate = today;
-                returnDateInput.valueAsDate = tomorrow;
-                
-                pickupDateInput.min = today.toISOString().split('T')[0];
-                returnDateInput.min = tomorrow.toISOString().split('T')[0];
-                
-                pickupDateInput.addEventListener('change', function() {
-                    const newMinReturn = new Date(this.value);
-                    newMinReturn.setDate(newMinReturn.getDate() + 1);
-                    returnDateInput.min = newMinReturn.toISOString().split('T')[0];
-                    
-                    if(new Date(returnDateInput.value) <= new Date(this.value)) {
-                        returnDateInput.valueAsDate = newMinReturn;
-                    }
-                });
-            }
-            
-            // Animate elements on scroll
-            const animateOnScroll = function() {
-                const elements = document.querySelectorAll('.animate-fade-in, .animate-slide-up');
-                elements.forEach(element => {
-                    const position = element.getBoundingClientRect();
-                    // If element is in viewport
-                    if(position.top < window.innerHeight * 0.9 && position.bottom >= 0) {
-                        element.style.opacity = '1';
-                    }
-                });
-            };
-            
-            // Run once on load
-            animateOnScroll();
-            
-            // Add scroll event listener
-            window.addEventListener('scroll', animateOnScroll);
-            
-            // Header scroll effect
-            const header = document.querySelector('header');
-            let lastScrollTop = 0;
-            
-            window.addEventListener('scroll', function() {
-                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                
-                if (scrollTop > 100) {
-                    header.classList.add('shadow-lg');
-                    header.classList.add('bg-white/95');
-                    header.classList.add('backdrop-blur-sm');
-                } else {
-                    header.classList.remove('shadow-lg');
-                    header.classList.remove('bg-white/95');
-                    header.classList.remove('backdrop-blur-sm');
-                }
-                
-                lastScrollTop = scrollTop;
-            });
-        });
-    </script>
+    @include('layouts.footer')
+    @include('layouts.scripts')
 </body>
 </html>

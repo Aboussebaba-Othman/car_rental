@@ -84,4 +84,39 @@ protected $fillable = [
     {
         return $this->role_id === Role::USER;
     }
+
+    /**
+     * Get the company ID safely.
+     * 
+     * @return int|null
+     */
+    public function getCompanyId()
+    {
+        return $this->company ? $this->company->id : null;
+    }
+
+    /**
+     * Get the company ID or throw an exception if not found.
+     * 
+     * @return int
+     * @throws \Exception
+     */
+    public function getCompanyIdOrFail()
+    {
+        if (!$this->company) {
+            throw new \Exception('User has no associated company');
+        }
+        
+        return $this->company->id;
+    }
+
+    /**
+     * Check if user has an associated company.
+     * 
+     * @return bool
+     */
+    public function hasCompany()
+    {
+        return $this->company !== null;
+    }
 }

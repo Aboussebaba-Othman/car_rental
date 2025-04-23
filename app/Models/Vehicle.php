@@ -57,36 +57,33 @@ class Vehicle extends Model
         return $this->hasMany(Reservation::class);
     }
 
-    /**
-     * Get the reviews for the vehicle.
-     */
+    
     public function reviews()
     {
         return $this->hasMany(Review::class);
     }
-
-    /**
-     * Get the average rating for the vehicle.
-     */
     public function getAverageRatingAttribute()
     {
         return $this->reviews()->where('is_approved', true)->avg('rating') ?? 0;
     }
 
-    /**
-     * Check if the vehicle is available for the given dates.
-     */
+   
     public function isAvailableForDates($startDate, $endDate)
     {
+        // First check if vehicle is marked as available and active
         if (!$this->is_available || !$this->is_active) {
             return false;
         }
 
+        // Check if there are any overlapping reservations
         return !$this->reservations()
             ->where('status', 'confirmed')
             ->where(function ($query) use ($startDate, $endDate) {
+                // Case 1: Reservation starts during requested period
                 $query->whereBetween('start_date', [$startDate, $endDate])
+                    // Case 2: Reservation ends during requested period
                     ->orWhereBetween('end_date', [$startDate, $endDate])
+                    // Case 3: Reservation completely encompasses requested period
                     ->orWhere(function ($q) use ($startDate, $endDate) {
                         $q->where('start_date', '<=', $startDate)
                             ->where('end_date', '>=', $endDate);

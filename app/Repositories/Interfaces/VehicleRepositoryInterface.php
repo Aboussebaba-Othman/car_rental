@@ -71,4 +71,16 @@ interface VehicleRepositoryInterface extends RepositoryInterface
      * @return array
      */
     public function getAllBrands();
+
+    /**
+     * Get available vehicles for a specific date range
+     * 
+     * @param array $filters
+     * @param string|null $startDate
+     * @param string|null $endDate
+     * @param string $sort
+     * @param int $perPage
+     * @return \Illuminate\Pagination\LengthAwarePaginator
+     */
+    public function getAvailableVehicles(array $filters, ?string $startDate = null, ?string $endDate = null, string $sort = 'newest', int $perPage = 10);
 }

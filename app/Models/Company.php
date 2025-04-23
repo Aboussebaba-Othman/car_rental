@@ -28,7 +28,6 @@ class Company extends Model
      *
      * @var array<string, string>
      */
-    
     protected $casts = [
         'is_validated' => 'boolean',
         'legal_documents' => 'array',
@@ -43,33 +42,31 @@ class Company extends Model
     }
 
     public function vehicles()
-{
-    return $this->hasMany(Vehicle::class);
-}
+    {
+        return $this->hasMany(Vehicle::class);
+    }
 
-/**
- * Get the reservations for the company through vehicles.
- */
-public function reservations()
-{
-    return $this->hasManyThrough(Reservation::class, Vehicle::class);
-}
+    /**
+     * Get the reservations for the company through vehicles.
+     */
+    public function reservations()
+    {
+        return $this->hasManyThrough(Reservation::class, Vehicle::class);
+    }
 
-/**
- * Get the promotions for the company.
- */
-public function promotions()
-{
-    return $this->hasMany(Promotion::class);
-}
+    /**
+     * Get the promotions for the company.
+     */
+    public function promotions()
+    {
+        return $this->hasMany(Promotion::class);
+    }
 
-/**
- * Get the messages for the company.
- */
-public function messages()
-{
-    return $this->hasMany(Message::class);
-}
-
-   
+    /**
+     * Get the messages for the company.
+     */
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
+    }
 }

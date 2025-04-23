@@ -39,75 +39,70 @@ class VehicleRepository extends BaseRepository implements VehicleRepositoryInter
     }
     
 
-    public function getAvailableVehicles(array $criteria)
+    public function getAvailableVehicles(array $filters, ?string $startDate = null, ?string $endDate = null, string $sort = 'newest', int $perPage = 10)
     {
-        $query = $this->model->where('is_active', true)
-            ->where('is_available', true)
-            ->with(['photos' => function($query) {
-                $query->orderBy('is_primary', 'desc');
-            }]);
+        $query = $this->model->query();
         
-        if (isset($criteria['company_id'])) {
-            $query->where('company_id', $criteria['company_id']);
-        }
-        
-        if (isset($criteria['brand'])) {
-            $query->where('brand', 'like', '%' . $criteria['brand'] . '%');
-        }
-        
-        if (isset($criteria['model'])) {
-            $query->where('model', 'like', '%' . $criteria['model'] . '%');
-        }
-        
-        if (isset($criteria['transmission'])) {
-            $query->where('transmission', $criteria['transmission']);
-        }
-        
-        if (isset($criteria['fuel_type'])) {
-            $query->where('fuel_type', $criteria['fuel_type']);
-        }
-        
-        if (isset($criteria['min_price'])) {
-            $query->where('price_per_day', '>=', $criteria['min_price']);
-        }
-        
-        if (isset($criteria['max_price'])) {
-            $query->where('price_per_day', '<=', $criteria['max_price']);
-        }
-        
-        if (isset($criteria['min_seats'])) {
-            $query->where('seats', '>=', $criteria['min_seats']);
-        }
-        
-        if (isset($criteria['max_seats'])) {
-            $query->where('seats', '<=', $criteria['max_seats']);
-        }
-        
-        if (isset($criteria['start_date']) && isset($criteria['end_date'])) {
-            $startDate = $criteria['start_date'];
-            $endDate = $criteria['end_date'];
-            
-            // Exclude vehicles with confirmed reservations in the selected date range
-            $query->whereDoesntHave('reservations', function($query) use ($startDate, $endDate) {
-                $query->where('status', 'confirmed')
-                    ->where(function($q) use ($startDate, $endDate) {
-                        $q->whereBetween('start_date', [$startDate, $endDate])
-                            ->orWhereBetween('end_date', [$startDate, $endDate])
-                            ->orWhere(function($q2) use ($startDate, $endDate) {
-                                $q2->where('start_date', '<=', $startDate)
-                                    ->where('end_date', '>=', $endDate);
-                            });
+        // Filter by date availability if dates are provided
+        if ($startDate && $endDate) {
+            // Exclude vehicles that have reservations overlapping with the requested date range
+            $query->whereDoesntHave('reservations', function ($query) use ($startDate, $endDate) {
+                $query->where(function ($q) use ($startDate, $endDate) {
+                    $q->where(function ($inner) use ($startDate, $endDate) {
+                        $inner->where('start_date', '<=', $endDate)
+                              ->where('end_date', '>=', $startDate);
                     });
+                });
             });
         }
         
-        if (isset($criteria['features']) && is_array($criteria['features'])) {
-            foreach ($criteria['features'] as $feature) {
-                $query->whereJsonContains('features', $feature);
-            }
+        // Filter by location (company name or city)
+        if (!empty($filters['location'])) {
+            $query->whereHas('company', function ($q) use ($filters) {
+                $q->where('company_name', 'LIKE', "%{$filters['location']}%")
+                  ->orWhere('city', 'LIKE', "%{$filters['location']}%");
+            });
         }
         
-        return $query->paginate(isset($criteria['per_page']) ? $criteria['per_page'] : 12);
+        // Apply other filters
+        if (!empty($filters['brand'])) {
+            $query->where('brand', $filters['brand']);
+        }
+        
+        if (!empty($filters['fuel_type'])) {
+            $query->where('fuel_type', $filters['fuel_type']);
+        }
+        
+        if (!empty($filters['seats'])) {
+            $query->where('seats', $filters['seats']);
+        }
+        
+        if (!empty($filters['price_min'])) {
+            $query->where('price_per_day', '>=', $filters['price_min']);
+        }
+        
+        if (!empty($filters['price_max'])) {
+            $query->where('price_per_day', '<=', $filters['price_max']);
+        }
+        
+        // Apply sorting
+        switch ($sort) {
+            case 'price_low':
+                $query->orderBy('price_per_day', 'asc');
+                break;
+            case 'price_high':
+                $query->orderBy('price_per_day', 'desc');
+                break;
+            case 'oldest':
+                $query->orderBy('created_at', 'asc');
+                break;
+            case 'newest':
+            default:
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
+        
+        return $query->paginate($perPage);
     }
     
 
@@ -282,18 +277,15 @@ class VehicleRepository extends BaseRepository implements VehicleRepositoryInter
         
         // Apply sorting
         switch ($sort) {
-            case 'price_asc':
+            case 'price_low':
                 $query->orderBy('price_per_day', 'asc');
                 break;
-                
-            case 'price_desc':
+            case 'price_high':
                 $query->orderBy('price_per_day', 'desc');
                 break;
-                
             case 'oldest':
                 $query->orderBy('created_at', 'asc');
                 break;
-                
             case 'newest':
             default:
                 $query->orderBy('created_at', 'desc');

@@ -4,19 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Repositories\Interfaces\VehicleRepositoryInterface;
 use App\Repositories\Interfaces\PromotionRepositoryInterface;
+use App\Repositories\Interfaces\CompanyRepositoryInterface;
 use Illuminate\Http\Request;
 
 class WelcomeController extends Controller
 {
     private $vehicleRepository;
     private $promotionRepository;
+    private $companyRepository;
     
     public function __construct(
         VehicleRepositoryInterface $vehicleRepository,
-        PromotionRepositoryInterface $promotionRepository
+        PromotionRepositoryInterface $promotionRepository,
+        CompanyRepositoryInterface $companyRepository
     ) {
         $this->vehicleRepository = $vehicleRepository;
         $this->promotionRepository = $promotionRepository;
+        $this->companyRepository = $companyRepository;
     }
     
     public function index(Request $request)
@@ -26,6 +30,7 @@ class WelcomeController extends Controller
         
         // Process search filters
         $filters = [
+            'location' => $request->input('location'),
             'brand' => $request->input('brand'),
             'fuel_type' => $request->input('fuel_type'),
             'seats' => $request->input('seats'),
@@ -33,21 +38,25 @@ class WelcomeController extends Controller
             'price_max' => $request->input('price_max'),
         ];
         
-        // Get paginated vehicles
-        $vehicles = $this->vehicleRepository->getPaginatedVehicles(
+        // Get start and end dates from request if provided
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+        
+        // Get vehicles with availability filter
+        $vehicles = $this->vehicleRepository->getAvailableVehicles(
             $filters,
+            $startDate,
+            $endDate,
             $request->input('sort', 'newest'),
-            6 // Items per page
+            6 
         );
         
-        // If there's a promotion ID in the query, get the promotion details
         $promotionId = $request->input('promo');
         $selectedPromotion = null;
         
         if ($promotionId) {
             try {
                 $selectedPromotion = $this->promotionRepository->find($promotionId);
-                // Check if promotion is valid
                 if (!$selectedPromotion->isValid()) {
                     $selectedPromotion = null;
                 }
@@ -59,12 +68,18 @@ class WelcomeController extends Controller
         // Get brands for filter dropdown
         $brands = $this->vehicleRepository->getAllBrands();
         
+        // Get cities for autocomplete
+        $cities = $this->companyRepository->getAllCities();
+        
         return view('welcome', compact(
             'vehicles',
             'activePromotions',
             'selectedPromotion',
             'brands',
-            'filters'
+            'filters',
+            'startDate',
+            'endDate',
+            'cities'
         ));
     }
 }
