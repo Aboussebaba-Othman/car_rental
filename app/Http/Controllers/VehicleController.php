@@ -15,6 +15,11 @@ class VehicleController extends Controller
             ->where('is_active', true)
             ->where('is_available', true);
 
+        // Filter by company if company_id is provided
+        if ($request->has('company_id')) {
+            $query->where('company_id', $request->company_id);
+        }
+
         // Apply filters if provided
         if ($request->filled('brand')) {
             $query->where('brand', $request->brand);
@@ -52,6 +57,15 @@ class VehicleController extends Controller
 
         $vehicles = $query->paginate(12);
 
+        // Add company name to the page title if filtering by company
+        $pageTitle = 'Véhicules disponibles';
+        if ($request->has('company_id')) {
+            $company = \App\Models\Company::find($request->company_id);
+            if ($company) {
+                $pageTitle = 'Véhicules de ' . $company->name;
+            }
+        }
+
         // Get unique brands for filtering
         $brands = Vehicle::where('is_active', true)
             ->where('is_available', true)
@@ -60,7 +74,11 @@ class VehicleController extends Controller
             ->orderBy('brand')
             ->pluck('brand');
 
-        return view('vehicles.index', compact('vehicles', 'brands'));
+        return view('vehicles.index', [
+            'vehicles' => $vehicles,
+            'brands' => $brands,
+            'pageTitle' => $pageTitle
+        ]);
     }
 
     public function show($id)

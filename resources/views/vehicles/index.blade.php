@@ -3,6 +3,9 @@
 @section('content')
 <div class="py-12 bg-gray-50">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="mb-6">
+            <h1 class="text-3xl font-bold text-gray-800">{{ $pageTitle ?? 'Véhicules disponibles' }}</h1>
+        </div>
         <div class="text-center mb-10">
             <h1 class="text-3xl font-bold text-gray-800 mb-4">Nos véhicules disponibles</h1>
             <p class="text-lg text-gray-600 max-w-3xl mx-auto">
@@ -16,7 +19,7 @@
                 <!-- Brand Filter -->
                 <div>
                     <label for="brand" class="block text-sm font-medium text-gray-700 mb-1">Marque</label>
-                    <select name="brand" id="brand" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                    <select name="brand" id="brand" class="block w-full py-2 rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
                         <option value="">Toutes les marques</option>
                         @foreach($brands ?? [] as $brand)
                             <option value="{{ $brand }}" {{ request('brand') == $brand ? 'selected' : '' }}>{{ $brand }}</option>
@@ -27,7 +30,7 @@
                 <!-- Fuel Type Filter -->
                 <div>
                     <label for="fuel_type" class="block text-sm font-medium text-gray-700 mb-1">Carburant</label>
-                    <select name="fuel_type" id="fuel_type" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                    <select name="fuel_type" id="fuel_type" class="block w-full py-2 rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
                         <option value="">Tous types</option>
                         <option value="gasoline" {{ request('fuel_type') == 'gasoline' ? 'selected' : '' }}>Essence</option>
                         <option value="diesel" {{ request('fuel_type') == 'diesel' ? 'selected' : '' }}>Diesel</option>
@@ -42,17 +45,17 @@
                     <div class="grid grid-cols-2 gap-2">
                         <input type="number" name="price_min" id="price_min" placeholder="Min €" 
                                value="{{ request('price_min') }}" min="0" 
-                               class="block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                               class="block w-full py-2 rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
                         <input type="number" name="price_max" id="price_max" placeholder="Max €" 
                                value="{{ request('price_max') }}" min="0" 
-                               class="block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                               class="block w-full py-2 rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
                     </div>
                 </div>
                 
                 <!-- Sort Order -->
                 <div>
                     <label for="sort" class="block text-sm font-medium text-gray-700 mb-1">Trier par</label>
-                    <select name="sort" id="sort" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                    <select name="sort" id="sort" class="block w-full py-2 rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
                         <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Plus récents</option>
                         <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Prix croissant</option>
                         <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Prix décroissant</option>
@@ -61,7 +64,7 @@
                 
                 <!-- Submit Button -->
                 <div class="flex items-end">
-                    <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded-md transition duration-200">
+                    <button type="submit" class="w-full py-2 bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded-md transition duration-200">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                         </svg>

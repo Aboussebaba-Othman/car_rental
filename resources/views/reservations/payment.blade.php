@@ -20,27 +20,6 @@
                     </div>
                 @endif
 
-                <!-- PayPal Sandbox Testing Info - Development Only -->
-                {{-- @if(config('app.env') !== 'production')
-                <div class="mb-6 bg-green-50 p-4 rounded-lg border border-green-200">
-                    <h3 class="font-medium text-green-800 mb-2 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-                        </svg>
-                        Mode Test PayPal (Sandbox)
-                    </h3>
-                    <p class="text-sm text-green-700 mb-2">
-                        Vous êtes actuellement dans un environnement de test. Pour effectuer un paiement test avec PayPal, utilisez les identifiants suivants :
-                    </p>
-                    <ul class="list-disc pl-5 text-sm text-green-700 mb-2">
-                        <li><strong>Email :</strong> sb-47bdi25749497@personal.example.com</li>
-                        <li><strong>Mot de passe :</strong> 12345678</li>
-                    </ul>
-                    <p class="text-sm text-green-700 font-medium mt-2">
-                        Note : Aucun vrai paiement ne sera effectué pendant les tests.
-                    </p>
-                </div>
-                @endif --}}
 
                 <div class="mb-8 border-b border-gray-200 pb-6">
                     <div class="flex justify-between items-center mb-4">
@@ -215,4 +194,5 @@
         </div>
     </div>
 </div>
+@include('layouts.footer')
 @endsection

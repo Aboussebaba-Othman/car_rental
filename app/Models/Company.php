@@ -23,28 +23,18 @@ class Company extends Model
         'is_validated'
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
+    
     protected $casts = [
         'is_validated' => 'boolean',
         'legal_documents' => 'array',
     ];
 
-    /**
-     * Get the user that owns the company.
-     */
+    
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Get all users associated with this company.
-     * This relationship allows a company to have multiple user accounts.
-     */
     public function users()
     {
 

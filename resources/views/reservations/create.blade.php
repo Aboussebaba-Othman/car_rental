@@ -333,7 +333,7 @@
         </div>
     </div>
 </div>
-
+@include('layouts.footer')
 <script>
     /**
 /**
@@ -474,10 +474,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return amount.toFixed(2).replace('.', ',') + '€';
     }
     
-    /**
-     * S'assurer que la date de fin est après la date de début
-     * et calcule le prix après validation
-     */
     function validateDates() {
         if (!startDateInput || !endDateInput) return;
         
