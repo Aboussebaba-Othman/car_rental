@@ -75,27 +75,63 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             @forelse($vehicles as $vehicle)
             <!-- Vehicle Card -->
-            <div class="bg-white rounded-xl shadow-md overflow-hidden transition-transform duration-300 hover:shadow-lg transform hover:-translate-y-1 relative">
-                <a href="{{ route('vehicles.show', $vehicle->id) }}" class="block relative h-48">
+            <div class="hover-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 relative">
+                <div class="relative h-56 vehicle-gallery">
                     @if($vehicle->photos->count() > 0)
-                        @php $primaryPhoto = $vehicle->photos->firstWhere('is_primary', true) ?? $vehicle->photos->first(); @endphp
-                        <img src="{{ asset('storage/' . $primaryPhoto->path) }}" alt="{{ $vehicle->brand }} {{ $vehicle->model }}" class="w-full h-full object-cover">
+                        <div class="gallery-container" data-index="0">
+                            @foreach($vehicle->photos as $index => $photo)
+                                <div class="gallery-slide">
+                                    <img src="{{ asset('storage/' . $photo->path) }}" alt="{{ $vehicle->brand }} {{ $vehicle->model }} - Photo {{ $index + 1 }}" class="w-full h-56 object-cover">
+                                </div>
+                            @endforeach
+                        </div>
+                        
+                        @if($vehicle->photos->count() > 1)
+                            <button class="gallery-nav gallery-prev" onclick="moveGallery(this.parentNode, -1)">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                            <button class="gallery-nav gallery-next" onclick="moveGallery(this.parentNode, 1)">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                            
+                            <div class="gallery-indicators">
+                                @foreach($vehicle->photos as $index => $photo)
+                                    <div class="gallery-indicator {{ $index === 0 ? 'active' : '' }}" data-index="{{ $index }}"></div>
+                                @endforeach
+                            </div>
+                            
+                            <div class="absolute top-0 right-0 bg-black bg-opacity-50 text-white text-xs px-2 py-1 m-2 rounded-lg">
+                                <span class="current-photo">1</span>/<span>{{ $vehicle->photos->count() }}</span>
+                            </div>
+                        @endif
                     @else
-                        <div class="w-full h-full flex items-center justify-center bg-gray-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div class="w-full h-full flex items-center justify-center bg-yellow-50">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-yellow-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                         </div>
                     @endif
-                    <div class="absolute top-0 right-0 bg-yellow-500 text-white px-3 py-1 m-2 rounded-lg font-medium">
+                    <div class="absolute bottom-0 right-0 bg-yellow-500 text-white px-3 py-1 m-3 rounded-lg font-medium shadow-md">
                         {{ number_format($vehicle->price_per_day, 2) }}€/jour
                     </div>
-                </a>
+                </div>
                 
                 <div class="p-6">
-                    <a href="{{ route('vehicles.show', $vehicle->id) }}" class="block">
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">{{ $vehicle->brand }} {{ $vehicle->model }}</h3>
-                    </a>
+                    <div class="flex justify-between items-start mb-3">
+                        <h3 class="text-xl font-bold text-gray-800">{{ $vehicle->brand }} {{ $vehicle->model }}</h3>
+                        @if(isset($vehicle->average_rating) && $vehicle->average_rating > 0)
+                        <div class="flex items-center text-sm text-yellow-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                            <span class="ml-1">{{ number_format($vehicle->average_rating, 1) }}</span>
+                        </div>
+                        @endif
+                    </div>
                     
                     <div class="flex flex-wrap text-sm text-gray-600 mb-4">
                         <div class="flex items-center mr-4 mb-2">
@@ -127,6 +163,34 @@
                                 @default {{ ucfirst($vehicle->transmission) }} @break
                             @endswitch
                         </div>
+                        
+                        @if(is_array($vehicle->features) && count($vehicle->features) > 0)
+                        <div class="w-full mt-2">
+                            <div class="flex flex-wrap gap-2">
+                                @foreach(array_slice($vehicle->features, 0, 3) as $feature)
+                                <span class="inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">
+                                    @switch($feature)
+                                        @case('air_conditioning') Climatisation @break
+                                        @case('gps') GPS @break
+                                        @case('bluetooth') Bluetooth @break
+                                        @case('usb') Port USB @break
+                                        @case('heated_seats') Sièges chauffants @break
+                                        @case('sunroof') Toit ouvrant @break
+                                        @case('cruise_control') Régulateur @break
+                                        @case('parking_sensors') Capteurs @break
+                                        @case('backup_camera') Caméra @break
+                                        @default {{ ucfirst(str_replace('_', ' ', $feature)) }} @break
+                                    @endswitch
+                                </span>
+                                @endforeach
+                                @if(count($vehicle->features) > 3)
+                                <span class="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full">
+                                    +{{ count($vehicle->features) - 3 }}
+                                </span>
+                                @endif
+                            </div>
+                        </div>
+                        @endif
                     </div>
                     
                     <div class="flex space-x-2">
@@ -217,4 +281,137 @@
         </div>
     </div>
 </div>
+
+<!-- Add gallery functionality script -->
+@push('scripts')
+<script>
+    function moveGallery(gallery, direction) {
+        const container = gallery.querySelector('.gallery-container');
+        const slides = gallery.querySelectorAll('.gallery-slide');
+        const indicators = gallery.querySelectorAll('.gallery-indicator');
+        const currentIndex = parseInt(container.dataset.index);
+        const totalSlides = slides.length;
+        
+        let newIndex = currentIndex + direction;
+        
+        if (newIndex < 0) newIndex = totalSlides - 1;
+        if (newIndex >= totalSlides) newIndex = 0;
+        
+        container.dataset.index = newIndex;
+        container.style.transform = `translateX(-${newIndex * 100}%)`;
+        
+        // Update indicators
+        indicators.forEach(indicator => {
+            indicator.classList.remove('active');
+        });
+        indicators[newIndex].classList.add('active');
+        
+        // Update counter
+        const counter = gallery.querySelector('.current-photo');
+        if (counter) counter.textContent = newIndex + 1;
+    }
+    
+    // Add click event to indicators
+    document.querySelectorAll('.gallery-indicator').forEach(indicator => {
+        indicator.addEventListener('click', function() {
+            const gallery = this.closest('.vehicle-gallery');
+            const container = gallery.querySelector('.gallery-container');
+            const currentIndex = parseInt(container.dataset.index);
+            const targetIndex = parseInt(this.dataset.index);
+            
+            moveGallery(gallery, targetIndex - currentIndex);
+        });
+    });
+</script>
+@endpush
+
+<style>
+    /* Vehicle gallery */
+    .vehicle-gallery {
+        position: relative;
+        overflow: hidden;
+        border-radius: 0.75rem 0.75rem 0 0;
+    }
+    
+    .gallery-container {
+        display: flex;
+        transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .gallery-slide {
+        min-width: 100%;
+    }
+    
+    .gallery-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 10;
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 50%;
+        width: 2.5rem;
+        height: 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s;
+        opacity: 0;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .vehicle-gallery:hover .gallery-nav {
+        opacity: 1;
+    }
+    
+    .gallery-nav:hover {
+        background-color: rgba(255, 255, 255, 0.95);
+        transform: translateY(-50%) scale(1.1);
+    }
+    
+    .gallery-prev {
+        left: 0.75rem;
+    }
+    
+    .gallery-next {
+        right: 0.75rem;
+    }
+    
+    .gallery-indicators {
+        position: absolute;
+        bottom: 0.75rem;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 0.35rem;
+        padding: 0.25rem 0.5rem;
+        background-color: rgba(0, 0, 0, 0.3);
+        border-radius: 1rem;
+    }
+    
+    .gallery-indicator {
+        width: 0.5rem;
+        height: 0.5rem;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .gallery-indicator.active {
+        background-color: white;
+        transform: scale(1.2);
+    }
+    
+    /* Card hover effects */
+    .hover-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .hover-card:hover {
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+</style>
+@include('layouts.footer')
+@include('layouts.scripts')
 @endsection

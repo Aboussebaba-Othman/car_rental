@@ -12,114 +12,49 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Mobile menu */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 80%;
+            max-width: 300px;
+            height: 100vh;
+            background-color: white;
+            z-index: 50;
+            transition: right 0.3s ease-in-out;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+        
+        .mobile-menu.active {
+            right: 0;
+        }
+        
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 40;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
 </head>
 <body class="font-sans antialiased bg-gray-100">
     <div class="min-h-screen">
-        <!-- Navbar Component -->
-        <header class="bg-white shadow">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-center h-16">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 flex items-center">
-                            <span class="text-3xl font-bold text-yellow-500">AutoLocPro</span>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-6">
-                        <nav class="hidden md:flex space-x-4 text-gray-600">
-                            <a href="#" class="font-medium hover:text-yellow-500 transition duration-300">Accueil</a>
-                            <a href="#" class="font-medium hover:text-yellow-500 transition duration-300">Véhicules</a>
-                            <a href="#" class="font-medium hover:text-yellow-500 transition duration-300">Promotions</a>
-                            <a href="#" class="font-medium hover:text-yellow-500 transition duration-300">À propos</a>
-                            <a href="#" class="font-medium hover:text-yellow-500 transition duration-300">Contact</a>
-                        </nav>
-                        <div class="flex items-center space-x-4">
-                            @auth
-                                <a href="{{ route('reservations.index') }}" class="text-gray-600 hover:text-yellow-600 font-medium transition duration-300">Mes réservations</a>
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit" class="text-gray-600 hover:text-yellow-600 font-medium transition duration-300">Déconnexion</button>
-                                </form>
-                            @else
-                                <a href="{{ route('login') }}" class="text-gray-600 hover:text-yellow-600 font-medium transition duration-300">Connexion</a>
-                                <a href="{{ route('register') }}" class="bg-yellow-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-yellow-600 transition duration-300">S'inscrire</a>
-                            @endauth
-                        </div>
-                    </div>
-                    <!-- Mobile menu button -->
-                    <div class="md:hidden flex items-center">
-                        <button type="button" class="text-gray-500 hover:text-gray-600 focus:outline-none" aria-label="Menu">
-                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-<!-- Spacer to prevent content from being hidden behind fixed navbar -->
-<div class="h-16"></div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Mobile menu toggle
-    const mobileMenuButton = document.getElementById('mobile-menu-button');
-    const mobileMenu = document.getElementById('mobile-menu');
-    const menuOpenIcon = document.getElementById('menu-open-icon');
-    const menuCloseIcon = document.getElementById('menu-close-icon');
-    
-    mobileMenuButton.addEventListener('click', function() {
-        mobileMenu.classList.toggle('hidden');
-        menuOpenIcon.classList.toggle('hidden');
-        menuCloseIcon.classList.toggle('hidden');
-    });
-    
-    // Navbar scroll effect
-    const navbar = document.getElementById('main-navbar');
-    let lastScrollTop = 0;
-    
-    window.addEventListener('scroll', function() {
-        let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        
-        // Add shadow and change background when scrolling down
-        if (scrollTop > 10) {
-            navbar.classList.add('shadow-lg', 'bg-white/95', 'backdrop-blur-sm');
-        } else {
-            navbar.classList.remove('shadow-lg', 'bg-white/95', 'backdrop-blur-sm');
-        }
-        
-        // Hide navbar when scrolling down, show when scrolling up
-        if (scrollTop > lastScrollTop && scrollTop > 200) {
-            navbar.style.transform = 'translateY(-100%)';
-        } else {
-            navbar.style.transform = 'translateY(0)';
-        }
-        
-        lastScrollTop = scrollTop;
-    });
-    
-    // Close mobile menu when clicking outside
-    document.addEventListener('click', function(event) {
-        const isClickInsideMenu = mobileMenu.contains(event.target);
-        const isClickInsideButton = mobileMenuButton.contains(event.target);
-        
-        if (!isClickInsideMenu && !isClickInsideButton && !mobileMenu.classList.contains('hidden')) {
-            mobileMenu.classList.add('hidden');
-            menuOpenIcon.classList.remove('hidden');
-            menuCloseIcon.classList.add('hidden');
-        }
-    });
-    
-    // Close mobile menu when window is resized to desktop size
-    window.addEventListener('resize', function() {
-        if (window.innerWidth >= 768 && !mobileMenu.classList.contains('hidden')) {
-            mobileMenu.classList.add('hidden');
-            menuOpenIcon.classList.remove('hidden');
-            menuCloseIcon.classList.add('hidden');
-        }
-    });
-});
-</script>
+        <!-- Include the shared header component -->
+        @include('layouts.header')
 
         <main class="py-6">
             @yield('content')

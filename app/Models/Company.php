@@ -41,30 +41,34 @@ class Company extends Model
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Get all users associated with this company.
+     * This relationship allows a company to have multiple user accounts.
+     */
+    public function users()
+    {
+
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
     public function vehicles()
     {
         return $this->hasMany(Vehicle::class);
     }
 
-    /**
-     * Get the reservations for the company through vehicles.
-     */
+   
     public function reservations()
     {
         return $this->hasManyThrough(Reservation::class, Vehicle::class);
     }
 
-    /**
-     * Get the promotions for the company.
-     */
+    
     public function promotions()
     {
         return $this->hasMany(Promotion::class);
     }
 
-    /**
-     * Get the messages for the company.
-     */
+    
     public function messages()
     {
         return $this->hasMany(Message::class);
