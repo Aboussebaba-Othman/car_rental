@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Repositories\Interfaces\CompanyRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class CompanyManagementController extends Controller 
 {
@@ -28,7 +29,20 @@ class CompanyManagementController extends Controller
     public function index()
     {
         $companies = $this->companyRepository->getAllWithUsers();
-        return view('admin.companies.index', compact('companies'));
+        
+        // Convert collection to paginator that has the total() method
+        $perPage = 10; // Adjust as needed
+        $currentPage = request()->get('page', 1);
+        
+        $companiesPaginator = new LengthAwarePaginator(
+            $companies->forPage($currentPage, $perPage),
+            $companies->count(),
+            $perPage,
+            $currentPage,
+            ['path' => request()->url()]
+        );
+        
+        return view('admin.companies.index', compact('companiesPaginator'));
     }
 
     /**

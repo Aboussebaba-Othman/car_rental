@@ -19,7 +19,7 @@
             <div class="flex justify-between items-center">
                 <div>
                     <p class="text-gray-500 text-sm">Total des entreprises</p>
-                    <h2 class="text-3xl font-bold">{{ $companies->total() }}</h2>
+                    <h2 class="text-3xl font-bold">{{ $companiesPaginator->total() }}</h2>
                 </div>
                 <div class="bg-yellow-100 p-3 rounded-full">
                     <i class="fas fa-building text-yellow-500 text-xl"></i>
@@ -31,7 +31,7 @@
             <div class="flex justify-between items-center">
                 <div>
                     <p class="text-gray-500 text-sm">Entreprises actives</p>
-                    <h2 class="text-3xl font-bold">{{ $companies->where('user.is_active', true)->count() }}</h2>
+                    <h2 class="text-3xl font-bold">{{ $companiesPaginator->where('user.is_active', true)->count() }}</h2>
                 </div>
                 <div class="bg-blue-100 p-3 rounded-full">
                     <i class="fas fa-check-circle text-blue-500 text-xl"></i>
@@ -43,7 +43,7 @@
             <div class="flex justify-between items-center">
                 <div>
                     <p class="text-gray-500 text-sm">En attente de validation</p>
-                    <h2 class="text-3xl font-bold">{{ $companies->where('is_validated', false)->count() }}</h2>
+                    <h2 class="text-3xl font-bold">{{ $companiesPaginator->where('is_validated', false)->count() }}</h2>
                 </div>
                 <div class="bg-orange-100 p-3 rounded-full">
                     <i class="fas fa-clock text-orange-500 text-xl"></i>
@@ -100,7 +100,7 @@
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-                @forelse($companies as $company)
+                @forelse($companiesPaginator as $company)
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
@@ -196,7 +196,7 @@
         </table>
         
         <div class="px-6 py-4 border-t">
-            {{ $companies->links() }}
+            {{ $companiesPaginator->links() }}
         </div>
     </div>
 </div>
