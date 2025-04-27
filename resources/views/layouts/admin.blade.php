@@ -55,7 +55,7 @@
                         Utilisateurs
                     </a>
                     
-                    <a href="#" class="group flex items-center px-2 py-2 text-base font-medium rounded-md {{ Request::routeIs('admin.vehicles.*') ? 'bg-yellow-50 text-yellow-600' : 'text-gray-600 hover:bg-yellow-50 hover:text-yellow-600' }}">
+                    <a href="{{ route('admin.vehicles.index') }}" class="group flex items-center px-2 py-2 text-base font-medium rounded-md {{ Request::routeIs('admin.vehicles.*') ? 'bg-yellow-50 text-yellow-600' : 'text-gray-600 hover:bg-yellow-50 hover:text-yellow-600' }}">
                         <i class="fas fa-car mr-3 text-gray-400 group-hover:text-yellow-500 {{ Request::routeIs('admin.vehicles.*') ? 'text-yellow-500' : '' }}"></i>
                         Véhicules
                     </a>
