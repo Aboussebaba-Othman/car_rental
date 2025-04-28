@@ -108,7 +108,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     // Simplified Vehicle Routes for viewing only
     Route::get('/vehicles', [App\Http\Controllers\Admin\VehicleController::class, 'index'])->name('vehicles.index');
     Route::get('/vehicles/{id}', [App\Http\Controllers\Admin\VehicleController::class, 'show'])->name('vehicles.show');
-
+    
+    // Simplified Reservation Routes for viewing only
+    Route::get('/reservations', [App\Http\Controllers\Admin\ReservationController::class, 'index'])->name('reservations.index');
+    Route::get('/reservations/{id}', [App\Http\Controllers\Admin\ReservationController::class, 'show'])->name('reservations.show');
+    
     Route::get('/users', [App\Http\Controllers\Admin\UserManagementController::class, 'index'])->name('users.index');
     Route::get('/users/{id}', [App\Http\Controllers\Admin\UserManagementController::class, 'show'])->name('users.show');
     Route::post('/users/{id}/activate', [App\Http\Controllers\Admin\UserManagementController::class, 'activate'])->name('users.activate');
