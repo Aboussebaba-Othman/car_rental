@@ -85,6 +85,11 @@ class DashboardController extends Controller
             'company_change' => $companyChange,
             'vehicle_change' => $vehicleChange,
             'reservation_change' => $reservationChange,
+            'usersCurrentMonth' => $usersCurrentMonth,
+            'companiesCurrentMonth' => $companiesCurrentMonth,
+            'vehiclesCurrentMonth' => $vehiclesCurrentMonth,
+            'reservationsCurrentMonth' => $reservationsCurrentMonth,
+            'currentMonthName' => $now->translatedFormat('F Y'),
         ];
         
         // Get data for charts

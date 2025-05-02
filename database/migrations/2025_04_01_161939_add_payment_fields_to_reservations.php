@@ -6,13 +6,10 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+   
     public function up(): void
     {
         Schema::table('reservations', function (Blueprint $table) {
-            // Add payment fields
             $table->string('payment_id')->nullable();
             $table->string('payment_method')->nullable();
             $table->string('payment_status')->nullable();
@@ -22,23 +19,18 @@ return new class extends Migration
             $table->string('payer_id')->nullable();
             $table->string('payer_email')->nullable();
             
-            // First drop the current enum constraint to modify it
             $table->dropColumn('status');
         });
 
-        // Re-add status column with updated enum values in a separate call to avoid issues
         Schema::table('reservations', function (Blueprint $table) {
             $table->enum('status', ['pending', 'confirmed', 'canceled', 'completed', 'payment_pending', 'paid'])->default('pending');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
+   
     public function down(): void
     {
         Schema::table('reservations', function (Blueprint $table) {
-            // Remove payment fields
             $table->dropColumn([
                 'payment_id',
                 'payment_method',
@@ -50,11 +42,9 @@ return new class extends Migration
                 'payer_email'
             ]);
             
-            // Drop the modified status column
             $table->dropColumn('status');
         });
 
-        // Restore original status column
         Schema::table('reservations', function (Blueprint $table) {
             $table->enum('status', ['pending', 'confirmed', 'canceled', 'completed'])->default('pending');
         });

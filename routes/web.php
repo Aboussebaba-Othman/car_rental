@@ -8,43 +8,29 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Admin\DashboardController;
 
-
-// Authentication Routes
 Route::middleware('guest')->group(function () {
-    // Registration Routes
     Route::get('/register', [RegisterController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
     Route::get('/register/company', [RegisterController::class, 'showCompanyRegisterForm'])->name('register.company');
     Route::post('/register/company', [RegisterController::class, 'registerCompany']);
 
-    // Login Routes
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login']);
 
-    // Password Reset Routes
     Route::get('/forgot-password', [ForgotPasswordController::class, 'showForgotPasswordForm'])->name('password.request');
     Route::post('/forgot-password', [ForgotPasswordController::class, 'forgotPassword'])->name('password.email');
     Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showResetPasswordForm'])->name('password.reset');
     Route::post('/reset-password', [ResetPasswordController::class, 'resetPassword'])->name('password.update');
 });
-// Google login
+
 Route::get('/auth/google', [App\Http\Controllers\Auth\GoogleController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('/auth/google/callback', [App\Http\Controllers\Auth\GoogleController::class, 'handleGoogleCallback']);
 
-// Logout Route
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout')->middleware('auth');
 
 Route::get('/auth/account-type', [App\Http\Controllers\Auth\AccountTypeController::class, 'showTypeSelection'])->name('auth.account.type');
 Route::post('/auth/account-type', [App\Http\Controllers\Auth\AccountTypeController::class, 'processTypeSelection'])->name('auth.account.type.process');
 
-
-// Role-based Routes
-// Route::middleware(['auth', 'role:user'])->group(function () {
-//     Route::get('/profile', [UserController::class, 'showProfile'])->name('user.profile');
-//     // Add more user routes here
-// });
-
-// Company document routes
 Route::middleware(['auth', 'role:company'])->group(function () {
     Route::get('/company/dashboard', 'App\Http\Controllers\Company\DashboardController@index')->name('company.dashboard');
     Route::get('/company/documents/upload', [App\Http\Controllers\Company\DocumentController::class, 'showUploadForm'])->name('company.documents.upload');
@@ -71,7 +57,6 @@ Route::middleware(['auth', 'role:company'])->group(function () {
     Route::delete('/company/promotions/{promotion}', 'App\Http\Controllers\Company\PromotionController@destroy')->name('company.promotions.destroy');
     Route::patch('/company/promotions/{promotion}/toggle-active', 'App\Http\Controllers\Company\PromotionController@toggleActive')->name('company.promotions.toggle-active');
 
-    // Ajout des routes de gestion des réservations
     Route::prefix('company')->group(function () {
         Route::get('/reservations', [App\Http\Controllers\Company\ReservationController::class, 'index'])->name('company.reservations.index');
         Route::get('/reservations/export', [App\Http\Controllers\Company\ReservationController::class, 'export'])->name('company.reservations.export');
@@ -83,7 +68,6 @@ Route::middleware(['auth', 'role:company'])->group(function () {
         Route::post('/reservations/{reservation}/add-note', [App\Http\Controllers\Company\ReservationController::class, 'addNote'])->name('company.reservations.add-note');
         Route::get('/reservations/{reservation}/invoice', [App\Http\Controllers\Company\ReservationController::class, 'generateInvoice'])->name('company.reservations.invoice');
 
-        // Fix the customer routes with proper prefix
         Route::get('/customers', [App\Http\Controllers\Company\CustomerController::class, 'index'])->name('company.customers.index');
         Route::get('/customers/{user}', [App\Http\Controllers\Company\CustomerController::class, 'show'])->name('company.customers.show');
         Route::post('/customers/{user}/send-promotion', [App\Http\Controllers\Company\CustomerController::class, 'sendPromotion'])->name('company.customers.send-promotion');
@@ -91,25 +75,18 @@ Route::middleware(['auth', 'role:company'])->group(function () {
     });
 });
 
-// Route::middleware(['auth', 'role:admin'])->group(function () {
-//     // Add more admin routes here
-// });
-// Admin - Company Management Routes
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/companies', [App\Http\Controllers\Admin\CompanyManagementController::class, 'index'])->name('companies.index');
-    // Route::get('/companies/{id}', [App\Http\Controllers\Admin\CompanyManagementController::class, 'show'])->name('companies.show');
     Route::post('/companies/{id}/validate', [App\Http\Controllers\Admin\CompanyManagementController::class, 'validate'])->name('companies.validate');
     Route::post('/companies/{id}/suspend', [App\Http\Controllers\Admin\CompanyManagementController::class, 'suspend'])->name('companies.suspend');
     Route::post('/companies/{id}/reactivate', [App\Http\Controllers\Admin\CompanyManagementController::class, 'reactivate'])->name('companies.reactivate');
     Route::get('/companies/filter', [App\Http\Controllers\Admin\CompanyManagementController::class, 'filter'])->name('companies.filter');
     Route::get('/companies/{id}', [App\Http\Controllers\Admin\CompanyManagementController::class, 'show'])->name('companies.show');
 
-    // Simplified Vehicle Routes for viewing only
     Route::get('/vehicles', [App\Http\Controllers\Admin\VehicleController::class, 'index'])->name('vehicles.index');
     Route::get('/vehicles/{id}', [App\Http\Controllers\Admin\VehicleController::class, 'show'])->name('vehicles.show');
     
-    // Simplified Reservation Routes for viewing only
     Route::get('/reservations', [App\Http\Controllers\Admin\ReservationController::class, 'index'])->name('reservations.index');
     Route::get('/reservations/{id}', [App\Http\Controllers\Admin\ReservationController::class, 'show'])->name('reservations.show');
     
@@ -119,7 +96,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::post('/users/{id}/deactivate', [App\Http\Controllers\Admin\UserManagementController::class, 'deactivate'])->name('users.deactivate');
 });
 
-// Reservation Routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/reservations', [App\Http\Controllers\ReservationController::class, 'index'])->name('reservations.index');
     Route::get('/reservations/create/{vehicleId}', [App\Http\Controllers\ReservationController::class, 'create'])->name('reservations.create');
@@ -128,17 +104,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/reservations/{reservation}/payment', [App\Http\Controllers\ReservationController::class, 'payment'])->name('reservations.payment');
     Route::post('/reservations/{reservation}/cancel', [App\Http\Controllers\ReservationController::class, 'cancel'])->name('reservations.cancel');
     
-    // PayPal Routes
     Route::post('/reservations/{reservation}/paypal', [App\Http\Controllers\ReservationController::class, 'processPayPal'])->name('reservations.paypal.process');
     Route::get('/reservations/{reservation}/paypal/success', [App\Http\Controllers\ReservationController::class, 'paypalSuccess'])->name('reservations.paypal.success');
     Route::get('/reservations/{reservation}/paypal/cancel', [App\Http\Controllers\ReservationController::class, 'paypalCancel'])->name('reservations.paypal.cancel');
     Route::get('/reservations/{reservation}/payment/confirmation', [App\Http\Controllers\ReservationController::class, 'paymentConfirmation'])->name('reservations.payment.confirmation');
-
 });
 
-// Public Routes
 Route::get('/', [App\Http\Controllers\WelcomeController::class, 'index'])->name('home');
 Route::get('/vehicles', [App\Http\Controllers\VehicleController::class, 'index'])->name('vehicles.index');
 Route::get('/vehicles/{id}', [App\Http\Controllers\VehicleController::class, 'show'])->name('vehicles.show');
-
 Route::get('/location-search', [App\Http\Controllers\LocationSearchController::class, 'search'])->name('location.search');

@@ -23,13 +23,11 @@ class Company extends Model
         'is_validated'
     ];
 
-    
     protected $casts = [
         'is_validated' => 'boolean',
         'legal_documents' => 'array',
     ];
 
-    
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -37,7 +35,6 @@ class Company extends Model
 
     public function users()
     {
-
         return $this->belongsTo(User::class, 'user_id');
     }
 
@@ -46,19 +43,16 @@ class Company extends Model
         return $this->hasMany(Vehicle::class);
     }
 
-   
     public function reservations()
     {
         return $this->hasManyThrough(Reservation::class, Vehicle::class);
     }
 
-    
     public function promotions()
     {
         return $this->hasMany(Promotion::class);
     }
 
-    
     public function messages()
     {
         return $this->hasMany(Message::class);

@@ -41,72 +41,104 @@
     @endif
 
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="bg-white rounded-xl shadow-md overflow-hidden transform transition-transform hover:scale-105 duration-300">
-            <div class="px-6 py-5 sm:px-8 border-b border-gray-100">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <p class="text-sm text-gray-500 font-medium">Total des entreprises</p>
-                        <h2 class="mt-2 text-3xl font-extrabold text-yellow-600">{{ $companiesPaginator->total() }}</h2>
-                    </div>
-                    <div class="bg-yellow-100 p-3 rounded-lg">
-                        <svg class="h-8 w-8 text-yellow-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                        </svg>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <!-- Total Companies Card -->
+        <div class="bg-white border border-gray-100 rounded-xl shadow-dashboard overflow-hidden transform transition duration-300 hover:shadow-dashboard-hover">
+            <div class="flex items-center px-6 py-5 border-b border-gray-50">
+                <div class="mr-4 bg-yellow-50 rounded-lg p-3">
+                    <svg class="h-6 w-6 text-yellow-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500">Total des entreprises</h3>
+                    <div class="flex items-baseline mt-1">
+                        <span class="text-2xl font-bold text-gray-900 tabular-nums tracking-tight">{{ $companiesPaginator->total() }}</span>
+                        <span class="ml-2 text-xs font-medium text-yellow-600 bg-yellow-50 px-2 py-0.5 rounded-full">100%</span>
                     </div>
                 </div>
-                
             </div>
-        </div>
-        
-        <div class="bg-white rounded-xl shadow-md overflow-hidden transform transition-transform hover:scale-105 duration-300">
-            <div class="px-6 py-5 sm:px-8 border-b border-gray-100">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <p class="text-sm text-gray-500 font-medium">Entreprises actives</p>
-                        <h2 class="mt-2 text-3xl font-extrabold text-blue-600">{{ $companiesPaginator->where('user.is_active', true)->count() }}</h2>
-                    </div>
-                    <div class="bg-blue-100 p-3 rounded-lg">
-                        <svg class="h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </div>
+            <div class="px-6 pt-4 pb-6">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-medium text-gray-500">Progression</span>
+                    <span class="text-xs font-semibold text-gray-900">Complète</span>
                 </div>
-                <div class="mt-4">
-                    <div class="flex items-center">
-                        <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div class="bg-blue-600 h-2 rounded-full" style="width: {{ ($companiesPaginator->where('user.is_active', true)->count() / $companiesPaginator->total()) * 100 }}%"></div>
-                        </div>
-                        <span class="ml-2 text-sm text-gray-500">{{ round(($companiesPaginator->where('user.is_active', true)->count() / $companiesPaginator->total()) * 100) }}%</span>
-                    </div>
+                <div class="overflow-hidden h-1.5 rounded-full bg-gray-100">
+                    <div class="h-full bg-gradient-to-r from-yellow-500 to-yellow-400 rounded-full w-full"></div>
                 </div>
             </div>
         </div>
         
-        <div class="bg-white rounded-xl shadow-md overflow-hidden transform transition-transform hover:scale-105 duration-300">
-            <div class="px-6 py-5 sm:px-8 border-b border-gray-100">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <p class="text-sm text-gray-500 font-medium">En attente de validation</p>
-                        <h2 class="mt-2 text-3xl font-extrabold text-orange-600">{{ $companiesPaginator->where('is_validated', false)->count() }}</h2>
-                    </div>
-                    <div class="bg-orange-100 p-3 rounded-lg">
-                        <svg class="h-8 w-8 text-orange-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+        <!-- Active Companies Card -->
+        <div class="bg-white border border-gray-100 rounded-xl shadow-dashboard overflow-hidden transform transition duration-300 hover:shadow-dashboard-hover">
+            <div class="flex items-center px-6 py-5 border-b border-gray-50">
+                <div class="mr-4 bg-blue-50 rounded-lg p-3">
+                    <svg class="h-6 w-6 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500">Entreprises actives</h3>
+                    <div class="flex items-baseline mt-1">
+                        <span class="text-2xl font-bold text-gray-900 tabular-nums tracking-tight">{{ $companiesPaginator->where('user.is_active', true)->count() }}</span>
+                        <span class="ml-2 text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">{{ round(($companiesPaginator->where('user.is_active', true)->count() / $companiesPaginator->total()) * 100) }}%</span>
                     </div>
                 </div>
-
+            </div>
+            <div class="px-6 pt-4 pb-6">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-medium text-gray-500">Progression</span>
+                    <span class="text-xs font-semibold text-gray-900">{{ $companiesPaginator->where('user.is_active', true)->count() }} sur {{ $companiesPaginator->total() }}</span>
+                </div>
+                <div class="overflow-hidden h-1.5 rounded-full bg-gray-100">
+                    <div class="h-full bg-gradient-to-r from-blue-500 to-blue-400 rounded-full" style="width: {{ ($companiesPaginator->where('user.is_active', true)->count() / $companiesPaginator->total()) * 100 }}%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pending Companies Card -->
+        <div class="bg-white border border-gray-100 rounded-xl shadow-dashboard overflow-hidden transform transition duration-300 hover:shadow-dashboard-hover">
+            <div class="flex items-center px-6 py-5 border-b border-gray-50">
+                <div class="mr-4 bg-orange-50 rounded-lg p-3">
+                    <svg class="h-6 w-6 text-orange-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500">En attente de validation</h3>
+                    <div class="flex items-baseline mt-1">
+                        <span class="text-2xl font-bold text-gray-900 tabular-nums tracking-tight">{{ $companiesPaginator->where('is_validated', false)->count() }}</span>
+                        <span class="ml-2 text-xs font-medium text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full">{{ round(($companiesPaginator->where('is_validated', false)->count() / $companiesPaginator->total()) * 100) }}%</span>
+                    </div>
+                </div>
+            </div>
+            <div class="px-6 pt-4 pb-6">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-medium text-gray-500">Progression</span>
+                    <span class="text-xs font-semibold text-gray-900">{{ $companiesPaginator->where('is_validated', false)->count() }} en attente</span>
+                </div>
+                <div class="overflow-hidden h-1.5 rounded-full bg-gray-100">
+                    <div class="h-full bg-gradient-to-r from-orange-500 to-orange-400 rounded-full" style="width: {{ ($companiesPaginator->where('is_validated', false)->count() / $companiesPaginator->total()) * 100 }}%"></div>
+                </div>
             </div>
         </div>
     </div>
+
+    <style>
+        .shadow-dashboard {
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        .shadow-dashboard-hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
 
     <!-- Filters and Search -->
     <div class="bg-white rounded-xl shadow-md mb-8 overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
             <h2 class="text-lg font-semibold text-gray-800 flex items-center">
                 <svg class="h-5 w-5 text-gray-500 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586L3.293 7.293A1 1 0 013 6.586V4z" />
                 </svg>
                 Filtres
             </h2>

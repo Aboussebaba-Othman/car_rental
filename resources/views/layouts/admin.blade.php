@@ -46,6 +46,34 @@
         .content-area {
             min-height: calc(100vh - 64px);
         }
+        
+        /* Statistics Card Styles */
+        .stats-card {
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stats-card .icon-bg {
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card:hover .icon-bg {
+            transform: scale(1.2);
+        }
+        
+        /* Stat Grid Animation */
+        .stat-grid-item {
+            transition: all 0.2s ease;
+        }
+        
+        .stat-grid-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
     </style>
 </head>
 <body class="font-sans antialiased bg-gray-50">
@@ -237,7 +265,7 @@
             </div>
             
             <!-- Page Content Area -->
-            <main class="flex-1 overflow-auto content-area p-6">
+            <main class="flex-1 overflow-auto content-area p-2">
                 @yield('content')
             </main>
             
@@ -317,4 +345,3 @@
     @yield('scripts')
 </body>
 </html>
-``` 

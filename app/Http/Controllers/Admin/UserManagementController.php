@@ -16,12 +16,6 @@ class UserManagementController extends Controller
         $this->userRepository = $userRepository;
     }
 
-    /**
-     * Display a listing of users.
-     *
-     * @param Request $request
-     * @return \Illuminate\View\View
-     */
     public function index(Request $request)
     {
         $filters = [];
@@ -46,24 +40,12 @@ class UserManagementController extends Controller
         return view('admin.users.index', compact('users', 'roles'));
     }
 
-    /**
-     * Show the specified user.
-     *
-     * @param  int  $id
-     * @return \Illuminate\View\View
-     */
     public function show($id)
     {
         $user = $this->userRepository->findWithDetails($id);
         return view('admin.users.show', compact('user'));
     }
 
-    /**
-     * Activate a user account.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function activate($id)
     {
         $user = $this->userRepository->find($id);
@@ -73,12 +55,6 @@ class UserManagementController extends Controller
             ->with('success', "Le compte de {$user->firstName} {$user->lastName} a été activé avec succès.");
     }
 
-    /**
-     * Deactivate a user account.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function deactivate($id)
     {
         $user = $this->userRepository->find($id);
