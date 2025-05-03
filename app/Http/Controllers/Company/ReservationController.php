@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
+use App\Mail\PaymentReminderMail;
 use App\Models\Reservation;
 use App\Models\Vehicle;
 use App\Repositories\Interfaces\ReservationRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 
 class ReservationController extends Controller
@@ -263,6 +266,71 @@ class ReservationController extends Controller
                 ->with('success', 'La fonctionnalité d\'exportation serait implémentée ici.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Erreur lors de l\'exportation: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Envoie un email de rappel de paiement au client.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Reservation  $reservation
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function sendPaymentReminder(Request $request, Reservation $reservation)
+    {
+        try {
+            // Vérifier que la réservation appartient à la compagnie connectée
+            if ($reservation->vehicle->company_id !== Auth::user()->company->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cette réservation n\'appartient pas à votre entreprise'
+                ], 403);
+            }
+
+            // Vérifier que la réservation est en attente de paiement
+            if (!in_array($reservation->status, ['pending', 'payment_pending'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cette réservation n\'est pas en attente de paiement'
+                ], 400);
+            }
+
+            // Envoyer l'email de rappel
+            Mail::to($reservation->user->email)
+                ->send(new PaymentReminderMail($reservation));
+
+            // Journaliser l'envoi sans utiliser le modèle Activity
+            Log::info('Payment reminder email sent', [
+                'reservation_id' => $reservation->id,
+                'user_id' => $reservation->user_id,
+                'email' => $reservation->user->email,
+                'sent_by' => Auth::id()
+            ]);
+
+            // Message de succès pour l'interface
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Email de rappel envoyé avec succès'
+                ]);
+            }
+
+            return redirect()->back()->with('success', 'Email de rappel envoyé avec succès');
+        } catch (\Exception $e) {
+            Log::error('Failed to send payment reminder email', [
+                'reservation_id' => $reservation->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Erreur lors de l\'envoi de l\'email: ' . $e->getMessage()
+                ], 500);
+            }
+
+            return redirect()->back()->with('error', 'Erreur lors de l\'envoi de l\'email: ' . $e->getMessage());
         }
     }
     

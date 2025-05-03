@@ -1,14 +1,14 @@
 @extends('layouts.company')
 
-@section('title', 'Reservation Details')
-@section('header', 'Reservation Details')
+@section('title', 'Détails de la Réservation')
+@section('header', 'Détails de la Réservation')
 
 @section('content')
     <div class="mb-6">
         <div class="flex items-center justify-between">
             <div>
-                <h2 class="text-2xl font-bold text-gray-800">Reservation #{{ $reservation->id }}</h2>
-                <p class="mt-1 text-sm text-gray-600">Created on {{ \Carbon\Carbon::parse($reservation->created_at)->format('d/m/Y \a\t H:i') }}</p>
+                <h2 class="text-2xl font-bold text-gray-800">Réservation #{{ $reservation->id }}</h2>
+                <p class="mt-1 text-sm text-gray-600">Créée le {{ \Carbon\Carbon::parse($reservation->created_at)->format('d/m/Y \à H:i') }}</p>
             </div>
             <span class="px-3 py-1 text-sm font-semibold rounded-full 
                 @if($reservation->status == 'confirmed') bg-green-100 text-green-800 
@@ -18,25 +18,25 @@
                 @elseif($reservation->status == 'completed') bg-gray-100 text-gray-800
                 @elseif($reservation->status == 'paid') bg-green-100 text-green-800
                 @endif">
-                @if($reservation->status == 'confirmed') Confirmed
-                @elseif($reservation->status == 'pending') Pending
-                @elseif($reservation->status == 'payment_pending') Payment Pending
-                @elseif($reservation->status == 'canceled') Canceled
-                @elseif($reservation->status == 'completed') Completed
-                @elseif($reservation->status == 'paid') Paid
+                @if($reservation->status == 'confirmed') Confirmée
+                @elseif($reservation->status == 'pending') En attente
+                @elseif($reservation->status == 'payment_pending') Paiement en attente
+                @elseif($reservation->status == 'canceled') Annulée
+                @elseif($reservation->status == 'completed') Terminée
+                @elseif($reservation->status == 'paid') Payée
                 @else {{ ucfirst($reservation->status) }}
                 @endif
             </span>
         </div>
         
-        <nav class="flex mt-4" aria-label="Breadcrumb">
+        <nav class="flex mt-4" aria-label="Fil d'Ariane">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
                 <li class="inline-flex items-center">
                     <a href="{{ route('company.dashboard') }}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
                         <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                             <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
                         </svg>
-                        Dashboard
+                        Tableau de bord
                     </a>
                 </li>
                 <li>
@@ -44,7 +44,7 @@
                         <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                             <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
                         </svg>
-                        <a href="{{ route('company.reservations.index') }}" class="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2">Reservations</a>
+                        <a href="{{ route('company.reservations.index') }}" class="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2">Réservations</a>
                     </div>
                 </li>
                 <li aria-current="page">
@@ -52,7 +52,7 @@
                         <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                             <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
                         </svg>
-                        <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">Reservation #{{ $reservation->id }}</span>
+                        <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">Réservation #{{ $reservation->id }}</span>
                     </div>
                 </li>
             </ol>
@@ -64,7 +64,7 @@
         <div class="bg-white rounded-lg shadow overflow-hidden">
             <div class="border-b border-gray-200">
                 <div class="px-6 py-4">
-                    <h3 class="text-lg font-medium text-gray-900">Vehicle Information</h3>
+                    <h3 class="text-lg font-medium text-gray-900">Informations du Véhicule</h3>
                 </div>
             </div>
             <div class="p-6">
@@ -85,11 +85,11 @@
                 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <p class="text-sm text-gray-500">License Plate</p>
+                        <p class="text-sm text-gray-500">Plaque d'immatriculation</p>
                         <p class="font-medium">{{ $reservation->vehicle->license_plate }}</p>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-500">Seats</p>
+                        <p class="text-sm text-gray-500">Sièges</p>
                         <p class="font-medium">{{ $reservation->vehicle->seats }}</p>
                     </div>
                     <div>
@@ -97,19 +97,19 @@
                         <p class="font-medium">{{ ucfirst($reservation->vehicle->transmission) }}</p>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-500">Fuel Type</p>
+                        <p class="text-sm text-gray-500">Type de carburant</p>
                         <p class="font-medium">{{ ucfirst($reservation->vehicle->fuel_type) }}</p>
                     </div>
                 </div>
                 
                 <div class="mt-4 pt-4 border-t border-gray-200">
-                    <p class="text-gray-500 text-sm mb-2">Daily Rate</p>
+                    <p class="text-gray-500 text-sm mb-2">Tarif journalier</p>
                     <p class="text-xl font-bold text-blue-600">{{ number_format($reservation->vehicle->price_per_day, 2) }} €</p>
                 </div>
                 
                 <div class="mt-4">
                     <a href="{{ route('company.vehicles.show', $reservation->vehicle) }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                        View complete vehicle details →
+                        Voir les détails complets du véhicule →
                     </a>
                 </div>
             </div>
@@ -119,7 +119,7 @@
         <div class="bg-white rounded-lg shadow overflow-hidden">
             <div class="border-b border-gray-200">
                 <div class="px-6 py-4">
-                    <h3 class="text-lg font-medium text-gray-900">Customer Information</h3>
+                    <h3 class="text-lg font-medium text-gray-900">Informations du Client</h3>
                 </div>
             </div>
             <div class="p-6">
@@ -129,23 +129,23 @@
                     </div>
                     <div class="ml-4">
                         <h4 class="text-lg font-bold text-gray-900">{{ $reservation->user->name }}</h4>
-                        <p class="text-sm text-gray-500">Customer since {{ \Carbon\Carbon::parse($reservation->user->created_at)->format('M Y') }}</p>
+                        <p class="text-sm text-gray-500">Client depuis {{ \Carbon\Carbon::parse($reservation->user->created_at)->format('M Y') }}</p>
                     </div>
                 </div>
                 
                 <div class="grid grid-cols-1 gap-4 mb-6">
                     <div>
-                        <p class="text-sm text-gray-500">Email Address</p>
+                        <p class="text-sm text-gray-500">Adresse e-mail</p>
                         <p class="font-medium">{{ $reservation->user->email }}</p>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-500">Phone Number</p>
-                        <p class="font-medium">{{ $reservation->user->phone ?? 'Not provided' }}</p>
+                        <p class="text-sm text-gray-500">Numéro de téléphone</p>
+                        <p class="font-medium">{{ $reservation->user->phone ?? 'Non fourni' }}</p>
                     </div>
                 </div>
                 
                 <div class="border-t border-gray-200 pt-4">
-                    <h5 class="text-sm font-medium text-gray-700 mb-3">Previous Reservations</h5>
+                    <h5 class="text-sm font-medium text-gray-700 mb-3">Réservations précédentes</h5>
                     
                     @php
                     $previousReservations = $reservation->user->reservations()
@@ -177,12 +177,12 @@
                             @endforeach
                         </div>
                     @else
-                        <p class="text-gray-500 text-sm italic">No previous reservations found.</p>
+                        <p class="text-gray-500 text-sm italic">Aucune réservation précédente trouvée.</p>
                     @endif
                     
                     <div class="mt-4">
                         <a href="{{ route('company.customers.show', $reservation->user->id) }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                            View customer profile →
+                            Voir le profil du client →
                         </a>
                     </div>
                 </div>
@@ -193,12 +193,12 @@
         <div class="bg-white rounded-lg shadow overflow-hidden">
             <div class="border-b border-gray-200">
                 <div class="px-6 py-4">
-                    <h3 class="text-lg font-medium text-gray-900">Reservation Details</h3>
+                    <h3 class="text-lg font-medium text-gray-900">Détails de la Réservation</h3>
                 </div>
             </div>
             <div class="p-6">
                 <div class="mb-6">
-                    <h4 class="text-sm font-medium text-gray-700 mb-3">Rental Period</h4>
+                    <h4 class="text-sm font-medium text-gray-700 mb-3">Période de location</h4>
                     <div class="bg-blue-50 rounded-lg p-4">
                         <div class="flex items-center mb-4">
                             <div class="bg-blue-100 rounded-full p-2 mr-3">
@@ -207,7 +207,7 @@
                                 </svg>
                             </div>
                             <div>
-                                <div class="text-sm text-gray-500">Pick-up Date</div>
+                                <div class="text-sm text-gray-500">Date de prise en charge</div>
                                 <div class="font-medium">{{ \Carbon\Carbon::parse($reservation->start_date)->format('d/m/Y') }}</div>
                             </div>
                         </div>
@@ -218,25 +218,25 @@
                                 </svg>
                             </div>
                             <div>
-                                <div class="text-sm text-gray-500">Return Date</div>
+                                <div class="text-sm text-gray-500">Date de retour</div>
                                 <div class="font-medium">{{ \Carbon\Carbon::parse($reservation->end_date)->format('d/m/Y') }}</div>
                             </div>
                         </div>
                         <div class="mt-3 text-sm text-blue-800 font-medium">
-                            Total: {{ \Carbon\Carbon::parse($reservation->start_date)->diffInDays(\Carbon\Carbon::parse($reservation->end_date)) + 1 }} days
+                            Total: {{ \Carbon\Carbon::parse($reservation->start_date)->diffInDays(\Carbon\Carbon::parse($reservation->end_date)) + 1 }} jours
                         </div>
                     </div>
                 </div>
                 
                 <div class="mb-6">
-                    <h4 class="text-sm font-medium text-gray-700 mb-3">Pickup & Return Locations</h4>
+                    <h4 class="text-sm font-medium text-gray-700 mb-3">Lieux de prise en charge & retour</h4>
                     <div class="space-y-3">
                         <div>
-                            <p class="text-sm text-gray-500">Pickup Location</p>
+                            <p class="text-sm text-gray-500">Lieu de prise en charge</p>
                             <p class="font-medium">{{ $reservation->pickup_location }}</p>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-500">Return Location</p>
+                            <p class="text-sm text-gray-500">Lieu de retour</p>
                             <p class="font-medium">{{ $reservation->return_location }}</p>
                         </div>
                     </div>
@@ -244,7 +244,7 @@
                 
                 @if($reservation->notes)
                 <div class="mb-6">
-                    <h4 class="text-sm font-medium text-gray-700 mb-3">Customer Notes</h4>
+                    <h4 class="text-sm font-medium text-gray-700 mb-3">Notes du Client</h4>
                     <div class="bg-gray-50 p-3 rounded-lg text-sm">
                         {{ $reservation->notes }}
                     </div>
@@ -252,20 +252,20 @@
                 @endif
                 
                 <div class="border-t border-gray-200 pt-4">
-                    <h4 class="text-sm font-medium text-gray-700 mb-3">Pricing Summary</h4>
+                    <h4 class="text-sm font-medium text-gray-700 mb-3">Récapitulatif des prix</h4>
                     <div class="space-y-2">
                         <div class="flex justify-between">
-                            <span class="text-gray-500">Daily Rate</span>
+                            <span class="text-gray-500">Tarif journalier</span>
                             <span>{{ number_format($reservation->vehicle->price_per_day, 2) }} €</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-gray-500">Number of Days</span>
+                            <span class="text-gray-500">Nombre de jours</span>
                             <span>{{ \Carbon\Carbon::parse($reservation->start_date)->diffInDays(\Carbon\Carbon::parse($reservation->end_date)) + 1 }}</span>
                         </div>
                         
                         @if($reservation->promotion)
                         <div class="flex justify-between">
-                            <span class="text-gray-500">Subtotal</span>
+                            <span class="text-gray-500">Sous-total</span>
                             <span>{{ number_format($reservation->vehicle->price_per_day * (\Carbon\Carbon::parse($reservation->start_date)->diffInDays(\Carbon\Carbon::parse($reservation->end_date)) + 1), 2) }} €</span>
                         </div>
                         <div class="flex justify-between text-green-600">
@@ -275,7 +275,7 @@
                         @endif
                         
                         <div class="flex justify-between font-bold pt-2 border-t">
-                            <span>Total Amount</span>
+                            <span>Montant total</span>
                             <span>{{ number_format($reservation->total_price, 2) }} €</span>
                         </div>
                     </div>
@@ -288,7 +288,7 @@
     <div class="bg-white rounded-lg shadow-md overflow-hidden mt-6">
         <div class="border-b border-gray-200">
             <div class="px-6 py-4">
-                <h3 class="text-lg font-medium text-gray-900">Payment Information</h3>
+                <h3 class="text-lg font-medium text-gray-900">Informations de Paiement</h3>
             </div>
         </div>
         
@@ -302,19 +302,19 @@
                             </svg>
                         </div>
                         <div class="ml-3">
-                            <h3 class="text-lg font-medium text-green-800">Payment Completed</h3>
-                            <p class="text-green-600">The customer's payment has been successfully processed.</p>
+                            <h3 class="text-lg font-medium text-green-800">Paiement Effectué</h3>
+                            <p class="text-green-600">Le paiement du client a été traité avec succès.</p>
                         </div>
                     </div>
                 </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <h4 class="text-sm font-medium text-gray-700 mb-3">Payment Details</h4>
+                        <h4 class="text-sm font-medium text-gray-700 mb-3">Détails du Paiement</h4>
                         <div class="bg-gray-50 p-4 rounded-lg">
                             <div class="grid grid-cols-1 gap-3">
                                 <div>
-                                    <p class="text-sm text-gray-500">Payment Method</p>
+                                    <p class="text-sm text-gray-500">Méthode de Paiement</p>
                                     <p class="font-medium">
                                         @if($reservation->payment_method == 'paypal')
                                             <div class="flex items-center">
@@ -329,26 +329,26 @@
                                     </p>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-gray-500">Payment Date</p>
+                                    <p class="text-sm text-gray-500">Date de Paiement</p>
                                     <p class="font-medium">{{ $reservation->payment_date ? \Carbon\Carbon::parse($reservation->payment_date)->format('d/m/Y H:i') : 'N/A' }}</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-gray-500">Transaction ID</p>
+                                    <p class="text-sm text-gray-500">Identifiant de Transaction</p>
                                     <p class="font-medium">{{ $reservation->transaction_id ?? 'N/A' }}</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-gray-500">Payment Status</p>
-                                    <p class="font-medium text-green-600">{{ $reservation->payment_status ?? 'Completed' }}</p>
+                                    <p class="text-sm text-gray-500">Statut du Paiement</p>
+                                    <p class="font-medium text-green-600">{{ $reservation->payment_status ?? 'Terminé' }}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
                     <div>
-                        <h4 class="text-sm font-medium text-gray-700 mb-3">Payment Amount</h4>
+                        <h4 class="text-sm font-medium text-gray-700 mb-3">Montant du Paiement</h4>
                         <div class="bg-gray-50 p-4 rounded-lg">
                             <div class="mb-4">
-                                <p class="text-sm text-gray-500">Amount Paid</p>
+                                <p class="text-sm text-gray-500">Montant Payé</p>
                                 <p class="text-2xl font-bold text-green-600">{{ number_format($reservation->amount_paid ?? $reservation->total_price, 2) }} €</p>
                             </div>
                             
@@ -357,7 +357,7 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                     </svg>
-                                    View Invoice
+                                    Voir la Facture
                                 </a>
                             </div>
                         </div>
@@ -373,55 +373,58 @@
                             </svg>
                         </div>
                         <div class="ml-3">
-                            <h3 class="text-lg font-medium text-yellow-800">Payment Pending</h3>
-                            <p class="text-yellow-600">The customer has not completed payment for this reservation yet.</p>
+                            <h3 class="text-lg font-medium text-yellow-800">Paiement en Attente</h3>
+                            <p class="text-yellow-600">Le client n'a pas encore effectué le paiement pour cette réservation.</p>
                         </div>
                     </div>
                 </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <h4 class="text-sm font-medium text-gray-700 mb-3">Payment Status</h4>
+                        <h4 class="text-sm font-medium text-gray-700 mb-3">Statut du Paiement</h4>
                         <div class="bg-gray-50 p-4 rounded-lg">
                             <div class="mb-4">
-                                <p class="text-sm text-gray-500">Status</p>
-                                <p class="font-medium text-yellow-600">Awaiting Payment</p>
+                                <p class="text-sm text-gray-500">Statut</p>
+                                <p class="font-medium text-yellow-600">En attente de paiement</p>
                             </div>
                             
                             <div class="mb-4">
-                                <p class="text-sm text-gray-500">Total Amount Due</p>
+                                <p class="text-sm text-gray-500">Montant Total Dû</p>
                                 <p class="text-2xl font-bold text-gray-800">{{ number_format($reservation->total_price, 2) }} €</p>
                             </div>
                             
                             <div class="text-sm text-gray-500">
-                                <p>A payment link has been sent to the customer's email address.</p>
+                                <p>Un lien de paiement a été envoyé à l'adresse e-mail du client.</p>
                             </div>
                         </div>
                     </div>
                     
                     <div>
-                        <h4 class="text-sm font-medium text-gray-700 mb-3">Payment Actions</h4>
+                        <h4 class="text-sm font-medium text-gray-700 mb-3">Actions de Paiement</h4>
                         <div class="bg-gray-50 p-4 rounded-lg">
                             <div class="space-y-4">
                                 <div>
-                                    <p class="text-sm text-gray-500 mb-3">Send payment reminder to customer:</p>
-                                    <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                        </svg>
-                                        Send Reminder Email
-                                    </button>
+                                    <p class="text-sm text-gray-500 mb-3">Envoyer un rappel de paiement au client :</p>
+                                    <form method="POST" action="{{ route('company.reservations.send-payment-reminder', $reservation->id) }}">
+                                        @csrf
+                                        <button type="submit" id="send-reminder-btn" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                            </svg>
+                                            Envoyer un Email de Rappel
+                                        </button>
+                                    </form>
                                 </div>
                                 
                                 <div>
-                                    <p class="text-sm text-gray-500 mb-3">Or manually mark payment as received:</p>
+                                    <p class="text-sm text-gray-500 mb-3">Ou marquer manuellement le paiement comme reçu :</p>
                                     <form method="POST" action="{{ route('company.reservations.mark-paid', $reservation) }}" class="inline">
                                         @csrf
                                         <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                             </svg>
-                                            Mark as Paid
+                                            Marquer comme Payé
                                         </button>
                                     </form>
                                 </div>
@@ -438,14 +441,14 @@
                             </svg>
                         </div>
                         <div class="ml-3">
-                            <h3 class="text-lg font-medium text-red-800">Reservation Canceled</h3>
-                            <p class="text-red-600">This reservation has been canceled {{ $reservation->canceled_at ? 'on ' . \Carbon\Carbon::parse($reservation->canceled_at)->format('d/m/Y') : '' }}.</p>
+                            <h3 class="text-lg font-medium text-red-800">Réservation Annulée</h3>
+                            <p class="text-red-600">Cette réservation a été annulée {{ $reservation->canceled_at ? 'le ' . \Carbon\Carbon::parse($reservation->canceled_at)->format('d/m/Y') : '' }}.</p>
                         </div>
                     </div>
                     
                     @if($reservation->cancellation_reason)
                         <div class="mt-4 text-sm text-red-700">
-                            <p class="font-medium">Cancellation Reason:</p>
+                            <p class="font-medium">Motif d'annulation :</p>
                             <p class="mt-1">{{ $reservation->cancellation_reason }}</p>
                         </div>
                     @endif
@@ -458,7 +461,7 @@
     <div class="bg-white rounded-lg shadow-md overflow-hidden mt-6">
         <div class="border-b border-gray-200">
             <div class="px-6 py-4">
-                <h3 class="text-lg font-medium text-gray-900">Internal Notes</h3>
+                <h3 class="text-lg font-medium text-gray-900">Notes Internes</h3>
             </div>
         </div>
         
@@ -467,19 +470,19 @@
                 <form method="POST" action="{{ route('company.reservations.add-note', $reservation) }}">
                     @csrf
                     <div class="mb-4">
-                        <label for="note" class="block text-sm font-medium text-gray-700 mb-1">Add Note</label>
-                        <textarea id="note" name="note" rows="3" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" placeholder="Add internal notes about this reservation..."></textarea>
+                        <label for="note" class="block text-sm font-medium text-gray-700 mb-1">Ajouter une Note</label>
+                        <textarea id="note" name="note" rows="3" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" placeholder="Ajoutez des notes internes concernant cette réservation..."></textarea>
                     </div>
                     <div class="flex justify-end">
                         <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            Add Note
+                            Ajouter une Note
                         </button>
                     </div>
                 </form>
             </div>
             
             <div>
-                <h4 class="text-sm font-medium text-gray-700 mb-3">Previous Notes</h4>
+                <h4 class="text-sm font-medium text-gray-700 mb-3">Notes Précédentes</h4>
                 
                 @if(isset($reservation->notes_history) && count($reservation->notes_history) > 0)
                     <div class="space-y-4">
@@ -501,7 +504,7 @@
                         @endforeach
                     </div>
                 @else
-                    <p class="text-gray-500 text-sm italic">No notes available for this reservation.</p>
+                    <p class="text-gray-500 text-sm italic">Aucune note disponible pour cette réservation.</p>
                 @endif
             </div>
         </div>
@@ -511,7 +514,7 @@
     <div class="bg-white rounded-lg shadow-md overflow-hidden mt-6 mb-6">
         <div class="border-b border-gray-200">
             <div class="px-6 py-4">
-                <h3 class="text-lg font-medium text-gray-900">Activity Log</h3>
+                <h3 class="text-lg font-medium text-gray-900">Journal d'Activité</h3>
             </div>
         </div>
         
@@ -564,7 +567,7 @@
                                             <div class="text-right text-sm whitespace-nowrap text-gray-500">
                                                 <p>{{ \Carbon\Carbon::parse($activity->created_at)->format('d/m/Y H:i') }}</p>
                                                 @if($activity->user)
-                                                    <p class="text-xs">by {{ $activity->user->name }}</p>
+                                                    <p class="text-xs">par {{ $activity->user->name }}</p>
                                                 @endif
                                             </div>
                                         </div>
@@ -575,7 +578,7 @@
                     </ul>
                 </div>
             @else
-                <p class="text-gray-500 text-sm italic">No activity recorded for this reservation.</p>
+                <p class="text-gray-500 text-sm italic">Aucune activité enregistrée pour cette réservation.</p>
             @endif
         </div>
     </div>
@@ -584,7 +587,60 @@
 @section('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Any JavaScript functionality specific to this page
+        // Afficher les messages flash au chargement de la page
+        @if(session('success'))
+            showAlert('{{ session('success') }}', 'success');
+        @endif
+        
+        @if(session('error'))
+            showAlert('{{ session('error') }}', 'error');
+        @endif
+        
+        // Fonction pour afficher une alerte
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg ${type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'} transition-opacity duration-500`;
+            alertDiv.style.zIndex = 9999;
+            
+            alertDiv.innerHTML = `
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        ${type === 'success' 
+                            ? '<svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>'
+                            : '<svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293-1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>'
+                        }
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium">${message}</p>
+                    </div>
+                    <div class="ml-auto pl-3">
+                        <button class="inline-flex text-gray-400 hover:text-gray-500">
+                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(alertDiv);
+            
+            // Faire disparaître et enlever l'alerte après 5 secondes
+            setTimeout(() => {
+                alertDiv.style.opacity = '0';
+                setTimeout(() => {
+                    alertDiv.remove();
+                }, 500);
+            }, 5000);
+            
+            // Fermer l'alerte en cliquant sur le bouton de fermeture
+            alertDiv.querySelector('button').addEventListener('click', function() {
+                alertDiv.style.opacity = '0';
+                setTimeout(() => {
+                    alertDiv.remove();
+                }, 500);
+            });
+        }
     });
 </script>
 @endsection

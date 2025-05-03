@@ -67,6 +67,7 @@ Route::middleware(['auth', 'role:company'])->group(function () {
         Route::post('/reservations/{reservation}/mark-paid', [App\Http\Controllers\Company\ReservationController::class, 'markPaid'])->name('company.reservations.mark-paid');
         Route::post('/reservations/{reservation}/add-note', [App\Http\Controllers\Company\ReservationController::class, 'addNote'])->name('company.reservations.add-note');
         Route::get('/reservations/{reservation}/invoice', [App\Http\Controllers\Company\ReservationController::class, 'generateInvoice'])->name('company.reservations.invoice');
+        Route::post('/reservations/{reservation}/send-payment-reminder', [App\Http\Controllers\Company\ReservationController::class, 'sendPaymentReminder'])->name('company.reservations.send-payment-reminder');
 
         Route::get('/customers', [App\Http\Controllers\Company\CustomerController::class, 'index'])->name('company.customers.index');
         Route::get('/customers/{user}', [App\Http\Controllers\Company\CustomerController::class, 'show'])->name('company.customers.show');
