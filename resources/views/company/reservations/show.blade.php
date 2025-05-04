@@ -106,9 +106,7 @@
         <div class="bg-white rounded-lg shadow-sm overflow-hidden">
             <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
                 <h3 class="text-lg font-medium text-gray-900">Informations du Client</h3>
-                <a href="{{ route('company.customers.show', $reservation->user->id) }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
-                    Voir profil
-                </a>
+                
             </div>
             <div class="p-6">
                 <div class="flex items-center mb-6">

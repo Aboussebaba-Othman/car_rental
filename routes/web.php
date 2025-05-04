@@ -69,10 +69,12 @@ Route::middleware(['auth', 'role:company'])->group(function () {
         Route::get('/reservations/{reservation}/invoice', [App\Http\Controllers\Company\ReservationController::class, 'generateInvoice'])->name('company.reservations.invoice');
         Route::post('/reservations/{reservation}/send-payment-reminder', [App\Http\Controllers\Company\ReservationController::class, 'sendPaymentReminder'])->name('company.reservations.send-payment-reminder');
 
-        Route::get('/customers', [App\Http\Controllers\Company\CustomerController::class, 'index'])->name('company.customers.index');
-        Route::get('/customers/{user}', [App\Http\Controllers\Company\CustomerController::class, 'show'])->name('company.customers.show');
-        Route::post('/customers/{user}/send-promotion', [App\Http\Controllers\Company\CustomerController::class, 'sendPromotion'])->name('company.customers.send-promotion');
-        Route::get('/customers/{user}/report', [App\Http\Controllers\Company\CustomerController::class, 'generateReport'])->name('company.customers.report');
+        Route::post('/invoices/{id}/download', [App\Http\Controllers\Company\InvoiceController::class, 'download'])->name('company.invoices.download');
+
+        // Route::get('/customers', [App\Http\Controllers\Company\CustomerController::class, 'index'])->name('company.customers.index');
+        // Route::get('/customers/{user}', [App\Http\Controllers\Company\CustomerController::class, 'show'])->name('company.customers.show');
+        // Route::post('/customers/{user}/send-promotion', [App\Http\Controllers\Company\CustomerController::class, 'sendPromotion'])->name('company.customers.send-promotion');
+        // Route::get('/customers/{user}/report', [App\Http\Controllers\Company\CustomerController::class, 'generateReport'])->name('company.customers.report');
     });
 });
 

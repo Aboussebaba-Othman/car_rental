@@ -8,19 +8,11 @@ use Illuminate\Support\Facades\DB;
 
 class PromotionRepository extends BaseRepository implements PromotionRepositoryInterface
 {
-    /**
-     * PromotionRepository constructor.
-     *
-     * @param Promotion $model
-     */
     public function __construct(Promotion $model)
     {
         parent::__construct($model);
     }
     
-    /**
-     * {@inheritdoc}
-     */
     public function getAllForCompany($companyId)
     {
         return $this->model->where('company_id', $companyId)
@@ -48,7 +40,6 @@ public function getActivePromotions($companyId = null, $limit = null)
         ->where('end_date', '>=', $today)
         ->orderBy('discount_percentage', 'desc');
     
-    // Only add the company_id condition if a specific company is requested
     if ($companyId !== null) {
         $query->where('company_id', $companyId);
     }
@@ -107,25 +98,21 @@ public function getActivePromotions($companyId = null, $limit = null)
     {
         $today = now()->startOfDay();
         
-        // Active promotions count
         $activeCount = $this->model->where('company_id', $companyId)
             ->where('is_active', true)
             ->where('start_date', '<=', $today)
             ->where('end_date', '>=', $today)
             ->count();
         
-        // Upcoming promotions count
         $upcomingCount = $this->model->where('company_id', $companyId)
             ->where('is_active', true)
             ->where('start_date', '>', $today)
             ->count();
         
-        // Expired promotions count
         $expiredCount = $this->model->where('company_id', $companyId)
             ->where('end_date', '<', $today)
             ->count();
         
-        // Most used promotion
         $mostUsed = DB::table('promotions')
             ->leftJoin('reservations', 'promotions.id', '=', 'reservations.promotion_id')
             ->select('promotions.id', 'promotions.name', DB::raw('count(reservations.id) as usage_count'))
@@ -134,10 +121,8 @@ public function getActivePromotions($companyId = null, $limit = null)
             ->orderBy('usage_count', 'desc')
             ->first();
         
-        // Average discount
         $avgDiscount = $this->model->where('company_id', $companyId)->avg('discount_percentage');
         
-        // Revenue generated with promotions
         $revenueWithPromotions = DB::table('reservations')
             ->join('vehicles', 'reservations.vehicle_id', '=', 'vehicles.id')
             ->whereNotNull('reservations.promotion_id')
@@ -154,49 +139,4 @@ public function getActivePromotions($companyId = null, $limit = null)
             'revenue_with_promotions' => $revenueWithPromotions
         ];
     }
-    /**
- * Check if any vehicles are already in active promotions
- * 
- * @param array $vehicleIds
- * @param int|null $excludePromotionId Promotion ID to exclude from check (for updates)
- * @return array Array of vehicle IDs that are already in active promotions
- */
-// public function getVehiclesInActivePromotions(array $vehicleIds, $excludePromotionId = null)
-// {
-//     $today = now()->startOfDay();
-    
-//     $query = $this->model
-//         ->where('is_active', true)
-//         ->where('start_date', '<=', $today)
-//         ->where('end_date', '>=', $today);
-    
-//     if ($excludePromotionId) {
-//         $query->where('id', '!=', $excludePromotionId);
-//     }
-    
-//     // Get promotions that apply to all vehicles (null applicable_vehicles)
-//     $globalPromotions = $query->whereNull('applicable_vehicles')->get();
-    
-//     if ($globalPromotions->count() > 0) {
-//         // If there's a global promotion, all vehicles are considered in promotion
-//         return $vehicleIds;
-//     }
-    
-//     // Get promotions with specific vehicles
-//     $specificPromotions = $query->whereNotNull('applicable_vehicles')->get();
-    
-//     $conflictingVehicleIds = [];
-    
-//     foreach ($specificPromotions as $promotion) {
-//         $promotionVehicles = $promotion->applicable_vehicles;
-        
-//         if (is_array($promotionVehicles)) {
-//             $conflicts = array_intersect($vehicleIds, $promotionVehicles);
-//             $conflictingVehicleIds = array_merge($conflictingVehicleIds, $conflicts);
-//         }
-//     }
-    
-//     return array_unique($conflictingVehicleIds);
-// }
-
 }
