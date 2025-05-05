@@ -12,7 +12,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Cache;
 
 class ReservationController extends Controller
 {
@@ -39,7 +38,7 @@ class ReservationController extends Controller
     {
         $vehicle = Vehicle::with(['photos'])->findOrFail($vehicleId);
         
-        // Check if vehicle is available
+        // Check if vehicle is available (only check if it's active, not date availability)
         if (!$vehicle->is_available || !$vehicle->is_active) {
             return redirect()->route('home')->with('error', 'Ce véhicule n\'est pas disponible à la location.');
         }
@@ -57,14 +56,10 @@ class ReservationController extends Controller
             $endDateTime = Carbon::parse($endDate);
         }
         
-        // Check if these dates are available
-        $isAvailable = $this->reservationService->checkVehicleAvailability($vehicle->id, $startDate, $endDate);
+        // We no longer check vehicle availability here - let the user choose dates
+        // in the availability calendar instead
         
-        if (!$isAvailable) {
-            return redirect()->route('home')->with('error', 'Ce véhicule n\'est pas disponible aux dates demandées.');
-        }
-        
-        // Calculate rental details with the service
+        // Get promotion if applicable
         $promotionId = $request->has('promotion_id') ? $request->promotion_id : null;
         $promotion = null;
         
@@ -88,6 +83,12 @@ class ReservationController extends Controller
         $totalPrice = $reservationDetails['total_price'];
         $promotion = $reservationDetails['promotion'];
         
+        // Get the available promotions that could apply to this vehicle
+        $availablePromotions = Promotion::active()->get()->filter(function($promo) use ($vehicle) {
+            return $promo->applicable_vehicles === null || 
+                   (is_array($promo->applicable_vehicles) && in_array($vehicle->id, $promo->applicable_vehicles));
+        });
+        
         return view('reservations.create', compact(
             'vehicle', 
             'startDate', 
@@ -95,7 +96,8 @@ class ReservationController extends Controller
             'numberOfDays',
             'pricePerDay',
             'totalPrice',
-            'promotion'
+            'promotion',
+            'availablePromotions'
         ));
     }
     
@@ -109,9 +111,10 @@ class ReservationController extends Controller
             'return_location' => 'required|string|max:255',
             'notes' => 'nullable|string',
             'promotion_id' => 'nullable|exists:promotions,id',
+            'total_price' => 'required|numeric|min:0.01',
         ]);
         
-        // Check if vehicle is available for the selected dates
+        // Vérifier la disponibilité du véhicule
         $isAvailable = $this->reservationService->checkVehicleAvailability(
             $validated['vehicle_id'],
             $validated['start_date'],
@@ -124,24 +127,17 @@ class ReservationController extends Controller
         
         $vehicle = Vehicle::findOrFail($validated['vehicle_id']);
         
-        // Calculate reservation details using the service
-        $reservationDetails = $this->reservationService->calculateReservationPrice(
-            $vehicle,
-            $validated['start_date'],
-            $validated['end_date'],
-            $validated['promotion_id'] ?? null
-        );
-        
         try {
             DB::beginTransaction();
             
-            // Create the reservation
+            // Créer la réservation
             $reservation = new Reservation();
             $reservation->user_id = Auth::id();
             $reservation->vehicle_id = $validated['vehicle_id'];
             $reservation->start_date = $validated['start_date'];
             $reservation->end_date = $validated['end_date'];
-            $reservation->total_price = $reservationDetails['total_price'];
+            // Utiliser DIRECTEMENT le prix soumis sans recalcul ni comparaison
+            $reservation->total_price = $validated['total_price']; 
             $reservation->pickup_location = $validated['pickup_location'];
             $reservation->return_location = $validated['return_location'];
             $reservation->notes = $validated['notes'];
@@ -151,12 +147,11 @@ class ReservationController extends Controller
             
             DB::commit();
             
-            // Store calculation details in session for debugging
-            session()->flash('reservation_calculation', [
-                'number_of_days' => $reservationDetails['number_of_days'],
-                'price_per_day' => $reservationDetails['price_per_day'],
-                'subtotal' => $reservationDetails['subtotal'],
-                'total_price' => $reservationDetails['total_price']
+            // Pour le débogage
+            Log::info('Reservation created', [
+                'reservation_id' => $reservation->id,
+                'total_price' => $reservation->total_price,
+                'submitted_price' => $validated['total_price']
             ]);
             
             return redirect()->route('reservations.payment', $reservation)
@@ -199,13 +194,13 @@ class ReservationController extends Controller
         // Eager load related data
         $reservation->load(['vehicle', 'vehicle.photos', 'promotion']);
         
-        // Recalculate price to ensure consistency
-        $this->reservationService->recalculateAndUpdateReservationPrice($reservation);
+        // Ne pas recalculer le prix ici pour éviter de l'écraser
+        // $this->reservationService->recalculateAndUpdateReservationPrice($reservation);
         
         // Calculate number of days for the view - ensure consistent calculation
         $startDate = Carbon::parse($reservation->start_date)->startOfDay();
         $endDate = Carbon::parse($reservation->end_date)->startOfDay();
-        $numberOfDays = max($endDate->diffInDays($startDate), 1); // Ensure at least 1 day
+        $numberOfDays = max($endDate->diffInDays($startDate) + 1, 1); // Ensure at least 1 day
         
         // Log calculation details for debugging
         Log::info('Payment page calculation', [
@@ -222,7 +217,7 @@ class ReservationController extends Controller
     /**
      * Traite le paiement PayPal pour une réservation
      */
-    public function processPayPal(Request $request, Reservation $reservation)
+    public function processPayPal(Reservation $reservation)
     {
         // Ensure user can only pay their own reservations
         if ($reservation->user_id !== Auth::id()) {
@@ -233,31 +228,6 @@ class ReservationController extends Controller
         if (!in_array($reservation->status, ['pending', 'payment_pending'])) {
             return redirect()->route('reservations.show', $reservation)
                 ->with('error', 'Cette réservation ne peut pas être payée dans son état actuel.');
-        }
-        
-        // Si un prix confirmé est fourni dans le formulaire, vérifier qu'il est cohérent
-        if ($request->has('confirmed_total_price')) {
-            $confirmedPrice = (float)$request->confirmed_total_price;
-            
-            // Calculer le prix attendu
-            $calculatedPrice = $this->calculateExpectedPrice($reservation);
-            
-            // Si les prix diffèrent significativement, mettre à jour la réservation
-            if (abs($reservation->total_price - $calculatedPrice) > 0.01) {
-                Log::warning('Price discrepancy detected', [
-                    'reservation_id' => $reservation->id,
-                    'old_price' => $reservation->total_price,
-                    'calculated_price' => $calculatedPrice,
-                    'confirmed_price' => $confirmedPrice
-                ]);
-                
-                // Mettre à jour avec le prix calculé ou confirmé (choisir le plus élevé pour sécurité)
-                $reservation->total_price = max($calculatedPrice, $confirmedPrice);
-                $reservation->save();
-            }
-        } else {
-            // Recalculer et mettre à jour le prix pour assurer la cohérence
-            $this->reservationService->recalculateAndUpdateReservationPrice($reservation);
         }
         
         // Log the reservation details for debugging
@@ -279,27 +249,6 @@ class ReservationController extends Controller
         }
     }
     
-    /**
-     * Calcule le prix attendu d'une réservation
-     */
-    private function calculateExpectedPrice(Reservation $reservation)
-    {
-        $startDate = Carbon::parse($reservation->start_date)->startOfDay();
-        $endDate = Carbon::parse($reservation->end_date)->startOfDay();
-        $numberOfDays = max($endDate->diffInDays($startDate), 1);
-        
-        $pricePerDay = $reservation->vehicle->price_per_day;
-        $subtotal = $pricePerDay * $numberOfDays;
-        
-        // Appliquer la promotion si présente
-        $discount = 0;
-        if ($reservation->promotion) {
-            $discount = $subtotal * ($reservation->promotion->discount_percentage / 100);
-        }
-        
-        // Calculer le total final (minimum 0.01)
-        return max($subtotal - $discount, 0.01);
-    }
     
     public function paypalSuccess(Request $request, Reservation $reservation)
     {

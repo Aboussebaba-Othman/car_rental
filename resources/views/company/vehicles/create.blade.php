@@ -75,19 +75,43 @@
             <div class="px-8 py-6">
                 <nav class="flex justify-center">
                     <ol class="flex items-center w-full max-w-3xl">
-                        <li class="flex items-center text-indigo-600 relative">
-                            <span id="step-1-indicator" class="h-12 w-12 flex items-center justify-center rounded-full bg-indigo-100 text-indigo-600 font-bold text-lg shadow-sm transition-all duration-300">1</span>
-                            <span class="ml-2 text-sm font-medium">Informations de base</span>
-                            <div class="flex-1 border-t-2 border-indigo-300 ml-2"></div>
+                        <li class="flex items-center text-indigo-600 relative flex-1">
+                            <span id="step-1-indicator" class="h-12 w-12 flex items-center justify-center rounded-full bg-indigo-100 text-indigo-600 font-bold text-lg shadow-sm transition-all duration-300 border-2 border-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 step-icon hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span class="step-number">1</span>
+                            </span>
+                            <div class="ml-3">
+                                <span class="text-sm font-medium">Informations de base</span>
+                                <p class="text-xs text-gray-500 hidden sm:block">Détails du véhicule</p>
+                            </div>
+                            <div class="flex-1 border-t-2 border-indigo-300 ml-4 hidden md:block"></div>
                         </li>
                         <li class="flex items-center text-gray-400 relative flex-1">
-                            <span id="step-2-indicator" class="h-12 w-12 flex items-center justify-center rounded-full bg-gray-100 font-bold text-lg shadow-sm transition-all duration-300">2</span>
-                            <span class="ml-2 text-sm font-medium">Caractéristiques</span>
-                            <div class="flex-1 border-t-2 border-gray-300 ml-2"></div>
+                            <span id="step-2-indicator" class="h-12 w-12 flex items-center justify-center rounded-full bg-gray-100 font-bold text-lg shadow-sm transition-all duration-300 border-2 border-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 step-icon hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span class="step-number">2</span>
+                            </span>
+                            <div class="ml-3">
+                                <span class="text-sm font-medium">Caractéristiques</span>
+                                <p class="text-xs text-gray-500 hidden sm:block">Options et équipements</p>
+                            </div>
+                            <div class="flex-1 border-t-2 border-gray-300 ml-4 hidden md:block"></div>
                         </li>
-                        <li class="flex items-center text-gray-400 relative">
-                            <span id="step-3-indicator" class="h-12 w-12 flex items-center justify-center rounded-full bg-gray-100 font-bold text-lg shadow-sm transition-all duration-300">3</span>
-                            <span class="ml-2 text-sm font-medium">Photos</span>
+                        <li class="flex items-center text-gray-400 relative flex-1">
+                            <span id="step-3-indicator" class="h-12 w-12 flex items-center justify-center rounded-full bg-gray-100 font-bold text-lg shadow-sm transition-all duration-300 border-2 border-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 step-icon hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span class="step-number">3</span>
+                            </span>
+                            <div class="ml-3">
+                                <span class="text-sm font-medium">Photos</span>
+                                <p class="text-xs text-gray-500 hidden sm:block">Images du véhicule</p>
+                            </div>
                         </li>
                     </ol>
                 </nav>

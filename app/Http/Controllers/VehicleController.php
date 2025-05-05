@@ -107,4 +107,69 @@ class VehicleController extends Controller
 
         return view('vehicles.show', compact('vehicle', 'promotion'));
     }
+
+    /**
+     * Get vehicle availability for a specific month
+     *
+     * @param  \App\Models\Vehicle  $vehicle
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getAvailability(Vehicle $vehicle, Request $request)
+    {
+        // Validate request
+        $request->validate([
+            'year' => 'required|integer',
+            'month' => 'required|integer|min:0|max:11',
+        ]);
+        
+        $year = $request->input('year');
+        $month = $request->input('month');
+        
+        // Get the first and last day of the requested month
+        $startDate = Carbon::create($year, $month + 1, 1)->startOfDay();
+        $endDate = Carbon::create($year, $month + 1, 1)->endOfMonth()->startOfDay();
+        
+        // Get all confirmed reservations for this vehicle in the specified month
+        $reservations = $vehicle->reservations()
+            ->where('status', 'confirmed')
+            ->where(function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('start_date', [$startDate, $endDate])
+                    ->orWhereBetween('end_date', [$startDate, $endDate])
+                    ->orWhere(function ($q) use ($startDate, $endDate) {
+                        $q->where('start_date', '<=', $startDate)
+                            ->where('end_date', '>=', $endDate);
+                    });
+            })
+            ->get();
+        
+        // Generate array of all days in the month
+        $daysInMonth = $endDate->day;
+        $unavailableDates = [];
+        
+        // For each day, check if the vehicle is available
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+            $checkDate = Carbon::create($year, $month + 1, $day)->startOfDay();
+            
+            // Skip dates in the past
+            if ($checkDate->isPast()) {
+                continue;
+            }
+            
+            // Check if this date is within any reservation
+            foreach ($reservations as $reservation) {
+                $resStart = Carbon::parse($reservation->start_date)->startOfDay();
+                $resEnd = Carbon::parse($reservation->end_date)->startOfDay();
+                
+                if ($checkDate->between($resStart, $resEnd)) {
+                    $unavailableDates[] = $checkDate->format('Y-m-d');
+                    break;
+                }
+            }
+        }
+        
+        return response()->json([
+            'unavailableDates' => $unavailableDates,
+        ]);
+    }
 }

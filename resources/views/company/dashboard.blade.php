@@ -318,7 +318,8 @@
                                             </p>
                                         </div>
                                         <p class="text-xs text-gray-500">
-                                            Loué par: {{ $activeReservation->user->name }}
+                                            Loué par: {{ $activeReservation->user->firstName }} {{ $activeReservation->user->lastName }}<br>
+                                           
                                         </p>
                                     </div>
                                 </div>

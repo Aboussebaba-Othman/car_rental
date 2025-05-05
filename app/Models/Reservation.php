@@ -66,14 +66,6 @@ class Reservation extends Model
         return $this->hasMany(Message::class);
     }
 
-    /**
-     * Get the activities for the reservation.
-     */
-    public function activities()
-    {
-        return $this->hasMany(Activity::class);
-    }
-
     public function getDurationInDaysAttribute()
     {
         return $this->start_date->diffInDays($this->end_date) + 1;

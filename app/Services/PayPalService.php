@@ -79,116 +79,127 @@ class PayPalService
     }
 
     public function createOrder(Reservation $reservation)
-    {
-        try {
-            // Double-check the reservation has a positive total price
-            if ($reservation->total_price <= 0) {
-                // Fix the price - ensure it's positive
-                $vehicle = \App\Models\Vehicle::findOrFail($reservation->vehicle_id);
-                $startDate = \Carbon\Carbon::parse($reservation->start_date);
-                $endDate = \Carbon\Carbon::parse($reservation->end_date);
-                $numberOfDays = max($endDate->diffInDays($startDate), 1); // Ensure at least 1 day
-                $totalPrice = $vehicle->price_per_day * $numberOfDays;
-                
-                // Apply minimum price
-                $reservation->total_price = max($totalPrice, 0.01);
-                $reservation->save();
-                
-                Log::warning('Fixed zero or negative reservation price', [
-                    'reservation_id' => $reservation->id,
-                    'new_price' => $reservation->total_price
-                ]);
-            }
-
-            $token = $this->getAccessToken();
+{
+    try {
+        // Double-check the reservation has a positive total price
+        if ($reservation->total_price <= 0) {
+            // Fix the price - ensure it's positive
+            $vehicle = \App\Models\Vehicle::findOrFail($reservation->vehicle_id);
+            $startDate = \Carbon\Carbon::parse($reservation->start_date);
+            $endDate = \Carbon\Carbon::parse($reservation->end_date);
+            $numberOfDays = max($endDate->diffInDays($startDate) + 1, 1); // Ajout du +1 ici
+            $totalPrice = $vehicle->price_per_day * $numberOfDays;
             
-            // Format price properly - ensure it has 2 decimal places and is a string
-            // Use max() to ensure the value is at least 0.01 (minimum PayPal amount)
-            $formattedPrice = sprintf('%.2f', max($reservation->total_price, 0.01));
+            // Apply minimum price
+            $reservation->total_price = max($totalPrice, 0.01);
+            $reservation->save();
             
-            // Log the request data for debugging
-            Log::info('Creating PayPal order', [
+            Log::warning('Fixed zero or negative reservation price', [
                 'reservation_id' => $reservation->id,
-                'total_price' => $reservation->total_price,
-                'formatted_price' => $formattedPrice,
-                'vehicle' => $reservation->vehicle->brand . ' ' . $reservation->vehicle->model
+                'new_price' => $reservation->total_price
             ]);
-            
-            $response = Http::withToken($token)
-                ->post("{$this->baseUrl}/v2/checkout/orders", [
-                    'intent' => 'CAPTURE',
-                    'purchase_units' => [
-                        [
-                            'reference_id' => (string)$reservation->id,
-                            'description' => "Réservation de véhicule - {$reservation->vehicle->brand} {$reservation->vehicle->model}",
-                            'amount' => [
-                                'currency_code' => 'EUR',
-                                'value' => $formattedPrice,
-                            ],
+        }
+
+        $token = $this->getAccessToken();
+        
+        // Format price properly - ensure it has 2 decimal places and is a string
+        // Use max() to ensure the value is at least 0.01 (minimum PayPal amount)
+        $formattedPrice = sprintf('%.2f', max($reservation->total_price, 0.01));
+        
+        // Log the request data for debugging
+        Log::info('Creating PayPal order', [
+            'reservation_id' => $reservation->id,
+            'total_price' => $reservation->total_price,
+            'formatted_price' => $formattedPrice,
+            'vehicle' => $reservation->vehicle->brand . ' ' . $reservation->vehicle->model,
+            'start_date' => $reservation->start_date,
+            'end_date' => $reservation->end_date,
+            'number_of_days' => \Carbon\Carbon::parse($reservation->start_date)->diffInDays(\Carbon\Carbon::parse($reservation->end_date)) + 1
+        ]);
+        
+        $response = Http::withToken($token)
+            ->post("{$this->baseUrl}/v2/checkout/orders", [
+                'intent' => 'CAPTURE',
+                'purchase_units' => [
+                    [
+                        'reference_id' => (string)$reservation->id,
+                        'description' => "Réservation de véhicule - {$reservation->vehicle->brand} {$reservation->vehicle->model}",
+                        'amount' => [
+                            'currency_code' => 'EUR',
+                            'value' => $formattedPrice,
                         ],
                     ],
-                    'application_context' => [
-                        'brand_name' => 'AutoLocPro',
-                        'return_url' => route('reservations.paypal.success', ['reservation' => $reservation->id]),
-                        'cancel_url' => route('reservations.paypal.cancel', ['reservation' => $reservation->id]),
-                    ]
-                ]);
-
-            // Log the full response for debugging
-            Log::info('PayPal response', ['status' => $response->status(), 'body' => $response->json()]);
-
-            if ($response->successful()) {
-                $data = $response->json();
-                
-                // Save payment ID to reservation
-                $reservation->payment_id = $data['id'];
-                $reservation->payment_method = 'paypal';
-                $reservation->payment_status = 'created';
-                $reservation->status = 'payment_pending';
-                $reservation->save();
-
-                // Find approval URL
-                $approvalUrl = null;
-                foreach ($data['links'] as $link) {
-                    if ($link['rel'] === 'approve') {
-                        $approvalUrl = $link['href'];
-                        break;
-                    }
-                }
-
-                return [
-                    'success' => true,
-                    'order_id' => $data['id'],
-                    'approval_url' => $approvalUrl,
-                ];
-            }
-
-            Log::error('PayPal Create Order Error', [
-                'status' => $response->status(),
-                'body' => $response->json(),
-                'request_data' => [
-                    'reference_id' => $reservation->id,
-                    'total_price' => number_format($reservation->total_price, 2, '.', ''),
+                ],
+                'application_context' => [
+                    'brand_name' => 'AutoLocPro',
                     'return_url' => route('reservations.paypal.success', ['reservation' => $reservation->id]),
                     'cancel_url' => route('reservations.paypal.cancel', ['reservation' => $reservation->id]),
                 ]
             ]);
-            return [
-                'success' => false,
-                'message' => 'Failed to create PayPal order: ' . ($response->json()['message'] ?? $response->status()),
-                'error' => $response->json(),
-            ];
-        } catch (\Exception $e) {
-            Log::error('PayPal Exception', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+
+        // Log the full response for debugging
+        Log::info('PayPal response', ['status' => $response->status(), 'body' => $response->json()]);
+
+        if ($response->successful()) {
+            $data = $response->json();
+            
+            // Save payment ID to reservation
+            $reservation->payment_id = $data['id'];
+            $reservation->payment_method = 'paypal';
+            $reservation->payment_status = 'created';
+            $reservation->status = 'payment_pending';
+            $reservation->save();
+
+            // Find approval URL
+            $approvalUrl = null;
+            foreach ($data['links'] as $link) {
+                if ($link['rel'] === 'approve') {
+                    $approvalUrl = $link['href'];
+                    break;
+                }
+            }
+
+            // Log successful payment creation with important details
+            Log::info('PayPal order created successfully', [
+                'order_id' => $data['id'],
+                'reservation_id' => $reservation->id,
+                'total_price' => $formattedPrice,
+                'currency' => 'EUR'
             ]);
+
             return [
-                'success' => false,
-                'message' => 'Exception occurred: ' . $e->getMessage(),
+                'success' => true,
+                'order_id' => $data['id'],
+                'approval_url' => $approvalUrl,
             ];
         }
+
+        Log::error('PayPal Create Order Error', [
+            'status' => $response->status(),
+            'body' => $response->json(),
+            'request_data' => [
+                'reference_id' => $reservation->id,
+                'total_price' => $formattedPrice,
+                'return_url' => route('reservations.paypal.success', ['reservation' => $reservation->id]),
+                'cancel_url' => route('reservations.paypal.cancel', ['reservation' => $reservation->id]),
+            ]
+        ]);
+        return [
+            'success' => false,
+            'message' => 'Failed to create PayPal order: ' . ($response->json()['message'] ?? $response->status()),
+            'error' => $response->json(),
+        ];
+    } catch (\Exception $e) {
+        Log::error('PayPal Exception', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+        return [
+            'success' => false,
+            'message' => 'Exception occurred: ' . $e->getMessage(),
+        ];
     }
+}
 
     public function capturePayment($orderId, Reservation $reservation)
     {

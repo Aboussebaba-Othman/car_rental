@@ -2,12 +2,20 @@
 <header class="bg-white shadow-md sticky top-0 z-50 transition-all duration-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-20">
-            <div class="flex items-center">
-                <div class="flex-shrink-0 flex items-center">
-                    <span class="text-3xl font-extrabold">
-                        <span class="text-yellow-500">Auto</span><span class="text-gray-800">Loc</span><span class="text-yellow-500">Pro</span>
-                    </span>
+            <div class="flex items-center justify-between px-6 py-5 border-b border-blue-800">
+                <div class="flex items-center">
+                    <div class="flex items-center">
+                        <div class="bg-yellow-500 text-white p-2 rounded-lg shadow-md mr-2">
+                            <i class="fas fa-car text-xl"></i>
+                        </div>
+                        <span class="text-2xl font-bold">
+                            <span class="text-yellow-400">Auto</span><span class="text-white">Loc</span><span class="text-yellow-400">Pro</span>
+                        </span>
+                    </div>
                 </div>
+                <button id="close-sidebar" class="p-2 rounded-md lg:hidden hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-700">
+                    <i class="fas fa-times text-white"></i>
+                </button>
             </div>
             <div class="flex items-center space-x-6">
                 <nav class="hidden md:flex space-x-6 text-gray-600">
