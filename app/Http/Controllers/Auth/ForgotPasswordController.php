@@ -13,22 +13,12 @@ use App\Models\User;
 
 class ForgotPasswordController extends Controller
 {
-    /**
-     * Show the forget password form.
-     *
-     * @return \Illuminate\View\View
-     */
     public function showForgotPasswordForm()
     {
         return view('auth.forgot-password');
     }
 
-    /**
-     * Handle a forgot password request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
+    
     public function forgotPassword(Request $request)
 {
     $validator = Validator::make($request->all(), [
@@ -55,7 +45,6 @@ class ForgotPasswordController extends Controller
         ]
     );
     
-    // Send the actual email
     Mail::send('emails.password-reset', ['token' => $token, 'email' => $email], function($message) use($request) {
         $message->to($request->email);
         $message->subject('Reset Password Notification');

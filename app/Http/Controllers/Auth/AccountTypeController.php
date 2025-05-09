@@ -12,14 +12,9 @@ use Illuminate\Support\Str;
 
 class AccountTypeController extends Controller
 {
-    /**
-     * Show the account type selection page.
-     *
-     * @return \Illuminate\View\View
-     */
+    
     public function showTypeSelection()
     {
-        // Verify that we have social data
         if (!Session::has('social_data')) {
             return redirect()->route('login');
         }
@@ -27,12 +22,7 @@ class AccountTypeController extends Controller
         return view('auth.account-type');
     }
     
-    /**
-     * Process the account type selection.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
+    
     public function processTypeSelection(Request $request)
     {
         $request->validate([
@@ -49,7 +39,6 @@ class AccountTypeController extends Controller
         $lastName = count($nameParts) > 1 ? end($nameParts) : '';
         
         if ($request->account_type === 'user') {
-            // Create regular user account
             $user = User::create([
                 'role_id' => Role::USER,
                 'firstName' => $firstName,
@@ -65,7 +54,6 @@ class AccountTypeController extends Controller
             
             return redirect()->route('home');
         } else {
-            // Create company user account
             $user = User::create([
                 'role_id' => Role::COMPANY,
                 'firstName' => $firstName,

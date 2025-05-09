@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Auth;
     use Illuminate\Http\Request;
     use Illuminate\Support\Facades\Auth;
     use Illuminate\Support\Facades\Validator;
+    use Illuminate\Support\Facades\Log;
 
 class LoginController extends Controller
 {
@@ -41,7 +42,26 @@ class LoginController extends Controller
                     ->with('error', 'Your account is currently inactive. Please contact the administrator.');
             }
 
+            $roleId = $user->role_id;
+            $isCompany = $user->isCompany();
+            $hasCompanyRelation = $user->company()->exists();
+            
+            Log::info('User login details', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'role_id' => $roleId,
+                'isCompany method' => $isCompany,
+                'has company relation' => $hasCompanyRelation
+            ]);
+            
+            if ($user->isCompany() && !$hasCompanyRelation) {
+                Log::error('Company user without company record', ['user_id' => $user->id]);
+                return redirect()->route('company.complete-registration')
+                    ->with('warning', 'Please complete your company profile to continue.');
+            }
+            
             if ($user->isCompany() && !$user->company->is_validated) {
+                Auth::logout();
                 return redirect()->route('login')
                     ->with('info', 'Your company account is pending approval from administrators.');
             }
@@ -58,5 +78,15 @@ class LoginController extends Controller
         return redirect()->back()
             ->withInput($request->only('email', 'remember'))
             ->withErrors(['email' => 'These credentials do not match our records.']);
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        
+        return redirect()->route('login');
     }
 }

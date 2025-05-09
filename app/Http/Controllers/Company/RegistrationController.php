@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Repositories\Interfaces\CompanyRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class RegistrationController extends Controller
 {
@@ -16,22 +17,12 @@ class RegistrationController extends Controller
         $this->companyRepository = $companyRepository;
     }
     
-    /**
-     * Show the company registration completion form.
-     *
-     * @return \Illuminate\View\View
-     */
+    
     public function showCompleteRegistration()
     {
         return view('company.complete-registration');
     }
     
-    /**
-     * Process the company registration completion form.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function completeRegistration(Request $request)
     {
         $request->validate([
@@ -48,8 +39,8 @@ class RegistrationController extends Controller
         ]);
         
         $user = Auth::user();
-        $user->update([
-            'phone' => $request->phone,
+        User::where('id', $user->id)->update([
+            'phone' => $request->phone
         ]);
         
         $documents = [];
@@ -69,7 +60,6 @@ class RegistrationController extends Controller
             }
         }
         
-        // Create company profile
         $this->companyRepository->create([
             'user_id' => $user->id,
             'company_name' => $request->company_name,

@@ -9,31 +9,38 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Repositories\Interfaces\CompanyRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
+use App\Services\MoroccanCitiesService;
 
 class RegisterController extends Controller
 {
     protected $userRepository;
     protected $companyRepository;
+    protected $moroccanCitiesService;
 
     public function __construct(
         UserRepositoryInterface $userRepository,
-        CompanyRepositoryInterface $companyRepository
+        CompanyRepositoryInterface $companyRepository,
+        MoroccanCitiesService $moroccanCitiesService
     ) {
         $this->userRepository = $userRepository;
         $this->companyRepository = $companyRepository;
+        $this->moroccanCitiesService = $moroccanCitiesService;
     }
+    
     public function showRegisterForm()
     {
         return view('auth.register');
     }
 
- 
     public function showCompanyRegisterForm()
     {
-        return view('auth.register-company');
+        $moroccanCities = $this->moroccanCitiesService->getAllCities();
+        
+        return view('auth.register-company', [
+            'moroccanCities' => $moroccanCities
+        ]);
     }
 
-   
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -51,7 +58,7 @@ class RegisterController extends Controller
             'nullable',
             'string',
             'max:20',
-            'regex:/^(?:\+212|0)([6-7])\d{8}$/'
+            // 'regex:/^(?:\+212|0)([6-7])\d{8}$/'
             ],
         ]);
 
@@ -71,55 +78,11 @@ class RegisterController extends Controller
             'is_active' => true,
         ]);
 
-        // auth()->login($user);
+       
 
         return redirect()->route('login')->with('success', 'Account registered successfully!');
     }
 
-  
-//     public function registerCompany(Request $request)
-// {
-//     $validator = Validator::make($request->all(), [
-//         'username' => 'required|string|max:255|unique:users',
-//         'email' => 'required|string|email|max:255|unique:users',
-//         'password' => 'required|string|min:8|confirmed',
-//         'phone' => 'required|string|max:20',
-//         'company_name' => 'required|string|max:255',
-//         'address' => 'required|string|max:255',
-//         'legal_documents' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
-//     ]);
-
-//     if ($validator->fails()) {
-//         return redirect()->back()
-//             ->withErrors($validator)
-//             ->withInput();
-//     }
-
-//     $user = $this->userRepository->create([
-//         'role_id' => Role::COMPANY,
-//         'username' => $request->username,
-//         'email' => $request->email,
-//         'password' => Hash::make($request->password),
-//         'phone' => $request->phone,
-//         'is_active' => true,
-//     ]);
-
-//     $legalDocumentsPath = null;
-//     if ($request->hasFile('legal_documents')) {
-//         $legalDocumentsPath = $request->file('legal_documents')->store('legal_documents', 'public');
-//     }
-
-//     $this->companyRepository->create([
-//         'user_id' => $user->id,
-//         'company_name' => $request->company_name,
-//         'address' => $request->address,
-//         'legal_documents' => $legalDocumentsPath,
-//         'is_validated' => false,
-//     ]);
-
-//     return redirect()->route('login')
-//         ->with('info', 'Your company account has been registered and is pending approval from our administrators.');
-// }
 public function registerCompany(Request $request)
 {
     $validator = Validator::make($request->all(), [
@@ -156,7 +119,6 @@ public function registerCompany(Request $request)
             ->withInput();
     }
 
-    // Create user first
     $user = $this->userRepository->create([
         'role_id' => Role::COMPANY,
         'firstName' => $request->firstName,
@@ -167,7 +129,6 @@ public function registerCompany(Request $request)
         'is_active' => true,
     ]);
 
-    // Process and store each document
     $documents = [];
     $documentFields = [
         'registre_commerce',
@@ -185,7 +146,6 @@ public function registerCompany(Request $request)
         }
     }
 
-    // Create company profile with basic info and documents
     $this->companyRepository->create([
         'user_id' => $user->id,
         'company_name' => $request->company_name,
@@ -195,7 +155,6 @@ public function registerCompany(Request $request)
         'is_validated' => false,
     ]);
 
-    // Redirect to login page
     return redirect()->route('login')
         ->with('success', 'Account registered successfully! Please login to continue.');
 

@@ -11,12 +11,7 @@ use Illuminate\Support\Facades\Validator;
 
 class ResetPasswordController extends Controller
 {
-    /**
-     * Show the reset password form.
-     *
-     * @param  string  $token
-     * @return \Illuminate\View\View
-     */
+
     public function showResetPasswordForm($token)
     {
         $resetRecord = DB::table('password_reset_tokens')
@@ -31,12 +26,7 @@ class ResetPasswordController extends Controller
         return view('auth.reset-password', ['token' => $token, 'email' => $resetRecord->email]);
     }
 
-    /**
-     * Handle a reset password request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
+    
     public function resetPassword(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -62,11 +52,9 @@ class ResetPasswordController extends Controller
                 ->withInput();
         }
 
-        // Update the user's password
         User::where('email', $request->email)
             ->update(['password' => Hash::make($request->password)]);
 
-        // Delete the password reset token
         DB::table('password_reset_tokens')
             ->where('email', $request->email)
             ->delete();

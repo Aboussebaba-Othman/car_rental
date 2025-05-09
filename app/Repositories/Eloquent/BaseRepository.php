@@ -65,4 +65,10 @@ abstract class BaseRepository implements RepositoryInterface
 
         return $query->get();
     }
+
+    
+    public function getModel()
+    {
+        return $this->model;
+    }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Repositories\Interfaces\CompanyRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class CompanyManagementController extends Controller 
 {
@@ -20,35 +21,30 @@ class CompanyManagementController extends Controller
         $this->userRepository = $userRepository;
     }
 
-    /**
-     * Display a listing of companies.
-     *
-     * @return \Illuminate\View\View
-     */
     public function index()
     {
         $companies = $this->companyRepository->getAllWithUsers();
-        return view('admin.companies.index', compact('companies'));
+        
+        $perPage = 10;
+        $currentPage = request()->get('page', 1);
+        
+        $companiesPaginator = new LengthAwarePaginator(
+            $companies->forPage($currentPage, $perPage),
+            $companies->count(),
+            $perPage,
+            $currentPage,
+            ['path' => request()->url()]
+        );
+        
+        return view('admin.companies.index', compact('companiesPaginator'));
     }
 
-    /**
-     * Show company details and documents.
-     *
-     * @param  int  $id
-     * @return \Illuminate\View\View
-     */
     public function show($id)
     {
         $company = $this->companyRepository->findWithUser($id);
         return view('admin.companies.show', compact('company'));
     }
 
-    /**
-     * Validate a company account.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function validate($id)
     {
         $company = $this->companyRepository->find($id);
@@ -58,12 +54,6 @@ class CompanyManagementController extends Controller
             ->with('success', "L'entreprise '{$company->company_name}' a été validée avec succès.");
     }
 
-    /**
-     * Suspend a company account.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function suspend($id)
     {
         $company = $this->companyRepository->findWithUser($id);
@@ -73,12 +63,6 @@ class CompanyManagementController extends Controller
             ->with('success', "L'entreprise '{$company->company_name}' a été suspendue.");
     }
 
-    /**
-     * Reactivate a company account.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function reactivate($id)
     {
         $company = $this->companyRepository->findWithUser($id);

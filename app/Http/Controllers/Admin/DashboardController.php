@@ -3,189 +3,244 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Company;
-use App\Models\Reservation;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use App\Models\User;
 use App\Models\Vehicle;
-use App\Models\Report;
-use App\Models\Payment;
+use App\Models\Reservation;
+use App\Models\Company;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Collection;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        // Statistiques utilisateurs
-        $totalUsers = User::where('role_id', 1)->count();
-        $activeUsers = User::where('role_id', 1)->where('is_active', true)->count();
-        $lastMonthUsers = User::where('role_id', 1)
-            ->where('created_at', '<=', Carbon::now()->subMonth())
-            ->count();
-        $currentUsers = User::where('role_id', 1)->count();
-        $userIncrease = $lastMonthUsers > 0 
-            ? round((($currentUsers - $lastMonthUsers) / $lastMonthUsers) * 100, 1) 
-            : 100;
-        $newUsers = User::where('role_id', 1)
-            ->where('created_at', '>=', Carbon::now()->startOfMonth())
-            ->count();
-
-        // Statistiques entreprises
-        $totalCompanies = Company::count();
-        $validatedCompanies = Company::where('is_validated', true)->count();
-        $pendingCompanies = Company::where('is_validated', false)->count();
-        $lastMonthCompanies = Company::where('created_at', '<=', Carbon::now()->subMonth())->count();
-        $currentCompanies = Company::count();
-        $companyIncrease = $lastMonthCompanies > 0 
-            ? round((($currentCompanies - $lastMonthCompanies) / $lastMonthCompanies) * 100, 1) 
-            : 100;
+        $admin = Auth::user()->admin;
         
-        // Statistiques véhicules
-        $totalVehicles = Vehicle::count();
-        $activeVehicles = Vehicle::where('availability', true)->count();
-        $inactiveVehicles = Vehicle::where('availability', false)->count();
-        $availableVehicles = Vehicle::where('availability', true)
-            ->whereDoesntHave('reservations', function($query) {
-                $query->where('status', 'confirmed')
-                    ->where('start_date', '<=', Carbon::now())
-                    ->where('end_date', '>=', Carbon::now());
-            })->count();
-        $rentedVehicles = $activeVehicles - $availableVehicles;
-        $maintenanceVehicles = Vehicle::where('status', 'maintenance')->count();
-        $lastMonthVehicles = Vehicle::where('created_at', '<=', Carbon::now()->subMonth())->count();
-        $currentVehicles = Vehicle::count();
-        $vehicleIncrease = $lastMonthVehicles > 0 
-            ? round((($currentVehicles - $lastMonthVehicles) / $lastMonthVehicles) * 100, 1) 
-            : 100;
+        $now = Carbon::now();
+        $currentMonth = $now->format('Y-m');
+        $previousMonth = $now->copy()->subMonth()->format('Y-m');
+        
+        $usersCurrentMonth = User::whereYear('created_at', $now->year)
+            ->whereMonth('created_at', $now->month)
+            ->count();
             
-        // Calcul des pourcentages de véhicules
-        $availableVehiclePercentage = $totalVehicles > 0 ? round(($availableVehicles / $totalVehicles) * 100, 1) : 0;
-        $rentedVehiclePercentage = $totalVehicles > 0 ? round(($rentedVehicles / $totalVehicles) * 100, 1) : 0;
-        $maintenanceVehiclePercentage = $totalVehicles > 0 ? round(($maintenanceVehicles / $totalVehicles) * 100, 1) : 0;
-        $inactiveVehiclePercentage = $totalVehicles > 0 ? round(($inactiveVehicles / $totalVehicles) * 100, 1) : 0;
+        $usersPreviousMonth = User::whereYear('created_at', $now->copy()->subMonth()->year)
+            ->whereMonth('created_at', $now->copy()->subMonth()->month)
+            ->count();
+            
+        $companiesCurrentMonth = Company::whereYear('created_at', $now->year)
+            ->whereMonth('created_at', $now->month)
+            ->count();
+            
+        $companiesPreviousMonth = Company::whereYear('created_at', $now->copy()->subMonth()->year)
+            ->whereMonth('created_at', $now->copy()->subMonth()->month)
+            ->count();
+            
+        $vehiclesCurrentMonth = Vehicle::whereYear('created_at', $now->year)
+            ->whereMonth('created_at', $now->month)
+            ->count();
+            
+        $vehiclesPreviousMonth = Vehicle::whereYear('created_at', $now->copy()->subMonth()->year)
+            ->whereMonth('created_at', $now->copy()->subMonth()->month)
+            ->count();
+            
+        $reservationsCurrentMonth = Reservation::whereYear('created_at', $now->year)
+            ->whereMonth('created_at', $now->month)
+            ->count();
+            
+        $reservationsPreviousMonth = Reservation::whereYear('created_at', $now->copy()->subMonth()->year)
+            ->whereMonth('created_at', $now->copy()->subMonth()->month)
+            ->count();
         
-        // Catégories de véhicules
-        $vehicleCategories = [
-            [
-                'name' => 'Économique',
-                'count' => Vehicle::where('category', 'economy')->count(),
-                'percentage' => $totalVehicles > 0 ? (Vehicle::where('category', 'economy')->count() / $totalVehicles) * 100 : 0,
-                'color' => '#3B82F6' // blue
-            ],
-            [
-                'name' => 'Confort',
-                'count' => Vehicle::where('category', 'comfort')->count(),
-                'percentage' => $totalVehicles > 0 ? (Vehicle::where('category', 'comfort')->count() / $totalVehicles) * 100 : 0,
-                'color' => '#10B981' // green
-            ],
-            [
-                'name' => 'SUV',
-                'count' => Vehicle::where('category', 'suv')->count(),
-                'percentage' => $totalVehicles > 0 ? (Vehicle::where('category', 'suv')->count() / $totalVehicles) * 100 : 0,
-                'color' => '#F59E0B' // amber
-            ],
-            [
-                'name' => 'Luxe',
-                'count' => Vehicle::where('category', 'luxury')->count(),
-                'percentage' => $totalVehicles > 0 ? (Vehicle::where('category', 'luxury')->count() / $totalVehicles) * 100 : 0,
-                'color' => '#8B5CF6' // purple
-            ],
-            [
-                'name' => 'Utilitaires',
-                'count' => Vehicle::where('category', 'utility')->count(),
-                'percentage' => $totalVehicles > 0 ? (Vehicle::where('category', 'utility')->count() / $totalVehicles) * 100 : 0,
-                'color' => '#EC4899' // pink
-            ]
+        $userChange = $usersPreviousMonth > 0 
+            ? round(($usersCurrentMonth - $usersPreviousMonth) / $usersPreviousMonth * 100, 1)
+            : ($usersCurrentMonth > 0 ? 100 : 0);
+            
+        $companyChange = $companiesPreviousMonth > 0
+            ? round(($companiesCurrentMonth - $companiesPreviousMonth) / $companiesPreviousMonth * 100, 1)
+            : ($companiesCurrentMonth > 0 ? 100 : 0);
+            
+        $vehicleChange = $vehiclesPreviousMonth > 0
+            ? round(($vehiclesCurrentMonth - $vehiclesPreviousMonth) / $vehiclesPreviousMonth * 100, 1)
+            : ($vehiclesCurrentMonth > 0 ? 100 : 0);
+            
+        $reservationChange = $reservationsPreviousMonth > 0
+            ? round(($reservationsCurrentMonth - $reservationsPreviousMonth) / $reservationsPreviousMonth * 100, 1)
+            : ($reservationsCurrentMonth > 0 ? 100 : 0);
+        
+        $stats = [
+            'users' => User::count(),
+            'companies' => Company::count(),
+            'vehicles' => Vehicle::count(),
+            'reservations' => Reservation::count(),
+            'user_change' => $userChange,
+            'company_change' => $companyChange,
+            'vehicle_change' => $vehicleChange,
+            'reservation_change' => $reservationChange,
+            'usersCurrentMonth' => $usersCurrentMonth,
+            'companiesCurrentMonth' => $companiesCurrentMonth,
+            'vehiclesCurrentMonth' => $vehiclesCurrentMonth,
+            'reservationsCurrentMonth' => $reservationsCurrentMonth,
+            'currentMonthName' => $now->translatedFormat('F Y'),
         ];
-
-        // Statistiques réservations
-        $totalReservations = Reservation::count();
-        $confirmedReservations = Reservation::where('status', 'confirmed')->count();
-        $pendingReservations = Reservation::where('status', 'pending')->count();
-        $canceledReservations = Reservation::where('status', 'canceled')->count();
-        $lastMonthReservations = Reservation::where('created_at', '<=', Carbon::now()->subMonth())->count();
-        $currentReservations = Reservation::count();
-        $reservationIncrease = $lastMonthReservations > 0 
-            ? round((($currentReservations - $lastMonthReservations) / $lastMonthReservations) * 100, 1) 
-            : 100;
-            
-        // Calcul des pourcentages de réservations
-        $confirmedReservationPercentage = $totalReservations > 0 ? round(($confirmedReservations / $totalReservations) * 100, 1) : 0;
-        $pendingReservationPercentage = $totalReservations > 0 ? round(($pendingReservations / $totalReservations) * 100, 1) : 0;
-        $canceledReservationPercentage = $totalReservations > 0 ? round(($canceledReservations / $totalReservations) * 100, 1) : 0;
         
-        // Données pour le graphique des réservations (6 derniers mois)
-        $reservationChartLabels = [];
-        $confirmedReservationData = [];
-        $pendingReservationData = [];
-        $canceledReservationData = [];
-        
+        $lastSixMonths = collect([]);
         for ($i = 5; $i >= 0; $i--) {
-            $month = Carbon::now()->subMonths($i);
-            $reservationChartLabels[] = $month->format('M Y');
-            
-            $confirmedReservationData[] = Reservation::where('status', 'confirmed')
-                ->whereYear('created_at', $month->year)
-                ->whereMonth('created_at', $month->month)
-                ->count();
-                
-            $pendingReservationData[] = Reservation::where('status', 'pending')
-                ->whereYear('created_at', $month->year)
-                ->whereMonth('created_at', $month->month)
-                ->count();
-                
-            $canceledReservationData[] = Reservation::where('status', 'canceled')
-                ->whereYear('created_at', $month->year)
+            $lastSixMonths->push($now->copy()->subMonths($i)->format('M Y'));
+        }
+        
+        $reservationData = [];
+        foreach (range(5, 0) as $i) {
+            $month = $now->copy()->subMonths($i);
+            $reservationData[] = Reservation::whereYear('created_at', $month->year)
                 ->whereMonth('created_at', $month->month)
                 ->count();
         }
         
-        // Statistiques revenus
-        $totalRevenue = Payment::where('status', 'confirmed')->sum('amount');
-        $monthlyRevenue = Payment::where('status', 'confirmed')
-            ->whereYear('created_at', Carbon::now()->year)
-            ->whereMonth('created_at', Carbon::now()->month)
-            ->sum('amount');
-        $monthlyTarget = 20000; // Objectif mensuel fictif
-        $revenuePercentage = $monthlyTarget > 0 ? round(($monthlyRevenue / $monthlyTarget) * 100, 1) : 0;
-        $confirmedPayments = Payment::where('status', 'confirmed')->sum('amount');
-        $pendingPayments = Payment::where('status', 'pending')->sum('amount');
-        $confirmedPaymentPercentage = ($confirmedPayments + $pendingPayments) > 0 
-            ? round(($confirmedPayments / ($confirmedPayments + $pendingPayments)) * 100, 1) 
-            : 0;
-        $pendingPaymentPercentage = ($confirmedPayments + $pendingPayments) > 0 
-            ? round(($pendingPayments / ($confirmedPayments + $pendingPayments)) * 100, 1) 
-            : 0;
-            
-        // Statistiques signalements
-        $totalReports = Report::count();
-        $pendingReports = Report::where('status', 'pending')->count();
-        $customerDisputes = Report::where('type', 'customer_dispute')->count();
-        $vehicleIssues = Report::where('type', 'vehicle_issue')->count();
-        $fraudReports = Report::where('type', 'fraud')->count();
+        $vehicleColumns = Schema::getColumnListing('vehicles');
         
-        // Entreprises en attente de validation
-        $pendingCompaniesData = Company::with('user')
-            ->where('is_validated', false)
-            ->latest()
-            ->take(5)
-            ->get();
-
+        $categoryColumn = 'type';
+        
+        $possibleColumns = ['type', 'vehicle_type', 'class', 'model', 'brand', 'category_id'];
+        foreach ($possibleColumns as $column) {
+            if (in_array($column, $vehicleColumns)) {
+                $categoryColumn = $column;
+                break;
+            }
+        }
+        
+        try {
+            $categories = Vehicle::select($categoryColumn, DB::raw('count(*) as total'))
+                ->whereNotNull($categoryColumn)
+                ->groupBy($categoryColumn)
+                ->pluck('total', $categoryColumn)
+                ->toArray();
+                
+            $categoryLabels = array_keys($categories);
+            $categoryData = array_values($categories);
+        } catch (\Exception $e) {
+            $categories = [];
+            $categoryLabels = [];
+            $categoryData = [];
+        }
+        
+        $charts = [
+            'months' => $lastSixMonths->toArray(),
+            'reservationData' => $reservationData,
+            'categories' => $categoryLabels,
+            'categoryData' => $categoryData
+        ];
+        
+        try {
+            if (Schema::hasTable('activity_log')) {
+                $recentActivity = DB::table('activity_log')
+                    ->latest()
+                    ->take(10)
+                    ->get();
+            } else {
+                $recentActivity = Reservation::with('user')
+                    ->latest()
+                    ->take(10)
+                    ->get()
+                    ->map(function($reservation) {
+                        $reservation->description = "Réservation #" . $reservation->id;
+                        $reservation->status = $reservation->status ?? 'completed';
+                        return $reservation;
+                    });
+            }
+        } catch (QueryException $e) {
+            $recentActivity = new Collection();
+        }
+        
+        $companyColumns = Schema::getColumnListing('companies');
+        $companyNameColumn = 'name';
+        
+        $possibleNameColumns = ['name', 'company_name', 'title', 'nom', 'label', 'raison_sociale'];
+        foreach ($possibleNameColumns as $column) {
+            if (in_array($column, $companyColumns)) {
+                $companyNameColumn = $column;
+                break;
+            }
+        }
+        
+        try {
+            $topCompaniesByVehicles = DB::table('companies')
+                ->select('companies.id', "companies.{$companyNameColumn} as company_name", DB::raw('COUNT(vehicles.id) as vehicle_count'))
+                ->leftJoin('vehicles', 'companies.id', '=', 'vehicles.company_id')
+                ->groupBy('companies.id', "companies.{$companyNameColumn}")
+                ->orderByDesc('vehicle_count')
+                ->limit(5)
+                ->get();
+        } catch (\Exception $e) {
+            $topCompaniesByVehicles = new Collection();
+        }
+            
+        try {
+            $topCompaniesByReservations = DB::table('companies')
+                ->select('companies.id', "companies.{$companyNameColumn} as company_name", DB::raw('COUNT(reservations.id) as reservation_count'))
+                ->leftJoin('vehicles', 'companies.id', '=', 'vehicles.company_id')
+                ->leftJoin('reservations', 'vehicles.id', '=', 'reservations.vehicle_id')
+                ->groupBy('companies.id', "companies.{$companyNameColumn}")
+                ->orderByDesc('reservation_count')
+                ->limit(5)
+                ->get();
+        } catch (\Exception $e) {
+            $topCompaniesByReservations = new Collection();
+        }
+        
+        $monthlyStats = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $month = Carbon::create(Carbon::now()->year, $i, 1);
+            $monthlyStats[] = [
+                'month' => $month->translatedFormat('F'),
+                'count' => Reservation::whereYear('created_at', $month->year)
+                    ->whereMonth('created_at', $month->month)
+                    ->count()
+            ];
+        }
+        
+        $weeklyStats = [];
+        for ($i = 9; $i >= 0; $i--) {
+            $startOfWeek = Carbon::now()->subWeeks($i)->startOfWeek();
+            $endOfWeek = Carbon::now()->subWeeks($i)->endOfWeek();
+            
+            $weekNumber = $startOfWeek->weekOfYear;
+            $weekLabel = 'S' . $weekNumber . ' (' . $startOfWeek->format('d/m') . ' - ' . $endOfWeek->format('d/m') . ')';
+            
+            $weeklyStats[] = [
+                'week' => $weekLabel,
+                'count' => Reservation::whereBetween('created_at', [$startOfWeek, $endOfWeek])->count()
+            ];
+        }
+        
+        $advancedCharts = [
+            'months' => array_column($monthlyStats, 'month'),
+            'monthlyData' => array_column($monthlyStats, 'count'),
+            'weeks' => array_column($weeklyStats, 'week'),
+            'weeklyData' => array_column($weeklyStats, 'count'),
+            'topVehicleCompanies' => [
+                'labels' => $topCompaniesByVehicles->pluck('company_name')->toArray(),
+                'data' => $topCompaniesByVehicles->pluck('vehicle_count')->toArray(),
+            ],
+            'topReservationCompanies' => [
+                'labels' => $topCompaniesByReservations->pluck('company_name')->toArray(),
+                'data' => $topCompaniesByReservations->pluck('reservation_count')->toArray(),
+            ]
+        ];
+        
         return view('admin.dashboard', compact(
-            'totalUsers', 'activeUsers', 'userIncrease', 'newUsers',
-            'totalCompanies', 'validatedCompanies', 'pendingCompanies', 'companyIncrease',
-            'totalVehicles', 'activeVehicles', 'inactiveVehicles', 'availableVehicles', 
-            'rentedVehicles', 'maintenanceVehicles', 'vehicleIncrease',
-            'availableVehiclePercentage', 'rentedVehiclePercentage', 
-            'maintenanceVehiclePercentage', 'inactiveVehiclePercentage', 'vehicleCategories',
-            'totalReservations', 'confirmedReservations', 'pendingReservations', 
-            'canceledReservations', 'reservationIncrease',
-            'confirmedReservationPercentage', 'pendingReservationPercentage', 'canceledReservationPercentage',
-            'reservationChartLabels', 'confirmedReservationData', 'pendingReservationData', 'canceledReservationData',
-            'totalRevenue', 'monthlyRevenue', 'revenuePercentage',
-            'confirmedPayments', 'pendingPayments', 'confirmedPaymentPercentage', 'pendingPaymentPercentage',
-            'totalReports', 'pendingReports', 'customerDisputes', 'vehicleIssues', 'fraudReports',
-            'pendingCompaniesData'
+            'admin', 
+            'stats', 
+            'charts',
+            'advancedCharts',
+            'topCompaniesByVehicles',
+            'topCompaniesByReservations',
+            'monthlyStats',
+            'weeklyStats'
         ));
     }
 }
