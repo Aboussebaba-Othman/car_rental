@@ -4,10 +4,8 @@ namespace App\Mail;
 
 use App\Models\Reservation;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Carbon\Carbon;
 
 class PaymentReminderMail extends Mailable
 {
@@ -21,12 +19,7 @@ class PaymentReminderMail extends Mailable
     public $paymentLink;
     public $companyName;
 
-    /**
-     * Create a new message instance.
-     *
-     * @param  \App\Models\Reservation  $reservation
-     * @return void
-     */
+    
     public function __construct(Reservation $reservation)
     {
         $this->reservation = $reservation;
@@ -35,14 +28,10 @@ class PaymentReminderMail extends Mailable
         $this->endDate = $reservation->end_date;
         $this->totalPrice = $reservation->total_price;
         $this->paymentLink = route('reservations.payment', $reservation->id);
-        $this->companyName = $reservation->vehicle->company->name;
+        $this->companyName = $reservation->vehicle->company->company_name;
     }
 
-    /**
-     * Build the message.
-     *
-     * @return $this
-     */
+   
     public function build()
     {
         return $this->subject('Rappel de paiement pour votre réservation')

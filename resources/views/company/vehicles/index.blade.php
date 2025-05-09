@@ -632,17 +632,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Écouteurs d'événements pour les filtres rapides
     function setQuickFilter(filterType, value) {
-        // Réinitialiser tous les filtres
         activeFilters = {
-            search: activeFilters.search, // Conserver la recherche textuelle
+            search: activeFilters.search,
             brand: '',
             status: '',
             availability: ''
         };
         
-        // Définir le filtre correspondant
         if (filterType === 'status') {
             activeFilters.status = value;
             if (statusFilter) statusFilter.value = value;
@@ -651,20 +648,16 @@ document.addEventListener('DOMContentLoaded', function() {
             if (availabilityFilter) availabilityFilter.value = value;
         }
         
-        // Réinitialiser les sélecteurs non concernés
         if (filterType !== 'brand' && brandFilter) brandFilter.value = '';
         if (filterType !== 'status' && statusFilter) statusFilter.value = '';
         if (filterType !== 'availability' && availabilityFilter) availabilityFilter.value = '';
         
-        // Appliquer les filtres
         filterVehicles();
         
-        // Mettre à jour l'apparence des filtres rapides
         updateQuickFilterStyles();
     }
     
     function updateQuickFilterStyles() {
-        // Supprimer la classe active de tous les filtres rapides
         [quickFilterAll, quickFilterActive, quickFilterAvailable, quickFilterReserved].forEach(filter => {
             if (filter) {
                 filter.classList.remove('bg-yellow-500', 'text-white');
@@ -672,7 +665,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Ajouter la classe active au filtre actif
         if (activeFilters.status === '' && activeFilters.availability === '' && activeFilters.brand === '') {
             if (quickFilterAll) {
                 quickFilterAll.classList.remove('bg-white', 'text-gray-700', 'border-gray-300');
@@ -696,7 +688,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Configurer les filtres rapides
     if (quickFilterAll) {
         quickFilterAll.addEventListener('click', function(e) {
             e.preventDefault();
@@ -725,7 +716,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Initialiser l'apparence des filtres rapides
     updateQuickFilterStyles();
 });
 </script>

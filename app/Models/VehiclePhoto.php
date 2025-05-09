@@ -21,9 +21,7 @@ class VehiclePhoto extends Model
         'display_order' => 'integer',
     ];
 
-    /**
-     * Get the vehicle that owns the photo.
-     */
+    
     public function vehicle()
     {
         return $this->belongsTo(Vehicle::class);

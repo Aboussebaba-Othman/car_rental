@@ -237,11 +237,7 @@ class VehicleRepository extends BaseRepository implements VehicleRepositoryInter
             ->get();
     }
 
-    /**
-     * Get the model instance
-     *
-     * @return \Illuminate\Database\Eloquent\Model
-     */
+   
     public function getModel()
     {
         return $this->model;
@@ -295,11 +291,6 @@ class VehicleRepository extends BaseRepository implements VehicleRepositoryInter
         return $query->paginate($perPage)->withQueryString();
     }
     
-    /**
-     * Get all unique brands
-     *
-     * @return array
-     */
     public function getAllBrands()
     {
         return $this->model

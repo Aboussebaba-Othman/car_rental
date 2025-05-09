@@ -68,13 +68,7 @@ Route::middleware(['auth', 'role:company'])->group(function () {
         Route::post('/reservations/{reservation}/add-note', [App\Http\Controllers\Company\ReservationController::class, 'addNote'])->name('company.reservations.add-note');
         Route::get('/reservations/{reservation}/invoice', [App\Http\Controllers\Company\ReservationController::class, 'generateInvoice'])->name('company.reservations.invoice');
         Route::post('/reservations/{reservation}/send-payment-reminder', [App\Http\Controllers\Company\ReservationController::class, 'sendPaymentReminder'])->name('company.reservations.send-payment-reminder');
-
         Route::post('/invoices/{id}/download', [App\Http\Controllers\Company\InvoiceController::class, 'download'])->name('company.invoices.download');
-
-        // Route::get('/customers', [App\Http\Controllers\Company\CustomerController::class, 'index'])->name('company.customers.index');
-        // Route::get('/customers/{user}', [App\Http\Controllers\Company\CustomerController::class, 'show'])->name('company.customers.show');
-        // Route::post('/customers/{user}/send-promotion', [App\Http\Controllers\Company\CustomerController::class, 'sendPromotion'])->name('company.customers.send-promotion');
-        // Route::get('/customers/{user}/report', [App\Http\Controllers\Company\CustomerController::class, 'generateReport'])->name('company.customers.report');
     });
 });
 
@@ -111,6 +105,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/reservations/{reservation}/paypal/success', [App\Http\Controllers\ReservationController::class, 'paypalSuccess'])->name('reservations.paypal.success');
     Route::get('/reservations/{reservation}/paypal/cancel', [App\Http\Controllers\ReservationController::class, 'paypalCancel'])->name('reservations.paypal.cancel');
     Route::get('/reservations/{reservation}/payment/confirmation', [App\Http\Controllers\ReservationController::class, 'paymentConfirmation'])->name('reservations.payment.confirmation');
+
+    // Add the invoice download route
+    Route::get('/reservations/{reservation}/invoice', [App\Http\Controllers\ReservationController::class, 'downloadInvoice'])
+        ->name('reservations.invoice')
+        ->middleware('auth');
 });
 
 Route::get('/', [App\Http\Controllers\WelcomeController::class, 'index'])->name('home');
@@ -118,5 +117,4 @@ Route::get('/vehicles', [App\Http\Controllers\VehicleController::class, 'index']
 Route::get('/vehicles/{id}', [App\Http\Controllers\VehicleController::class, 'show'])->name('vehicles.show');
 Route::get('/location-search', [App\Http\Controllers\LocationSearchController::class, 'search'])->name('location.search');
 
-// Vehicle availability API for the calendar
 Route::get('/vehicles/{vehicle}/availability', [App\Http\Controllers\VehicleController::class, 'getAvailability'])->name('vehicles.availability');

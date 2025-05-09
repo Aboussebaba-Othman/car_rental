@@ -9,7 +9,9 @@
                             <i class="fas fa-car text-xl"></i>
                         </div>
                         <span class="text-2xl font-bold">
-                            <span class="text-yellow-400">Auto</span><span class="text-white">Loc</span><span class="text-yellow-400">Pro</span>
+                            <a href="{{ route('home') }}" class="flex items-center">
+                                <span class="text-yellow-400">Auto</span><span class="text-blue-800">Loc</span><span class="text-yellow-400">Pro</span>
+                            </a>
                         </span>
                     </div>
                 </div>
@@ -19,13 +21,13 @@
             </div>
             <div class="flex items-center space-x-6">
                 <nav class="hidden md:flex space-x-6 text-gray-600">
-                    <a href="#" class="font-medium hover:text-yellow-500 transition duration-300 border-b-2 border-transparent hover:border-yellow-500 py-2">Accueil</a>
-                    <a href="{{ route('vehicles.index') }}" class="font-medium hover:text-yellow-500 transition duration-300 border-b-2 border-transparent hover:border-yellow-500 py-2">Véhicules</a>
-                    <a href="#vehicles" class="font-medium hover:text-yellow-500 transition duration-300 border-b-2 border-transparent hover:border-yellow-500 py-2">Promotions</a>
+                    <a href="{{ route('home') }}" class="font-medium hover:text-yellow-500 transition duration-300 border-b-2 {{ request()->routeIs('home') ? 'border-yellow-500 text-yellow-500' : 'border-transparent' }} hover:border-yellow-500 py-2">Accueil</a>
+                    <a href="{{ route('vehicles.index') }}" class="font-medium hover:text-yellow-500 transition duration-300 border-b-2 {{ request()->routeIs('vehicles.*') ? 'border-yellow-500 text-yellow-500' : 'border-transparent' }} hover:border-yellow-500 py-2">Véhicules</a>
+                    <a href="#promotions" class="font-medium hover:text-yellow-500 transition duration-300 border-b-2 border-transparent hover:border-yellow-500 py-2">Promotions</a>
                 </nav>
                 <div class="flex items-center space-x-4">
                     @auth
-                        <a href="{{ route('reservations.index') }}" class="text-gray-600 hover:text-yellow-600 font-medium transition duration-300">Mes réservations</a>
+                        <a href="{{ route('reservations.index') }}" class="text-gray-600 hover:text-yellow-600 font-medium transition duration-300 {{ request()->routeIs('reservations.*') ? 'text-yellow-600' : '' }}">Mes réservations</a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="text-gray-600 hover:text-yellow-600 font-medium transition duration-300">Déconnexion</button>
@@ -62,11 +64,9 @@
         </button>
     </div>
     <nav class="flex flex-col space-y-4">
-        <a href="#" class="font-medium text-gray-800 hover:text-yellow-500 py-2 border-b border-gray-100">Accueil</a>
-        <a href="{{ route('vehicles.index') }}" class="font-medium text-gray-800 hover:text-yellow-500 py-2 border-b border-gray-100">Véhicules</a>
+        <a href="{{ route('home') }}" class="font-medium text-gray-800 hover:text-yellow-500 py-2 border-b border-gray-100 {{ request()->routeIs('home') ? 'text-yellow-500' : '' }}">Accueil</a>
+        <a href="{{ route('vehicles.index') }}" class="font-medium text-gray-800 hover:text-yellow-500 py-2 border-b border-gray-100 {{ request()->routeIs('vehicles.*') ? 'text-yellow-500' : '' }}">Véhicules</a>
         <a href="#promotions" class="font-medium text-gray-800 hover:text-yellow-500 py-2 border-b border-gray-100">Promotions</a>
-        <a href="#" class="font-medium text-gray-800 hover:text-yellow-500 py-2 border-b border-gray-100">À propos</a>
-        <a href="#" class="font-medium text-gray-800 hover:text-yellow-500 py-2 border-b border-gray-100">Contact</a>
     </nav>
     <div class="mt-8 space-y-4">
         @auth

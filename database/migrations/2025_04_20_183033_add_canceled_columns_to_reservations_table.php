@@ -14,7 +14,6 @@ class AddCanceledColumnsToReservationsTable extends Migration
     public function up()
     {
         Schema::table('reservations', function (Blueprint $table) {
-            // Vérifier si les colonnes n'existent pas déjà avant de les ajouter
             if (!Schema::hasColumn('reservations', 'canceled_at')) {
                 $table->timestamp('canceled_at')->nullable();
             }
@@ -28,7 +27,6 @@ class AddCanceledColumnsToReservationsTable extends Migration
                 $table->text('cancellation_reason')->nullable();
             }
             
-            // Ajouter également les autres colonnes qui pourraient manquer
             if (!Schema::hasColumn('reservations', 'confirmed_at')) {
                 $table->timestamp('confirmed_at')->nullable();
             }
@@ -49,15 +47,10 @@ class AddCanceledColumnsToReservationsTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
+    
     public function down()
     {
         Schema::table('reservations', function (Blueprint $table) {
-            // Supprimer les colonnes si elles existent
             if (Schema::hasColumn('reservations', 'canceled_at')) {
                 $table->dropColumn('canceled_at');
             }

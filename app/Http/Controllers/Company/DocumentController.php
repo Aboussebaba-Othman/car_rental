@@ -10,23 +10,11 @@ use Illuminate\Support\Facades\Auth;
 
 class DocumentController extends Controller
 {
-    /**
-     * Show the document upload form.
-     *
-     * @return \Illuminate\View\View
-     */
     public function showUploadForm()
     {
         $company = Auth::user()->company;
         return view('company.documents.upload', compact('company'));
     }
-
-    /**
-     * Process the document uploads.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function uploadDocuments(Request $request)
     {
         $request->validate([
@@ -40,7 +28,6 @@ class DocumentController extends Controller
 
         $company = Auth::user()->company;
         
-        // Process and store each document
         $documents = [];
         
         foreach ($request->file() as $key => $file) {
@@ -48,7 +35,6 @@ class DocumentController extends Controller
             $documents[$key] = $path;
         }
         
-        // Update company with JSON document paths
         $company->legal_documents = json_encode($documents);
         $company->save();
 

@@ -11,47 +11,30 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use Carbon\Carbon;
+
 
 class ReservationController extends Controller
 {
-    /**
-     * @var ReservationRepositoryInterface
-     */
     private $reservationRepository;
     
-    /**
-     * ReservationController constructor.
-     *
-     * @param ReservationRepositoryInterface $reservationRepository
-     */
     public function __construct(ReservationRepositoryInterface $reservationRepository)
     {
         $this->reservationRepository = $reservationRepository;
     }
 
-    /**
-     * Display a listing of the reservations.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function index(Request $request)
     {
         try {
             $reservations = $this->reservationRepository->getFilteredReservations($request);
             $vehicles = Vehicle::where('company_id', Auth::user()->company_id)->get();
             
-            // Get the company ID safely (could be null)
             $companyId = Auth::user() ? Auth::user()->company_id : null;
             $stats = $this->reservationRepository->getReservationStats($companyId);
             
             return view('company.reservations.index', compact('reservations', 'vehicles', 'stats'));
         } catch (\Exception $e) {
-            // Log l'erreur pour le débogage
-            \Log::error('Erreur lors de la récupération des réservations: ' . $e->getMessage());
+            Log::error('Erreur lors de la récupération des réservations: ' . $e->getMessage());
             
-            // Données par défaut
             return view('company.reservations.index', [
                 'reservations' => collect([]),
                 'vehicles' => collect([]),
@@ -65,49 +48,31 @@ class ReservationController extends Controller
         }
     }
 
-    /**
-     * Display the specified reservation.
-     *
-     * @param  \App\Models\Reservation  $reservation
-     * @return \Illuminate\Http\Response
-     */
     public function show(Reservation $reservation)
     {
         try {
-            // Check if the reservation belongs to the company
             $this->checkReservationBelongsToCompany($reservation);
             
-            // Load reservation with all relationships
             $reservation->load(['vehicle', 'user', 'promotion']);
             
-            // Get previous reservations for the user
             $previousReservations = $this->reservationRepository->getPreviousReservations(
                 $reservation->user_id, 
                 $reservation->id
             );
             
-            // Mock activities for demonstration
             $reservation->activities = $this->getMockActivities($reservation);
             
             return view('company.reservations.show', compact('reservation', 'previousReservations'));
         } catch (\Exception $e) {
-            // Log l'erreur pour le débogage
-            \Log::error('Erreur lors de l\'affichage d\'une réservation: ' . $e->getMessage());
+            Log::error('Erreur lors de l\'affichage d\'une réservation: ' . $e->getMessage());
             return redirect()->route('company.reservations.index')
                 ->with('error', 'Impossible d\'afficher cette réservation: ' . $e->getMessage());
         }
     }
     
-    /**
-     * Confirm a reservation.
-     *
-     * @param  \App\Models\Reservation  $reservation
-     * @return \Illuminate\Http\Response
-     */
     public function confirm(Reservation $reservation)
     {
         try {
-            // Check if the reservation belongs to the company
             $this->checkReservationBelongsToCompany($reservation);
             
             if ($reservation->status !== 'pending') {
@@ -123,17 +88,9 @@ class ReservationController extends Controller
         }
     }
     
-    /**
-     * Cancel a reservation.
-     *
-     * @param  \App\Models\Reservation  $reservation
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function cancel(Reservation $reservation, Request $request)
     {
         try {
-            // Check if the reservation belongs to the company
             $this->checkReservationBelongsToCompany($reservation);
             
             if (!in_array($reservation->status, ['pending', 'payment_pending'])) {
@@ -150,16 +107,9 @@ class ReservationController extends Controller
         }
     }
     
-    /**
-     * Mark a reservation as completed.
-     *
-     * @param  \App\Models\Reservation  $reservation
-     * @return \Illuminate\Http\Response
-     */
     public function complete(Reservation $reservation)
     {
         try {
-            // Check if the reservation belongs to the company
             $this->checkReservationBelongsToCompany($reservation);
             
             if ($reservation->status !== 'confirmed' && $reservation->status !== 'paid') {
@@ -175,17 +125,9 @@ class ReservationController extends Controller
         }
     }
     
-    /**
-     * Mark a reservation as paid.
-     *
-     * @param  \App\Models\Reservation  $reservation
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function markPaid(Reservation $reservation, Request $request)
     {
         try {
-            // Check if the reservation belongs to the company
             $this->checkReservationBelongsToCompany($reservation);
             
             if (!in_array($reservation->status, ['pending', 'payment_pending'])) {
@@ -201,24 +143,14 @@ class ReservationController extends Controller
         }
     }
     
-    /**
-     * Add a note to the reservation.
-     *
-     * @param  \App\Models\Reservation  $reservation
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function addNote(Reservation $reservation, Request $request)
     {
         try {
-            // Check if the reservation belongs to the company
             $this->checkReservationBelongsToCompany($reservation);
             
             $request->validate([
                 'note' => 'required|string|max:1000',
             ]);
-            
-            // In a real app, you would add the note to a notes table
             
             return redirect()->route('company.reservations.show', $reservation)
                 ->with('success', 'Note ajoutée à la réservation.');
@@ -227,41 +159,26 @@ class ReservationController extends Controller
         }
     }
     
-    /**
-     * Generate an invoice for the reservation.
-     *
-     * @param  \App\Models\Reservation  $reservation
-     * @return \Illuminate\Http\Response
-     */
     public function generateInvoice(Reservation $reservation)
     {
         try {
-            // Check if the reservation belongs to the company
             $this->checkReservationBelongsToCompany($reservation);
             
             $reservation->load(['vehicle', 'user', 'promotion']);
             
             $company = Auth::user()->company;
             
-            // For demonstration purposes, just return a view
             return view('company.invoices.template', compact('reservation', 'company'));
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Erreur lors de la génération de la facture: ' . $e->getMessage());
         }
     }
     
-    /**
-     * Export reservations as CSV/Excel.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function export(Request $request)
     {
         try {
             $reservations = $this->reservationRepository->getFilteredReservations($request, 1000);
             
-            // For demonstration purposes, just return a message
             return redirect()->route('company.reservations.index')
                 ->with('success', 'La fonctionnalité d\'exportation serait implémentée ici.');
         } catch (\Exception $e) {
@@ -269,17 +186,9 @@ class ReservationController extends Controller
         }
     }
     
-    /**
-     * Envoie un email de rappel de paiement au client.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Reservation  $reservation
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function sendPaymentReminder(Request $request, Reservation $reservation)
     {
         try {
-            // Vérifier que la réservation appartient à la compagnie connectée
             if ($reservation->vehicle->company_id !== Auth::user()->company->id) {
                 return response()->json([
                     'success' => false,
@@ -287,7 +196,6 @@ class ReservationController extends Controller
                 ], 403);
             }
 
-            // Vérifier que la réservation est en attente de paiement
             if (!in_array($reservation->status, ['pending', 'payment_pending'])) {
                 return response()->json([
                     'success' => false,
@@ -295,11 +203,9 @@ class ReservationController extends Controller
                 ], 400);
             }
 
-            // Envoyer l'email de rappel
             Mail::to($reservation->user->email)
                 ->send(new PaymentReminderMail($reservation));
 
-            // Journaliser l'envoi sans utiliser le modèle Activity
             Log::info('Payment reminder email sent', [
                 'reservation_id' => $reservation->id,
                 'user_id' => $reservation->user_id,
@@ -307,7 +213,6 @@ class ReservationController extends Controller
                 'sent_by' => Auth::id()
             ]);
 
-            // Message de succès pour l'interface
             if ($request->wantsJson()) {
                 return response()->json([
                     'success' => true,
@@ -334,15 +239,8 @@ class ReservationController extends Controller
         }
     }
     
-    /**
-     * Check if a reservation belongs to the company.
-     *
-     * @param  \App\Models\Reservation  $reservation
-     * @return void
-     */
     private function checkReservationBelongsToCompany(Reservation $reservation)
     {
-        // Load the vehicle relationship if not already loaded
         if (!$reservation->relationLoaded('vehicle')) {
             $reservation->load('vehicle');
         }
@@ -352,15 +250,8 @@ class ReservationController extends Controller
         }
     }
     
-    /**
-     * Mock activities for demonstration.
-     *
-     * @param  \App\Models\Reservation  $reservation
-     * @return array
-     */
     private function getMockActivities(Reservation $reservation)
     {
-        // In a real app, this would come from a database
         $createdAt = $reservation->created_at;
         
         $activities = [

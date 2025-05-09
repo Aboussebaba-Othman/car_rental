@@ -205,13 +205,9 @@
                                     </span>
                                     <select id="ville" name="city" required class="pl-10 block w-full border border-gray-300 rounded-lg shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition duration-200 appearance-none">
                                         <option value="" disabled selected>Sélectionnez une ville</option>
-                                        <option value="Casablanca">Casablanca</option>
-                                        <option value="Rabat">Rabat</option>
-                                        <option value="Marrakech">Marrakech</option>
-                                        <option value="Tanger">Tanger</option>
-                                        <option value="Fès">Fès</option>
-                                        <option value="Agadir">Agadir</option>
-                                        <option value="Meknès">Meknès</option>
+                                        @foreach($moroccanCities as $city)
+                                            <option value="{{ $city }}">{{ $city }}</option>
+                                        @endforeach
                                     </select>
                                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                                         <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -234,6 +230,11 @@
                                 <textarea id="address" name="address" rows="4" required class="pl-10 block w-full border border-gray-300 rounded-lg shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition duration-200 resize-none"></textarea>
                             </div>
                             <p class="error-message text-red-500 text-xs italic hidden mt-1">Ce champ est obligatoire</p>
+                        </div>
+
+                        <!-- Instructions for easier address entry -->
+                        <div class="text-sm text-gray-500 -mt-4 mb-6">
+                            <p>Conseil: Incluez le numéro, la rue, le quartier et tout autre détail pertinent pour faciliter la livraison.</p>
                         </div>
 
                         <!-- Navigation buttons -->
@@ -450,7 +451,7 @@
         </div>
     </div>
 </div>
-
+@include('layouts.footer')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const step1Form = document.getElementById('step1-form');
@@ -711,12 +712,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (errorElement) {
                     errorElement.classList.add('hidden');
                 }
-                
-                // Add animation for better UX
-                label.classList.add('file-selected');
-                setTimeout(() => {
-                    label.classList.remove('file-selected');
-                }, 1000);
             }
         });
         
@@ -800,7 +795,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Validate all required file inputs
-        // Validate all required file inputs
         const requiredFileInputs = [
             'registre_commerce',
             'carte_fiscale',
@@ -844,19 +838,16 @@ document.addEventListener('DOMContentLoaded', function() {
             Traitement en cours...
         `;
         
-        // Add animation class to form
-        this.classList.add('submitting');
-        
-        // Show success notification
+        // Show notification
         showNotification('Votre compte est en cours de création...', 'info');
         
-        // Submit the form after a short delay (for demonstration purposes)
+        // Submit the form after a short delay
         setTimeout(() => {
             this.submit();
         }, 1500);
     });
     
-    // Notification system
+    // Notification system - simplified
     function showNotification(message, type = 'success') {
         // Remove any existing notifications
         const existingNotifications = document.querySelectorAll('.notification');
@@ -866,7 +857,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Create notification element
         const notification = document.createElement('div');
-        notification.className = 'notification fixed top-4 right-4 p-4 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50';
+        notification.className = 'notification fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50';
         
         // Set style based on type
         if (type === 'success') {
@@ -913,227 +904,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add to DOM
         document.body.appendChild(notification);
         
-        // Animate in
-        setTimeout(() => {
-            notification.classList.remove('translate-x-full');
-        }, 10);
-        
         // Auto dismiss after 5 seconds
         setTimeout(() => {
             if (document.body.contains(notification)) {
-                notification.classList.add('translate-x-full');
-                setTimeout(() => {
-                    if (document.body.contains(notification)) {
-                        notification.remove();
-                    }
-                }, 300);
+                notification.remove();
             }
         }, 5000);
     }
-    
-    // Input masking for phone number
-    const phoneInput = document.getElementById('telephone');
-    
-    phoneInput.addEventListener('input', function(e) {
-        let value = e.target.value.replace(/\D/g, '');
-        
-        // Format the phone number
-        if (value.length > 0) {
-            if (value.length <= 2) {
-                value = '+' + value;
-            } else if (value.length <= 5) {
-                value = '+' + value.substring(0, 2) + ' ' + value.substring(2);
-            } else if (value.length <= 8) {
-                value = '+' + value.substring(0, 2) + ' ' + value.substring(2, 5) + ' ' + value.substring(5);
-            } else if (value.length <= 10) {
-                value = '+' + value.substring(0, 2) + ' ' + value.substring(2, 5) + ' ' + value.substring(5, 8) + ' ' + value.substring(8);
-            } else {
-                value = '+' + value.substring(0, 2) + ' ' + value.substring(2, 5) + ' ' + value.substring(5, 8) + ' ' + value.substring(8, 10) + ' ' + value.substring(10);
-            }
-        }
-        
-        e.target.value = value;
-    });
-    
-    // Form field animations
-    const formInputs = document.querySelectorAll('input:not([type="file"]):not([type="checkbox"]), textarea, select');
-    
-    formInputs.forEach(input => {
-        // Add focus animation
-        input.addEventListener('focus', function() {
-            this.parentNode.classList.add('scale-105', 'z-10');
-            this.classList.add('ring-2', 'ring-yellow-200', 'ring-opacity-50');
-        });
-        
-        // Remove focus animation
-        input.addEventListener('blur', function() {
-            this.parentNode.classList.remove('scale-105', 'z-10');
-            this.classList.remove('ring-2', 'ring-yellow-200', 'ring-opacity-50');
-        });
-        
-        // Real-time validation
-        input.addEventListener('input', function() {
-            const inputType = this.type;
-            const inputId = this.id;
-            const inputValue = this.value;
-            
-            // Skip validation for empty fields until form submission
-            if (!inputValue) return;
-            
-            // Validate email
-            if (inputType === 'email') {
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(inputValue)) {
-                    this.classList.add('border-red-500');
-                    this.classList.remove('border-gray-300');
-                    
-                    const errorElement = this.parentNode.parentNode.querySelector('.error-message');
-                    if (errorElement) {
-                        errorElement.textContent = 'Veuillez saisir une adresse email valide';
-                        errorElement.classList.remove('hidden');
-                    }
-                } else {
-                    this.classList.remove('border-red-500');
-                    this.classList.add('border-gray-300');
-                    
-                    const errorElement = this.parentNode.parentNode.querySelector('.error-message');
-                    if (errorElement) {
-                        errorElement.classList.add('hidden');
-                    }
-                }
-            }
-            
-            // Validate password confirmation
-            if (inputId === 'password_confirmation') {
-                const password = document.getElementById('password').value;
-                
-                if (inputValue !== password) {
-                    this.classList.add('border-red-500');
-                    this.classList.remove('border-gray-300');
-                    
-                    const errorElement = this.parentNode.parentNode.querySelector('.error-message');
-                    if (errorElement) {
-                        errorElement.textContent = 'Les mots de passe ne correspondent pas';
-                        errorElement.classList.remove('hidden');
-                    }
-                } else {
-                    this.classList.remove('border-red-500');
-                    this.classList.add('border-gray-300');
-                    
-                    const errorElement = this.parentNode.parentNode.querySelector('.error-message');
-                    if (errorElement) {
-                        errorElement.classList.add('hidden');
-                    }
-                }
-            }
-        });
-    });
 });
-
-// Add custom styling for animations and effects
-document.head.insertAdjacentHTML('beforeend', `
-    <style>
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translate3d(0, 20px, 0);
-            }
-            to {
-                opacity: 1;
-                transform: translate3d(0, 0, 0);
-            }
-        }
-        
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            50% { transform: translateX(5px); }
-            75% { transform: translateX(-5px); }
-        }
-        
-        @keyframes shimmer {
-            0% { background-position: -1000px 0; }
-            100% { background-position: 1000px 0; }
-        }
-        
-        /* Form animations */
-        #step1-form, #step2-form, #step3-form {
-            animation: fadeInUp 0.5s ease-out;
-        }
-        
-        .file-upload-label {
-            transition: all 0.3s ease;
-        }
-        
-        .file-upload-label:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-        
-        .file-selected {
-            animation: pulse 0.6s ease-in-out;
-        }
-        
-        /* Form validation styles */
-        input:focus:not(.border-red-500), textarea:focus:not(.border-red-500), select:focus:not(.border-red-500) {
-            border-color: #FCD34D;
-        }
-        
-        input.border-red-500, textarea.border-red-500, select.border-red-500 {
-            animation: shake 0.5s ease-in-out;
-        }
-        
-        /* Button animations */
-        button {
-            transition: all 0.3s ease;
-        }
-        
-        button:hover:not(:disabled) {
-            transform: translateY(-2px);
-        }
-        
-        button:active:not(:disabled) {
-            transform: translateY(0);
-        }
-        
-        button:disabled {
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-        
-        /* Progress bar animation */
-        #progress-bar {
-            transition: width 0.5s ease;
-        }
-        
-        /* Form submission animation */
-        .submitting {
-            position: relative;
-        }
-        
-        .submitting::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to right, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
-            background-size: 200% 100%;
-            animation: shimmer 2s infinite;
-            pointer-events: none;
-        }
-        
-        /* Notification animation */
-        .notification {
-            transition: transform 0.3s ease;
-        }
-    </style>
-`);
 </script>
 @endsection

@@ -33,12 +33,100 @@
             height: 1px;
             background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent);
         }
+        
+        /* Animation for sidebar */
+        .sidebar-enter-active,
+        .sidebar-leave-active {
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        
+        .sidebar-enter-from,
+        .sidebar-leave-to {
+            opacity: 0;
+            transform: translateX(-100%);
+        }
+        
+        /* Mobile responsive styles */
+        @media (max-width: 768px) {
+            .sidebar-mobile {
+                position: fixed;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                z-index: 50;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                width: 256px;
+            }
+            
+            .sidebar-mobile.open {
+                transform: translateX(0);
+                box-shadow: 4px 0 15px rgba(0, 0, 0, 0.2);
+            }
+            
+            .sidebar-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 40;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.3s ease;
+            }
+            
+            .sidebar-overlay.active {
+                opacity: 1;
+                pointer-events: auto;
+            }
+            
+            /* Animations for menu items */
+            .mobile-menu-item {
+                transform: translateX(-20px);
+                opacity: 0;
+                transition: transform 0.3s ease, opacity 0.3s ease;
+            }
+            
+            .sidebar-mobile.open .mobile-menu-item {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            
+            .sidebar-mobile.open .mobile-menu-item:nth-child(1) { transition-delay: 0.05s; }
+            .sidebar-mobile.open .mobile-menu-item:nth-child(2) { transition-delay: 0.1s; }
+            .sidebar-mobile.open .mobile-menu-item:nth-child(3) { transition-delay: 0.15s; }
+            .sidebar-mobile.open .mobile-menu-item:nth-child(4) { transition-delay: 0.2s; }
+            .sidebar-mobile.open .mobile-menu-item:nth-child(5) { transition-delay: 0.25s; }
+        }
     </style>
 </head>
-<body class="font-sans antialiased bg-gray-50">
+<body class="font-sans antialiased bg-gray-50" x-data="{ sidebarOpen: false }">
     <div class="min-h-screen flex">
+        <!-- Mobile Sidebar Toggle -->
+        <div 
+            @click="sidebarOpen = false" 
+            class="sidebar-overlay"
+            :class="{'active': sidebarOpen}">
+        </div>
+        
+        <!-- Mobile Menu Button -->
+        <button 
+            @click="sidebarOpen = !sidebarOpen" 
+            class="md:hidden fixed bottom-6 right-6 z-50 p-3 rounded-full bg-indigo-600 text-white shadow-lg focus:outline-none hover:bg-indigo-700 transition duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" :class="{'hidden': sidebarOpen}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" :class="{'hidden': !sidebarOpen}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        
         <!-- Sidebar Navigation -->
-        <aside class="w-64 bg-gradient-sidebar h-screen sticky top-0 shadow-xl">
+        <aside 
+            class="w-64 bg-gradient-sidebar h-screen md:sticky top-0 shadow-xl sidebar-mobile"
+            :class="{'open': sidebarOpen}">
             <div class="py-6 px-4">
                 <!-- Logo Section -->
                 <div class="flex items-center justify-center mb-8">
@@ -57,7 +145,7 @@
                 <nav>
                     <ul class="space-y-1">
                         <!-- Dashboard -->
-                        <li>
+                        <li class="mobile-menu-item">
                             <a href="{{ route('company.dashboard') }}" 
                                class="flex items-center px-4 py-3 text-white rounded-lg transition-all duration-200 menu-item-hover {{ request()->routeIs('company.dashboard') ? 'bg-blue-600 shadow-md' : 'hover:bg-blue-700/30' }}">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -69,7 +157,7 @@
                         </li>
                         
                         <!-- Vehicles -->
-                        <li>
+                        <li class="mobile-menu-item">
                             <a href="{{ route('company.vehicles.index') }}" 
                                class="flex items-center px-4 py-3 text-white rounded-lg transition-all duration-200 menu-item-hover {{ request()->routeIs('company.vehicles.*') ? 'bg-blue-600 shadow-md' : 'hover:bg-blue-700/30' }}">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -83,7 +171,7 @@
                         <div class="sidebar-divider my-4"></div>
                         
                         <!-- Reservations -->
-                        <li>
+                        <li class="mobile-menu-item">
                             <a href="{{ route('company.reservations.index') }}" 
                                class="flex items-center px-4 py-3 text-white rounded-lg transition-all duration-200 menu-item-hover {{ request()->routeIs('company.reservations.*') ? 'bg-blue-600 shadow-md' : 'hover:bg-blue-700/30' }}">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -95,7 +183,7 @@
                         </li>
                         
                         <!-- Offers & Promotions -->
-                        <li>
+                        <li class="mobile-menu-item">
                             <a href="{{ route('company.promotions.index') }}" 
                                class="flex items-center px-4 py-3 text-white rounded-lg transition-all duration-200 menu-item-hover hover:bg-blue-700/30">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -103,50 +191,6 @@
                                           d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                                 <span class="font-medium">Offers & Promotions</span>
-                            </a>
-                        </li>
-                        
-                        <div class="sidebar-divider my-4"></div>
-                        
-                        <!-- Messages -->
-                        <li>
-                            <a href="#" 
-                               class="flex items-center justify-between px-4 py-3 text-white rounded-lg transition-all duration-200 menu-item-hover hover:bg-blue-700/30">
-                                <div class="flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                              d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
-                                    </svg>
-                                    <span class="font-medium">Messages</span>
-                                </div>
-                                <span class="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">3</span>
-                            </a>
-                        </li>
-                        
-                        <!-- Reviews -->
-                        <li>
-                            <a href="#" 
-                               class="flex items-center px-4 py-3 text-white rounded-lg transition-all duration-200 menu-item-hover hover:bg-blue-700/30">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                          d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                                </svg>
-                                <span class="font-medium">Reviews</span>
-                            </a>
-                        </li>
-                        
-                        <div class="sidebar-divider my-4"></div>
-                        
-                        <!-- Settings -->
-                        <li>
-                            <a href="#" 
-                               class="flex items-center px-4 py-3 text-white rounded-lg transition-all duration-200 menu-item-hover hover:bg-blue-700/30">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                                <span class="font-medium">Settings</span>
                             </a>
                         </li>
                     </ul>
@@ -174,8 +218,17 @@
             <header class="bg-white shadow-md">
                 <div class="py-4 px-6 flex justify-between items-center">
                     <div class="flex items-center">
+                        <!-- Mobile Menu Toggle for header -->
+                        <button 
+                            @click="sidebarOpen = !sidebarOpen"
+                            class="text-gray-500 hover:text-indigo-600 md:hidden mr-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+                        
                         <h1 class="text-xl font-bold text-gray-800">@yield('header', 'Dashboard')</h1>
-                        <span class="ml-3 px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">Company Portal</span>
+                        <span class="ml-3 px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 hidden md:inline-block">Company Portal</span>
                     </div>
                     
                     <div class="flex items-center space-x-4">
@@ -187,62 +240,14 @@
                             </svg>
                         </div>
                         
-                        <!-- Notifications -->
-                        <div class="relative" x-data="{ open: false }">
-                            <button @click="open = !open" class="p-1.5 rounded-full text-gray-600 hover:bg-gray-100 hover:text-blue-600 focus:outline-none relative">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                          d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                                </svg>
-                                <span class="absolute top-0 right-0 h-4 w-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">3</span>
-                            </button>
-                            
-                            <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg py-2 z-50">
-                                <div class="px-4 py-2 border-b">
-                                    <h3 class="text-sm font-semibold text-gray-700">Notifications</h3>
-                                </div>
-                                <div class="max-h-60 overflow-y-auto">
-                                    <a href="#" class="block px-4 py-2 hover:bg-gray-50 transition">
-                                        <div class="flex items-start">
-                                            <div class="flex-shrink-0 bg-blue-100 rounded-full p-1">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                            </div>
-                                            <div class="ml-3">
-                                                <p class="text-sm font-medium text-gray-800">New reservation request</p>
-                                                <p class="text-xs text-gray-500">John Doe has requested BMW X5</p>
-                                                <p class="text-xs text-gray-400 mt-1">2 min ago</p>
-                                            </div>
-                                        </div>
-                                    </a>
-                                    <a href="#" class="block px-4 py-2 hover:bg-gray-50 transition">
-                                        <div class="flex items-start">
-                                            <div class="flex-shrink-0 bg-green-100 rounded-full p-1">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                            </div>
-                                            <div class="ml-3">
-                                                <p class="text-sm font-medium text-gray-800">Payment received</p>
-                                                <p class="text-xs text-gray-500">Payment for order #12345 was successful</p>
-                                                <p class="text-xs text-gray-400 mt-1">1 hour ago</p>
-                                            </div>
-                                        </div>
-                                    </a>
-                                </div>
-                                <div class="px-4 py-2 border-t">
-                                    <a href="#" class="text-xs text-blue-600 font-medium">View all notifications</a>
-                                </div>
-                            </div>
-                        </div>
+                       
                         
                         <!-- User Dropdown -->
                         <div class="relative" x-data="{ open: false }">
                             <button @click="open = !open" class="flex items-center text-gray-700 hover:text-blue-600 focus:outline-none transition">
-                                <span class="mr-2 font-medium">{{ Auth::user()->name }}</span>
+                                <span class="mr-2 font-medium">{{ Auth::user()->firstName }} {{ Auth::user()->lastName }}</span>
                                 <img class="h-9 w-9 rounded-full object-cover border-2 border-blue-100" 
-                                     src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&color=7F9CF5&background=EBF4FF" 
+                                     src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->fisrtName) }} {{ urlencode(Auth::user()->lastName) }}&color=7F9CF5&background=EBF4FF" 
                                      alt="User avatar">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -262,16 +267,7 @@
                                         Profile
                                     </div>
                                 </a>
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600">
-                                    <div class="flex items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
-                                        Settings
-                                    </div>
-                                </a>
-                                <div class="border-t my-1"></div>
+                                
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
                                     <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-red-600">
@@ -290,17 +286,14 @@
             </header>
 
             <!-- Page Content -->
-            <main class="py-6 px-6">
-                <!-- Breadcrumbs -->
-                
-                
+            <main class="py-6 px-4 md:px-6">
                 @yield('content')
             </main>
             
             <!-- Footer -->
             <footer class="bg-white py-4 px-6 border-t">
-                <div class="flex justify-between items-center">
-                    <p class="text-sm text-gray-500">&copy; {{ date('Y') }} {{ config('app.name', 'Car Rental') }}. All rights reserved.</p>
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-sm text-gray-500 mb-3 md:mb-0">&copy; {{ date('Y') }} {{ config('app.name', 'Car Rental') }}. All rights reserved.</p>
                     <div class="flex space-x-4">
                         <a href="#" class="text-sm text-gray-500 hover:text-blue-600">Privacy Policy</a>
                         <a href="#" class="text-sm text-gray-500 hover:text-blue-600">Terms of Service</a>
@@ -312,28 +305,41 @@
 
     <script>
         document.addEventListener('alpine:init', () => {
-        Alpine.data('dropdown', () => ({
-        open: false,
-        toggle() {
-            this.open = !this.open;
-        },
-        closeOnClickOutside(event) {
-            if (!this.$el.contains(event.target)) {
-                this.open = false;
-            }
-        }
-    }));
-});
+            Alpine.data('dropdown', () => ({
+                open: false,
+                toggle() {
+                    this.open = !this.open;
+                },
+                closeOnClickOutside(event) {
+                    if (!this.$el.contains(event.target)) {
+                        this.open = false;
+                    }
+                }
+            }));
+        });
 
-// Ajoutez cet événement global pour fermer les menus au clic en dehors
-document.addEventListener('click', (event) => {
-    document.querySelectorAll('[x-data]').forEach((element) => {
-        if (element.__x) {
-            element.__x.callMethod('closeOnClickOutside', event);
-        }
-    });
-});
+        // Fermer le sidebar lorsqu'on clique sur un lien (pour mobile)
+        document.querySelectorAll('.sidebar-mobile a').forEach(link => {
+            link.addEventListener('click', () => {
+                const sidebarEl = document.querySelector('.sidebar-mobile');
+                if (window.innerWidth < 768 && sidebarEl.classList.contains('open')) {
+                    // Accès à Alpine.js state
+                    const alpineComponent = Alpine.getComponent(document.body);
+                    if (alpineComponent) {
+                        alpineComponent.sidebarOpen = false;
+                    }
+                }
+            });
+        });
 
-</script>
+        // Ajoutez cet événement global pour fermer les menus au clic en dehors
+        document.addEventListener('click', (event) => {
+            document.querySelectorAll('[x-data]').forEach((element) => {
+                if (element.__x) {
+                    element.__x.callMethod('closeOnClickOutside', event);
+                }
+            });
+        });
+    </script>
 </body>
 </html>

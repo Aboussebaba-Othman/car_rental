@@ -3,9 +3,7 @@
 @section('content')
 <div class="py-12 bg-gray-50">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="mb-6">
-            <h1 class="text-3xl font-bold text-gray-800">{{ $pageTitle ?? 'Véhicules disponibles' }}</h1>
-        </div>
+        
         <div class="text-center mb-10">
             <h1 class="text-3xl font-bold text-gray-800 mb-4">Nos véhicules disponibles</h1>
             <p class="text-lg text-gray-600 max-w-3xl mx-auto">

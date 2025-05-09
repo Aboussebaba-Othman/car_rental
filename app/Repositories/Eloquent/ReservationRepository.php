@@ -18,13 +18,7 @@ class ReservationRepository implements ReservationRepositoryInterface
         $this->model = $reservation;
     }
     
-    /**
-     * Get filtered reservations with pagination
-     *
-     * @param Request $request
-     * @param int $perPage
-     * @return LengthAwarePaginator
-     */
+
     public function getFilteredReservations(Request $request, int $perPage = 10): LengthAwarePaginator
     {
         $query = $this->model->query()
@@ -70,12 +64,6 @@ class ReservationRepository implements ReservationRepositoryInterface
         return $query->paginate($perPage);
     }
     
-    /**
-     * Get reservation statistics
-     *
-     * @param int|null $companyId
-     * @return array
-     */
     public function getReservationStats(?int $companyId = null): array
     {
         $query = $this->model->query();
@@ -101,14 +89,6 @@ class ReservationRepository implements ReservationRepositoryInterface
         ];
     }
     
-    /**
-     * Get previous reservations for a user
-     *
-     * @param int $userId
-     * @param int $excludeReservationId
-     * @param int $limit
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
     public function getPreviousReservations(int $userId, int $excludeReservationId, int $limit = 3)
     {
         return $this->model->where('user_id', $userId)
@@ -118,13 +98,7 @@ class ReservationRepository implements ReservationRepositoryInterface
             ->get();
     }
     
-    /**
-     * Confirm a reservation
-     *
-     * @param Reservation $reservation
-     * @param int $confirmedBy
-     * @return Reservation
-     */
+
     public function confirmReservation(Reservation $reservation, int $confirmedBy): Reservation
     {
         $reservation->status = 'confirmed';
@@ -135,14 +109,7 @@ class ReservationRepository implements ReservationRepositoryInterface
         return $reservation;
     }
     
-    /**
-     * Cancel a reservation
-     *
-     * @param Reservation $reservation
-     * @param int $canceledBy
-     * @param string|null $reason
-     * @return Reservation
-     */
+   
     public function cancelReservation(Reservation $reservation, int $canceledBy, ?string $reason = null): Reservation
     {
         $reservation->status = 'canceled';
@@ -157,14 +124,7 @@ class ReservationRepository implements ReservationRepositoryInterface
         
         return $reservation;
     }
-    
-    /**
-     * Complete a reservation
-     *
-     * @param Reservation $reservation
-     * @param int $completedBy
-     * @return Reservation
-     */
+
     public function completeReservation(Reservation $reservation, int $completedBy): Reservation
     {
         $reservation->status = 'completed';
@@ -174,13 +134,7 @@ class ReservationRepository implements ReservationRepositoryInterface
         
         return $reservation;
     }
-    
-    /**
-     * Mark a reservation as paid
-     *
-     * @param Reservation $reservation
-     * @return Reservation
-     */
+
     public function markReservationAsPaid(Reservation $reservation): Reservation
     {
         $reservation->status = 'paid';
@@ -193,14 +147,7 @@ class ReservationRepository implements ReservationRepositoryInterface
         
         return $reservation;
     }
-    
-    /**
-     * Check if a reservation belongs to a company
-     *
-     * @param Reservation $reservation
-     * @param int $companyId
-     * @return bool
-     */
+
     public function reservationBelongsToCompany(Reservation $reservation, int $companyId): bool
     {
         // Make sure the vehicle relationship is loaded
@@ -215,13 +162,7 @@ class ReservationRepository implements ReservationRepositoryInterface
         
         return $reservation->vehicle->company_id === $companyId;
     }
-    
-    /**
-     * Authorize a vehicle belongs to user's company
-     *
-     * @param \App\Models\Vehicle $vehicle
-     * @return bool
-     */
+ 
     public function authorizeVehicle($vehicle): bool
     {
         if (!$vehicle) {

@@ -9,20 +9,10 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
-/**
- * Service class for managing reservations and price calculations
- */
+
 class ReservationService
 {
-    /**
-     * Calculate the total price and details of a reservation
-     *
-     * @param Vehicle $vehicle
-     * @param string|Carbon $startDate
-     * @param string|Carbon $endDate
-     * @param int|null $promotionId
-     * @return array
-     */
+    
     public function calculateReservationPrice($vehicle, $startDate, $endDate, $promotionId = null)
     {
         // Ensure dates are Carbon instances
@@ -87,14 +77,6 @@ class ReservationService
         ];
     }
     
-    /**
-     * Check if a vehicle is available for the given date range
-     *
-     * @param int $vehicleId
-     * @param string|Carbon $startDate
-     * @param string|Carbon $endDate
-     * @return bool
-     */
     public function checkVehicleAvailability($vehicleId, $startDate, $endDate)
     {
         // Format dates to strings if they are Carbon objects
@@ -126,15 +108,7 @@ class ReservationService
                 ->exists();
         });
     }
-    
-    /**
-     * Get available dates for a vehicle within a specified range
-     *
-     * @param int $vehicleId
-     * @param Carbon $startDate
-     * @param Carbon $endDate
-     * @return array
-     */
+   
     public function getAvailableDates($vehicleId, Carbon $startDate, Carbon $endDate)
     {
         $vehicle = Vehicle::findOrFail($vehicleId);
@@ -192,30 +166,17 @@ class ReservationService
         return $availableDates;
     }
     
-    /**
-     * Clear cache related to vehicle availability
-     *
-     * @param int $vehicleId
-     * @return void
-     */
     public function clearVehicleAvailabilityCache($vehicleId = null)
     {
         if ($vehicleId) {
-            // Clear specific vehicle cache
             $pattern = "vehicle_availability_{$vehicleId}_*";
-            // In a real implementation, you'd use cache tags or a more sophisticated
-            // method to clear specific patterns. For now, we'll use a full flush.
+
         }
         
         Cache::flush();
     }
     
-    /**
-     * Recalculate and update the total price for a reservation
-     *
-     * @param Reservation $reservation
-     * @return float
-     */
+   
     public function recalculateAndUpdateReservationPrice(Reservation $reservation)
     {
         // Ensure the reservation is loaded with its vehicle and promotion

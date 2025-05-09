@@ -29,25 +29,19 @@ class Promotion extends Model
         'applicable_vehicles' => 'array',
     ];
 
-    /**
-     * Get the company that owns the promotion.
-     */
+  
     public function company()
     {
         return $this->belongsTo(Company::class);
     }
 
-    /**
-     * Get the reservations that use this promotion.
-     */
+    
     public function reservations()
     {
         return $this->hasMany(Reservation::class);
     }
 
-    /**
-     * Check if the promotion is currently valid
-     */
+    
     public function isValid()
     {
         $today = now()->startOfDay();
@@ -56,9 +50,7 @@ class Promotion extends Model
             && $today->lessThanOrEqualTo($this->end_date);
     }
 
-    /**
-     * Check if the promotion applies to a specific vehicle
-     */
+    
     public function appliesToVehicle($vehicleId)
     {
         return $this->applicable_vehicles === null || 

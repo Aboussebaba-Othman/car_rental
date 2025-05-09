@@ -25,10 +25,8 @@ class WelcomeController extends Controller
     
     public function index(Request $request)
     {
-        // Get active promotions, limited to 3
         $activePromotions = $this->promotionRepository->getActivePromotions(null, 3);
         
-        // Process search filters
         $filters = [
             'location' => $request->input('location'),
             'brand' => $request->input('brand'),
@@ -38,11 +36,9 @@ class WelcomeController extends Controller
             'price_max' => $request->input('price_max'),
         ];
         
-        // Get start and end dates from request if provided
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
         
-        // Get vehicles with availability filter
         $vehicles = $this->vehicleRepository->getAvailableVehicles(
             $filters,
             $startDate,
@@ -65,10 +61,8 @@ class WelcomeController extends Controller
             }
         }
         
-        // Get brands for filter dropdown
         $brands = $this->vehicleRepository->getAllBrands();
         
-        // Get cities for autocomplete
         $cities = $this->companyRepository->getAllCities();
         
         return view('welcome', compact(

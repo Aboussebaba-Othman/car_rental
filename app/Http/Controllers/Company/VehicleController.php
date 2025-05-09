@@ -9,7 +9,6 @@ use App\Repositories\Interfaces\VehicleRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class VehicleController extends Controller
 {
@@ -29,9 +28,9 @@ class VehicleController extends Controller
         $vehicles = Vehicle::with(['photos', 'reservations'])
         ->where('company_id', Auth::user()->company->id)
         ->withCount('reservations')
+        ->orderBy('created_at', 'desc')
         ->paginate(10);
 
-        // Récupérer les marques uniques pour le filtre
         $uniqueBrands = Vehicle::where('company_id', Auth::user()->company->id)
             ->select('brand')
             ->distinct()
@@ -64,7 +63,6 @@ class VehicleController extends Controller
         'photos.*' => 'image|mimes:jpeg,png,jpg,gif',
     ]);
 
-    // Create vehicle with repository
     $vehicleData = array_merge($validated, [
         'company_id' => Auth::user()->company->id,
         'is_active' => true,
@@ -73,7 +71,6 @@ class VehicleController extends Controller
     
     $vehicle = $this->vehicleRepository->create($vehicleData);
 
-    // Handle photos upload
     if ($request->hasFile('photos')) {
         $photos = $request->file('photos');
         $displayOrder = 1;
@@ -135,7 +132,6 @@ class VehicleController extends Controller
             'primary_photo_id' => 'nullable|integer|exists:vehicle_photos,id',
         ]);
 
-        // Update vehicle data
         $vehicleData = [
             'brand' => $validated['brand'],
             'model' => $validated['model'],
@@ -153,12 +149,10 @@ class VehicleController extends Controller
         
         $this->vehicleRepository->update($id, $vehicleData);
 
-        // Delete photos if requested
         if ($request->has('photos_to_delete') && is_array($request->photos_to_delete)) {
             $this->vehicleRepository->deletePhotos($vehicle->id, $request->photos_to_delete);
         }
 
-        // Add new photos if uploaded
         if ($request->hasFile('new_photos')) {
             $newPhotos = $request->file('new_photos');
             $displayOrder = $vehicle->photos()->max('display_order') + 1;
@@ -169,13 +163,12 @@ class VehicleController extends Controller
                 $vehiclePhoto = new VehiclePhoto();
                 $vehiclePhoto->vehicle_id = $vehicle->id;
                 $vehiclePhoto->path = $path;
-                $vehiclePhoto->is_primary = false; // New photos are not primary by default
+                $vehiclePhoto->is_primary = false; 
                 $vehiclePhoto->display_order = $displayOrder++;
                 $vehiclePhoto->save();
             }
         }
 
-        // Update primary photo if requested
         if ($request->has('primary_photo_id')) {
             $this->vehicleRepository->setPrimaryPhoto($vehicle->id, $request->input('primary_photo_id'));
         }
@@ -189,20 +182,17 @@ class VehicleController extends Controller
         $vehicle = $this->vehicleRepository->findWithRelations($id);
         $this->authorizeVehicle($vehicle);
 
-        // Check if vehicle has reservations
         if ($vehicle->reservations()->exists()) {
             return redirect()->route('company.vehicles.index')
                 ->with('error', 'Cannot delete vehicle with existing reservations.');
         }
 
-        // Delete vehicle photos from storage
         foreach ($vehicle->photos as $photo) {
             if (Storage::disk('public')->exists($photo->path)) {
                 Storage::disk('public')->delete($photo->path);
             }
         }
 
-        // Delete vehicle and related photos (via foreign key constraint)
         $this->vehicleRepository->delete($id);
 
         return redirect()->route('company.vehicles.index')

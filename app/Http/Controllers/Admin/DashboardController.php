@@ -20,12 +20,10 @@ class DashboardController extends Controller
     {
         $admin = Auth::user()->admin;
         
-        // Get current month and previous month dates
         $now = Carbon::now();
         $currentMonth = $now->format('Y-m');
         $previousMonth = $now->copy()->subMonth()->format('Y-m');
         
-        // Count statistics for current and previous months
         $usersCurrentMonth = User::whereYear('created_at', $now->year)
             ->whereMonth('created_at', $now->month)
             ->count();
@@ -58,7 +56,6 @@ class DashboardController extends Controller
             ->whereMonth('created_at', $now->copy()->subMonth()->month)
             ->count();
         
-        // Calculate percentage changes
         $userChange = $usersPreviousMonth > 0 
             ? round(($usersCurrentMonth - $usersPreviousMonth) / $usersPreviousMonth * 100, 1)
             : ($usersCurrentMonth > 0 ? 100 : 0);
@@ -75,7 +72,6 @@ class DashboardController extends Controller
             ? round(($reservationsCurrentMonth - $reservationsPreviousMonth) / $reservationsPreviousMonth * 100, 1)
             : ($reservationsCurrentMonth > 0 ? 100 : 0);
         
-        // Prepare statistics array for view
         $stats = [
             'users' => User::count(),
             'companies' => Company::count(),
@@ -92,7 +88,6 @@ class DashboardController extends Controller
             'currentMonthName' => $now->translatedFormat('F Y'),
         ];
         
-        // Get data for charts
         $lastSixMonths = collect([]);
         for ($i = 5; $i >= 0; $i--) {
             $lastSixMonths->push($now->copy()->subMonths($i)->format('M Y'));
@@ -106,13 +101,10 @@ class DashboardController extends Controller
                 ->count();
         }
         
-        // Get vehicle categories data - fixing the unknown column issue
-        // Let's check if we can find an appropriate category column
         $vehicleColumns = Schema::getColumnListing('vehicles');
         
-        $categoryColumn = 'type'; // Default to a likely column name for vehicle type
+        $categoryColumn = 'type';
         
-        // Check for common category column names
         $possibleColumns = ['type', 'vehicle_type', 'class', 'model', 'brand', 'category_id'];
         foreach ($possibleColumns as $column) {
             if (in_array($column, $vehicleColumns)) {
@@ -121,7 +113,6 @@ class DashboardController extends Controller
             }
         }
         
-        // Get vehicle categories data using the found column
         try {
             $categories = Vehicle::select($categoryColumn, DB::raw('count(*) as total'))
                 ->whereNotNull($categoryColumn)
@@ -132,13 +123,11 @@ class DashboardController extends Controller
             $categoryLabels = array_keys($categories);
             $categoryData = array_values($categories);
         } catch (\Exception $e) {
-            // Fallback if query fails
             $categories = [];
             $categoryLabels = [];
             $categoryData = [];
         }
         
-        // Prepare charts array
         $charts = [
             'months' => $lastSixMonths->toArray(),
             'reservationData' => $reservationData,
@@ -146,16 +135,13 @@ class DashboardController extends Controller
             'categoryData' => $categoryData
         ];
         
-        // Get recent activity with error handling for missing table
         try {
-            // Check if the table exists before querying
             if (Schema::hasTable('activity_log')) {
                 $recentActivity = DB::table('activity_log')
                     ->latest()
                     ->take(10)
                     ->get();
             } else {
-                // Use recent reservations as activity if activity_log doesn't exist
                 $recentActivity = Reservation::with('user')
                     ->latest()
                     ->take(10)
@@ -167,15 +153,12 @@ class DashboardController extends Controller
                     });
             }
         } catch (QueryException $e) {
-            // Fallback to an empty collection if query fails
             $recentActivity = new Collection();
         }
         
-        // Check for the actual company name column
         $companyColumns = Schema::getColumnListing('companies');
-        $companyNameColumn = 'name'; // Default assumption
+        $companyNameColumn = 'name';
         
-        // Check for common name column alternatives
         $possibleNameColumns = ['name', 'company_name', 'title', 'nom', 'label', 'raison_sociale'];
         foreach ($possibleNameColumns as $column) {
             if (in_array($column, $companyColumns)) {
@@ -184,7 +167,6 @@ class DashboardController extends Controller
             }
         }
         
-        // Get top 5 companies by vehicle count - Fixed column name issue
         try {
             $topCompaniesByVehicles = DB::table('companies')
                 ->select('companies.id', "companies.{$companyNameColumn} as company_name", DB::raw('COUNT(vehicles.id) as vehicle_count'))
@@ -194,11 +176,9 @@ class DashboardController extends Controller
                 ->limit(5)
                 ->get();
         } catch (\Exception $e) {
-            // Fallback if query fails
             $topCompaniesByVehicles = new Collection();
         }
             
-        // Get top 5 companies by reservation count - Fixed column name issue
         try {
             $topCompaniesByReservations = DB::table('companies')
                 ->select('companies.id', "companies.{$companyNameColumn} as company_name", DB::raw('COUNT(reservations.id) as reservation_count'))
@@ -209,11 +189,9 @@ class DashboardController extends Controller
                 ->limit(5)
                 ->get();
         } catch (\Exception $e) {
-            // Fallback if query fails
             $topCompaniesByReservations = new Collection();
         }
         
-        // Get monthly reservation stats for the current year
         $monthlyStats = [];
         for ($i = 1; $i <= 12; $i++) {
             $month = Carbon::create(Carbon::now()->year, $i, 1);
@@ -225,7 +203,6 @@ class DashboardController extends Controller
             ];
         }
         
-        // Get weekly reservation stats for the last 10 weeks
         $weeklyStats = [];
         for ($i = 9; $i >= 0; $i--) {
             $startOfWeek = Carbon::now()->subWeeks($i)->startOfWeek();
@@ -240,7 +217,6 @@ class DashboardController extends Controller
             ];
         }
         
-        // Prepare extended charts data
         $advancedCharts = [
             'months' => array_column($monthlyStats, 'month'),
             'monthlyData' => array_column($monthlyStats, 'count'),

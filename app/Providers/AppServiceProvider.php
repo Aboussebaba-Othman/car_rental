@@ -8,6 +8,7 @@ use App\Repositories\Eloquent\CompanyRepository;
 use App\Repositories\Interfaces\CompanyRepositoryInterface;
 use App\Services\Search\SearchService;
 use App\Services\Search\SearchStrategyFactory;
+use App\Services\MoroccanCitiesService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,16 +22,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(VehicleRepositoryInterface::class, VehicleRepository::class);
         $this->app->bind(CompanyRepositoryInterface::class, CompanyRepository::class);
 
-        // Register search service
-        $this->app->singleton(SearchService::class, function ($app) {
-            return new SearchService();
-        });
-        
-        // Register search strategy factory
-        $this->app->singleton(SearchStrategyFactory::class, function ($app) {
-            return new SearchStrategyFactory(
-                $app->make('App\Repositories\Interfaces\VehicleRepositoryInterface')
-            );
+       
+
+        $this->app->singleton(MoroccanCitiesService::class, function ($app) {
+            return new MoroccanCitiesService();
         });
     }
 

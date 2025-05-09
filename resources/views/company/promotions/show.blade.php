@@ -329,7 +329,6 @@
         </div>
     </div>
 </div>
-// Ajoutez ce code à la fin de votre vue
 <script>
     // Modal confirmation for deletion
     const deleteButtons = document.querySelectorAll('.delete-promotion');

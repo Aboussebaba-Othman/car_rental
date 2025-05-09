@@ -14,7 +14,7 @@ class Message extends Model
         'user_id',
         'content',
         'is_read',
-        'sender_type', // 'user' or 'company'
+        'sender_type', 
         'reservation_id'
     ];
 
@@ -34,17 +34,13 @@ class Message extends Model
         return $this->belongsTo(User::class);
     }
     
-    /**
-     * Get the reservation related to this message, if any.
-     */
+    
     public function reservation()
     {
         return $this->belongsTo(Reservation::class);
     }
 
-    /**
-     * Get the sender name based on sender type
-     */
+   
     public function getSenderNameAttribute()
     {
         return $this->sender_type == 'user' 

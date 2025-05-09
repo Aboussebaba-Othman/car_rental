@@ -66,11 +66,7 @@ abstract class BaseRepository implements RepositoryInterface
         return $query->get();
     }
 
-    /**
-     * Get the model instance
-     *
-     * @return \Illuminate\Database\Eloquent\Model
-     */
+    
     public function getModel()
     {
         return $this->model;

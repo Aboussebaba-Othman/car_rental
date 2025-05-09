@@ -3,9 +3,10 @@
 @section('content')
 <div class="py-16 bg-gradient-to-b from-gray-50 to-gray-100">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="mb-8">
-            <h1 class="text-4xl font-bold text-gray-900 mb-2">Réserver un véhicule</h1>
-            <p class="text-lg text-gray-600">Complétez le formulaire pour réserver {{ $vehicle->brand }} {{ $vehicle->model }}</p>
+        <div class="mb-10 relative">
+            <h1 class="text-4xl font-bold text-gray-900 mb-3 inline-block">Réserver un véhicule</h1>
+            <div class="h-1 w-24 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full"></div>
+            <p class="text-lg text-gray-600 mt-3">Complétez le formulaire pour réserver {{ $vehicle->brand }} {{ $vehicle->model }}</p>
         </div>
 
         @if ($errors->any())
@@ -20,50 +21,45 @@
         @endif
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Vehicle details -->
             <div class="lg:col-span-1">
                 <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-xl">
                     <div class="relative">
                         @if($vehicle->photos->count() > 0)
                             <div class="aspect-w-16 aspect-h-9">
-                                <!-- Main Photo Display -->
-                                <div id="mainPhotoContainer" class="w-full h-64 relative overflow-hidden">
+                                <div id="mainPhotoContainer" class="w-full h-72 relative overflow-hidden">
                                     @foreach($vehicle->photos as $index => $photo)
                                         <img 
                                             src="{{ asset('storage/' . $photo->path) }}" 
                                             alt="{{ $vehicle->brand }} {{ $vehicle->model }}" 
-                                            class="w-full h-64 object-cover absolute top-0 left-0 transition-all duration-500 ease-in-out {{ $index === 0 ? 'opacity-100 scale-100' : 'opacity-0 scale-105' }}"
+                                            class="w-full h-72 object-cover absolute top-0 left-0 transition-all duration-700 ease-in-out {{ $index === 0 ? 'opacity-100 scale-100' : 'opacity-0 scale-105' }}"
                                             id="vehiclePhoto-{{ $index }}"
                                             data-index="{{ $index }}">
                                     @endforeach
 
-                                    <!-- Photo Controls -->
                                     @if($vehicle->photos->count() > 1)
-                                        <button type="button" id="prevPhoto" class="absolute left-3 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                                        <button type="button" id="prevPhoto" class="absolute left-3 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-40 text-white p-2.5 rounded-full hover:bg-opacity-60 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 backdrop-blur-sm">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                                             </svg>
                                         </button>
-                                        <button type="button" id="nextPhoto" class="absolute right-3 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                                        <button type="button" id="nextPhoto" class="absolute right-3 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-40 text-white p-2.5 rounded-full hover:bg-opacity-60 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 backdrop-blur-sm">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                                             </svg>
                                         </button>
                                         
-                                        <!-- Photo Counter -->
-                                        <div class="absolute bottom-3 right-3 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded-full">
+                                        <div class="absolute bottom-3 right-3 bg-black bg-opacity-50 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm">
                                             <span id="currentPhotoIndex">1</span>/<span>{{ $vehicle->photos->count() }}</span>
                                         </div>
                                     @endif
                                 </div>
                             </div>
 
-                            <!-- Thumbnails Navigation -->
                             @if($vehicle->photos->count() > 1)
                                 <div class="flex overflow-x-auto py-3 px-2 bg-gray-50 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
                                     @foreach($vehicle->photos as $index => $photo)
                                         <div 
-                                            class="w-16 h-16 flex-shrink-0 mx-1 cursor-pointer rounded-lg overflow-hidden thumbnail-item transition-all duration-300 transform hover:-translate-y-1 {{ $index === 0 ? 'ring-2 ring-yellow-500' : '' }}"
+                                            class="w-16 h-16 flex-shrink-0 mx-1 cursor-pointer rounded-lg overflow-hidden thumbnail-item transition-all duration-300 transform hover:-translate-y-1 hover:shadow-md {{ $index === 0 ? 'ring-2 ring-yellow-500' : '' }}"
                                             data-index="{{ $index }}">
                                             <img 
                                                 src="{{ asset('storage/' . $photo->path) }}" 
@@ -74,7 +70,7 @@
                                 </div>
                             @endif
                         @else
-                            <div class="w-full h-64 bg-gray-100 flex items-center justify-center">
+                            <div class="w-full h-72 bg-gray-100 flex items-center justify-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
@@ -84,12 +80,12 @@
                     
                     <div class="p-6">
                         <h3 class="text-2xl font-bold text-gray-800 mb-2">{{ $vehicle->brand }} {{ $vehicle->model }} <span class="text-gray-500">({{ $vehicle->year }})</span></h3>
-                        <div class="text-yellow-500 font-bold text-xl mb-4 flex items-center">
+                        <div class="text-yellow-500 font-bold text-xl mb-5 flex items-center">
                             {{ number_format($vehicle->price_per_day, 2) }}€ <span class="text-gray-500 text-base font-normal ml-1">/ jour</span>
                         </div>
                         
                         <div class="grid grid-cols-2 gap-5 mb-6">
-                            <div class="bg-gray-50 p-3 rounded-xl">
+                            <div class="bg-gray-50 p-3 rounded-xl transition-all duration-300 hover:bg-gray-100 hover:shadow-sm">
                                 <span class="text-gray-500 text-sm block mb-1">Transmission</span>
                                 <p class="font-medium flex items-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -104,7 +100,7 @@
                                     @endif
                                 </p>
                             </div>
-                            <div class="bg-gray-50 p-3 rounded-xl">
+                            <div class="bg-gray-50 p-3 rounded-xl transition-all duration-300 hover:bg-gray-100 hover:shadow-sm">
                                 <span class="text-gray-500 text-sm block mb-1">Carburant</span>
                                 <p class="font-medium flex items-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -123,7 +119,7 @@
                                     @endif
                                 </p>
                             </div>
-                            <div class="bg-gray-50 p-3 rounded-xl">
+                            <div class="bg-gray-50 p-3 rounded-xl transition-all duration-300 hover:bg-gray-100 hover:shadow-sm">
                                 <span class="text-gray-500 text-sm block mb-1">Places</span>
                                 <p class="font-medium flex items-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -132,7 +128,7 @@
                                     {{ $vehicle->seats }}
                                 </p>
                             </div>
-                            <div class="bg-gray-50 p-3 rounded-xl">
+                            <div class="bg-gray-50 p-3 rounded-xl transition-all duration-300 hover:bg-gray-100 hover:shadow-sm">
                                 <span class="text-gray-500 text-sm block mb-1">Immatriculation</span>
                                 <p class="font-medium flex items-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -143,7 +139,6 @@
                             </div>
                         </div>
                         
-                        <!-- Features/Amenities -->
                         @php
                             $features = is_array($vehicle->features) 
                                 ? $vehicle->features 
@@ -160,7 +155,7 @@
                                 </h4>
                                 <div class="flex flex-wrap gap-2">
                                     @foreach($features as $feature)
-                                        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 transition-all duration-300 hover:bg-yellow-200">
+                                        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 transition-all duration-300 hover:bg-yellow-200 hover:shadow-sm transform hover:-translate-y-0.5">
                                             {{ $feature }}
                                         </span>
                                     @endforeach
@@ -170,7 +165,6 @@
                     </div>
                 </div>
                 
-                <!-- Availability Calendar Preview -->
                 <div class="mt-6 bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-xl">
                     <div class="p-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white">
                         <h3 class="font-bold flex items-center">
@@ -186,12 +180,14 @@
                 </div>
             </div>
 
-            <!-- Reservation form -->
             <div class="lg:col-span-2">
                 <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-xl">
-                    <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 p-6 text-white">
-                        <h2 class="text-2xl font-bold mb-1">Détails de votre réservation</h2>
-                        <p class="opacity-90">Tous les champs marqués d'un * sont obligatoires</p>
+                    <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 p-6 text-white relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -mt-20 -mr-20"></div>
+                        <div class="absolute bottom-0 left-0 w-32 h-32 bg-white opacity-5 rounded-full -mb-10 -ml-10"></div>
+                        
+                        <h2 class="text-2xl font-bold mb-1 relative">Détails de votre réservation</h2>
+                        <p class="opacity-90 relative">Tous les champs marqués d'un * sont obligatoires</p>
                     </div>  
                     <form method="POST" action="{{ route('reservations.store') }}" class="p-8" id="reservation-form">
                         @csrf
@@ -201,9 +197,11 @@
                         
                         <div class="mb-8">
                             <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
+                                <div class="flex items-center justify-center w-8 h-8 bg-yellow-100 rounded-full mr-3 text-yellow-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
                                 Dates de location
                             </h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -211,7 +209,7 @@
                                     <label for="start_date" class="block text-sm font-medium text-gray-700 mb-2">Date de début *</label>
                                     <div class="relative">
                                         <input type="date" id="start_date" name="start_date" value="{{ $startDate }}" 
-                                            class="w-full rounded-lg border-gray-300 focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50 pl-10 py-3 transition-all duration-300" required>
+                                            class="w-full rounded-lg border-gray-300 focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50 pl-10 py-3 transition-all duration-300 hover:border-gray-400" required>
                                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -223,7 +221,7 @@
                                     <label for="end_date" class="block text-sm font-medium text-gray-700 mb-2">Date de fin *</label>
                                     <div class="relative">
                                         <input type="date" id="end_date" name="end_date" value="{{ $endDate }}" 
-                                            class="w-full rounded-lg border-gray-300 focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50 pl-10 py-3 transition-all duration-300" required>
+                                            class="w-full rounded-lg border-gray-300 focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50 pl-10 py-3 transition-all duration-300 hover:border-gray-400" required>
                                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -232,7 +230,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="mt-3 text-sm text-gray-500 flex items-center bg-blue-50 p-3 rounded-lg">
+                            <div class="mt-3 text-sm text-gray-500 flex items-center bg-blue-50 p-3 rounded-lg border border-blue-100">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
                                 </svg>
@@ -242,10 +240,12 @@
                         
                         <div class="mb-8">
                             <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
+                                <div class="flex items-center justify-center w-8 h-8 bg-yellow-100 rounded-full mr-3 text-yellow-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                </div>
                                 Lieux de prise en charge et de retour
                             </h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -254,7 +254,7 @@
                                     <div class="relative">
                                         <input type="text" id="pickup_location" name="pickup_location" value="{{ old('pickup_location') }}" 
                                             placeholder="Adresse complète" 
-                                            class="w-full rounded-lg border-gray-300 focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50 pl-10 py-3 transition-all duration-300" required>
+                                            class="w-full rounded-lg border-gray-300 focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50 pl-10 py-3 transition-all duration-300 hover:border-gray-400" required>
                                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -268,7 +268,7 @@
                                     <div class="relative">
                                         <input type="text" id="return_location" name="return_location" value="{{ old('return_location') }}" 
                                             placeholder="Adresse complète" 
-                                            class="w-full rounded-lg border-gray-300 focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50 pl-10 py-3 transition-all duration-300" required>
+                                            class="w-full rounded-lg border-gray-300 focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50 pl-10 py-3 transition-all duration-300 hover:border-gray-400" required>
                                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -279,22 +279,21 @@
                                 </div>
                             </div>
                             
-                            <!-- Quick address buttons -->
                             <div class="mt-3 flex flex-wrap gap-2">
-                                <button type="button" id="same-address-btn" class="text-sm px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700 transition-all duration-300 flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <button type="button" id="same-address-btn" class="text-sm px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700 transition-all duration-300 flex items-center transform hover:-translate-y-0.5 hover:shadow-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                                     </svg>
                                     Même adresse pour le retour
                                 </button>
-                                <button type="button" id="home-address-btn" class="text-sm px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700 transition-all duration-300 flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <button type="button" id="home-address-btn" class="text-sm px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700 transition-all duration-300 flex items-center transform hover:-translate-y-0.5 hover:shadow-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                     </svg>
                                     Utiliser mon adresse
                                 </button>
-                                <button type="button" id="agency-address-btn" class="text-sm px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700 transition-all duration-300 flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <button type="button" id="agency-address-btn" class="text-sm px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700 transition-all duration-300 flex items-center transform hover:-translate-y-0.5 hover:shadow-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                                     </svg>
                                     À l'agence
@@ -304,27 +303,30 @@
                         
                         <div class="mb-8">
                             <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                                </svg>
+                                <div class="flex items-center justify-center w-8 h-8 bg-yellow-100 rounded-full mr-3 text-yellow-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                                    </svg>
+                                </div>
                                 Notes additionnelles
                             </h3>
                             <textarea id="notes" name="notes" rows="3" 
                                 placeholder="Instructions spéciales, besoins particuliers, etc." 
-                                class="w-full rounded-lg border-gray-300 focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50 py-3 transition-all duration-300">{{ old('notes') }}</textarea>
+                                class="w-full rounded-lg border-gray-300 focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50 py-3 transition-all duration-300 hover:border-gray-400">{{ old('notes') }}</textarea>
                         </div>
                         
-                        <!-- Promotion selection -->
                         @if(isset($availablePromotions) && count($availablePromotions) > 0)
                         <div class="mb-8">
                             <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-                                </svg>
+                                <div class="flex items-center justify-center w-8 h-8 bg-yellow-100 rounded-full mr-3 text-yellow-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                                    </svg>
+                                </div>
                                 Promotion
                             </h3>
                             <div class="relative">
-                                <select id="promotion_id" name="promotion_id" class="w-full rounded-lg border-gray-300 focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50 py-3 pl-10 transition-all duration-300 appearance-none">
+                                <select id="promotion_id" name="promotion_id" class="w-full rounded-lg border-gray-300 focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50 py-3 pl-10 transition-all duration-300 appearance-none hover:border-gray-400">
                                     <option value="">Aucune promotion</option>
                                     @foreach($availablePromotions as $promo)
                                         <option value="{{ $promo->id }}" {{ isset($promotion) && $promotion->id == $promo->id ? 'selected' : '' }}>
@@ -348,7 +350,7 @@
                         <input type="hidden" name="promotion_id" value="{{ $promotion->id }}">
                         <div class="mb-8 bg-yellow-50 p-5 rounded-xl border border-yellow-200 shadow-sm">
                             <div class="flex items-center">
-                                <div class="bg-yellow-100 p-2 rounded-full mr-3">
+                                <div class="bg-yellow-100 p-2 rounded-full mr-3 flex items-center justify-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-600" viewBox="0 0 20 20" fill="currentColor">
                                         <path fill-rule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z" clip-rule="evenodd" />
                                     </svg>
@@ -364,11 +366,13 @@
                         @endif
                         
                         <!-- Price summary -->
-                        <div class="mb-8 bg-gray-50 p-6 rounded-xl shadow-sm">
+                        <div class="mb-8 bg-gradient-to-br from-gray-50 to-gray-100 p-6 rounded-xl shadow-sm border border-gray-200">
                             <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
+                                <div class="flex items-center justify-center w-8 h-8 bg-yellow-100 rounded-full mr-3 text-yellow-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
                                 Récapitulatif du prix
                             </h3>
                             <div class="flex justify-between items-center mb-3 text-gray-600">
@@ -378,6 +382,10 @@
                             <div class="flex justify-between items-center mb-3 text-gray-600">
                                 <span>Nombre de jours:</span>
                                 <span id="number_of_days" class="font-medium transition-all duration-300">{{ $numberOfDays }}</span>
+                            </div>
+                            <div class="flex justify-between items-center mb-3 text-gray-600">
+                                <span>Sous-total:</span>
+                                <span id="subtotal" class="font-medium">{{ number_format($pricePerDay * $numberOfDays, 2) }}€</span>
                             </div>
                             <div class="flex justify-between items-center mb-3 text-green-600 discount-row transition-all duration-300" 
                                  style="{{ isset($promotion) ? '' : 'display: none;' }}">
@@ -390,6 +398,7 @@
                                     @endif
                                 </span>
                             </div>
+                            
                             <div class="border-t border-gray-300 my-3 pt-3 flex justify-between items-center">
                                 <span class="text-lg font-bold text-gray-800">Total:</span>
                                 <span id="total_price" class="text-2xl font-bold text-yellow-600 transition-all duration-300">{{ number_format($totalPrice, 2) }}€</span>
@@ -410,13 +419,13 @@
                         </div>
                         
                         <div class="flex items-center justify-between">
-                            <a href="{{ url()->previous() }}" class="inline-flex items-center px-5 py-3 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-all duration-300">
+                            <a href="{{ url()->previous() }}" class="inline-flex items-center px-5 py-3 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
                                 </svg>
                                 Retour
                             </a>
-                            <button type="submit" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-md text-white bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-all duration-300 transform hover:-translate-y-0.5">
+                            <button type="submit" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-md text-white bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg">
                                 Continuer vers le paiement
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -433,10 +442,26 @@
 @include('layouts.footer')
 
 <script>
-    /**
-     * Calculateur de prix en temps réel pour les réservations
-     */
+    
     document.addEventListener('DOMContentLoaded', function() {
+        
+    window.promotionsData = {
+        @foreach($availablePromotions ?? [] as $promo)
+            {{ $promo->id }}: {
+                id: {{ $promo->id }},
+                name: "{{ $promo->name }}",
+                discount_percentage: {{ $promo->discount_percentage }}
+            },
+        @endforeach
+        
+        @if(isset($promotion) && $promotion)
+            {{ $promotion->id }}: {
+                id: {{ $promotion->id }},
+                name: "{{ $promotion->name }}",
+                discount_percentage: {{ $promotion->discount_percentage }}
+            }
+        @endif
+    };
         // Éléments du formulaire
         const startDateInput = document.getElementById('start_date');
         const endDateInput = document.getElementById('end_date');
@@ -461,109 +486,109 @@
         const agencyAddressBtn = document.getElementById('agency-address-btn');
         const agencyAddress = "123 Rue de l'Agence, 75001 Paris";
         
-        /**
-         * Calcule le prix de la réservation et met à jour l'affichage
-         */
-        function calculatePrice() {
-            if (!startDateInput || !endDateInput || !pricePerDay) {
-                return;
-            }
-            
-            // Obtenir les dates avec le temps réglé à minuit pour un calcul précis
-            let startDate = new Date(startDateInput.value);
-            let endDate = new Date(endDateInput.value);
-            
-            // Si les dates sont invalides, sortir
-            if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-                return;
-            }
-            
-            // Normaliser à minuit UTC pour un calcul cohérent
-            startDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
-            endDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
-            
-            // Calculer le nombre de jours (au moins 1 jour)
-            const diffTime = Math.abs(endDate - startDate);
-            const numberOfDays = Math.max(Math.ceil(diffTime / (1000 * 60 * 60 * 24)), 1);
-            
-            // Calculer le sous-total
-            const subtotal = parseFloat((pricePerDay * numberOfDays).toFixed(2));
-            
-            // Vérifier promotion
-            let discount = 0;
-            let discountText = '';
-            let promotionApplied = false;
-            
-            if (promotionElement && promotionElement.value) {
-                const promotionId = parseInt(promotionElement.value);
-                if (promotions[promotionId]) {
-                    const discountPercentage = promotions[promotionId].discount_percentage;
-                    discount = parseFloat(((subtotal * discountPercentage) / 100).toFixed(2));
-                    discountText = `(-${discountPercentage}%)`;
-                    promotionApplied = true;
-                }
-            }
-            
-            // Calculer le total (minimum 0.01)
-            const totalPrice = Math.max(parseFloat((subtotal - discount).toFixed(2)), 0.01);
-            
-            console.log('Price calculation:', {
-                startDate: startDate,
-                endDate: endDate,
-                numberOfDays: numberOfDays,
-                pricePerDay: pricePerDay,
-                subtotal: subtotal,
-                discount: discount,
-                total: totalPrice
-            });
-            
-            // Mettre à jour l'affichage avec effet d'animation
-            if (numberOfDaysElement) {
-                const currentDays = parseInt(numberOfDaysElement.textContent) || 0;
-                if (currentDays !== numberOfDays) {
-                    numberOfDaysElement.classList.add('text-yellow-600');
-                    numberOfDaysElement.textContent = numberOfDays;
-                    setTimeout(() => numberOfDaysElement.classList.remove('text-yellow-600'), 500);
-                }
-            }
-            
-            if (subtotalElement) {
-                subtotalElement.textContent = formatCurrency(subtotal);
-            }
-            
-            if (discountElement) {
-                discountElement.textContent = discount > 0 ? 
-                    `${formatCurrency(discount)} ${discountText}` : 
-                    '0,00€';
-                
-                // Afficher/masquer ligne de remise
-                const discountRow = discountElement.closest('.discount-row');
-                if (discountRow) {
-                    if (promotionApplied) {
-                        discountRow.style.display = 'flex';
-                        discountRow.style.opacity = '1';
-                    } else {
-                        discountRow.style.opacity = '0';
-                        setTimeout(() => discountRow.style.display = 'none', 300);
-                    }
-                }
-            }
-            
-            if (totalPriceElement) {
-                const currentPrice = parseFloat(totalPriceElement.textContent.replace('€', '').replace(',', '.')) || 0;
-                if (Math.abs(currentPrice - totalPrice) > 0.01) {
-                    totalPriceElement.classList.add('text-yellow-600');
-                    totalPriceElement.textContent = formatCurrency(totalPrice);
-                    setTimeout(() => totalPriceElement.classList.remove('text-yellow-600'), 500);
-                }
-            }
-            
-            // IMPORTANT: Mettre à jour le champ caché correctement
-            if (hiddenTotalPriceInput) {
-                hiddenTotalPriceInput.value = totalPrice.toFixed(2);
-                console.log('Input prix total mis à jour:', hiddenTotalPriceInput.value, 'Valeur calculée:', totalPrice.toFixed(2));
+        
+function calculatePrice() {
+    if (!startDateInput || !endDateInput || !pricePerDay) {
+        return;
+    }
+    
+    // Obtenir les dates avec le temps réglé à minuit pour un calcul précis
+    let startDate = new Date(startDateInput.value);
+    let endDate = new Date(endDateInput.value);
+    
+    // Si les dates sont invalides, sortir
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        return;
+    }
+    
+    // Normaliser à minuit UTC pour un calcul cohérent
+    startDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+    endDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+    
+    // Calculer le nombre de jours (au moins 1 jour)
+    const diffTime = Math.abs(endDate - startDate);
+    const numberOfDays = Math.max(Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1, 1);
+    
+    // Calculer le sous-total
+    const subtotal = parseFloat((pricePerDay * numberOfDays).toFixed(2));
+    
+    // Vérifier promotion
+    let discount = 0;
+    let discountText = '';
+    let promotionApplied = false;
+    
+    if (promotionElement && promotionElement.value) {
+        const promotionId = parseInt(promotionElement.value);
+        const promotions = window.promotionsData || {};
+        
+        if (promotions[promotionId]) {
+            const discountPercentage = promotions[promotionId].discount_percentage;
+            discount = parseFloat(((subtotal * discountPercentage) / 100).toFixed(2));
+            discountText = `(-${discountPercentage}%)`;
+            promotionApplied = true;
+        }
+    }
+    
+    // Calculer le total (minimum 0.01)
+    const totalPrice = Math.max(parseFloat((subtotal - discount).toFixed(2)), 0.01);
+    
+    console.log('Price calculation:', {
+        startDate: startDate,
+        endDate: endDate,
+        numberOfDays: numberOfDays,
+        pricePerDay: pricePerDay,
+        subtotal: subtotal,
+        discount: discount,
+        total: totalPrice
+    });
+    
+    // Mettre à jour l'affichage avec effet d'animation
+    if (numberOfDaysElement) {
+        const currentDays = parseInt(numberOfDaysElement.textContent) || 0;
+        if (currentDays !== numberOfDays) {
+            numberOfDaysElement.classList.add('text-yellow-600');
+            numberOfDaysElement.textContent = numberOfDays;
+            setTimeout(() => numberOfDaysElement.classList.remove('text-yellow-600'), 500);
+        }
+    }
+    
+    if (subtotalElement) {
+        subtotalElement.textContent = formatCurrency(subtotal);
+    }
+    
+    if (discountElement) {
+        discountElement.textContent = discount > 0 ? 
+            `${formatCurrency(discount)} ${discountText}` : 
+            '0,00€';
+        
+        // Afficher/masquer ligne de remise
+        const discountRow = discountElement.closest('.discount-row');
+        if (discountRow) {
+            if (promotionApplied) {
+                discountRow.style.display = 'flex';
+                discountRow.style.opacity = '1';
+            } else {
+                discountRow.style.opacity = '0';
+                setTimeout(() => discountRow.style.display = 'none', 300);
             }
         }
+    }
+    
+    if (totalPriceElement) {
+        const currentPrice = parseFloat(totalPriceElement.textContent.replace('€', '').replace(',', '.')) || 0;
+        if (Math.abs(currentPrice - totalPrice) > 0.01) {
+            totalPriceElement.classList.add('text-yellow-600');
+            totalPriceElement.textContent = formatCurrency(totalPrice);
+            setTimeout(() => totalPriceElement.classList.remove('text-yellow-600'), 500);
+        }
+    }
+    
+    // IMPORTANT: Mettre à jour le champ caché correctement
+    if (hiddenTotalPriceInput) {
+        hiddenTotalPriceInput.value = totalPrice.toFixed(2);
+        console.log('Input prix total mis à jour:', hiddenTotalPriceInput.value, 'Valeur calculée:', totalPrice.toFixed(2));
+    }
+}
         
         /**
          * Formater un montant en devise
@@ -712,9 +737,8 @@
         validateDates();
     });
     
-    /**
-     * Configure la galerie de photos
-     */
+    //  Configure la galerie de photos
+     
     function setupPhotoGallery() {
         const photoElements = document.querySelectorAll('#mainPhotoContainer img');
         const photoCount = photoElements.length;
@@ -818,9 +842,8 @@
         });
     }
     
-    /**
-     * Calendrier de disponibilité interactif
-     */
+    // Calendrier de disponibilité interactif
+    
     function initAvailabilityCalendar() {
         const calendarContainer = document.getElementById('availability-calendar');
         if (!calendarContainer) return;

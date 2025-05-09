@@ -53,10 +53,9 @@
 </head>
 <body class="font-sans antialiased bg-gray-100">
     <div class="min-h-screen">
-        <!-- Include the shared header component -->
         @include('layouts.header')
 
-        <main class="py-6">
+        <main>
             @yield('content')
         </main>
     </div>

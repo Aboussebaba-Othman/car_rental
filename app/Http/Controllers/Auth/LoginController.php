@@ -42,12 +42,10 @@ class LoginController extends Controller
                     ->with('error', 'Your account is currently inactive. Please contact the administrator.');
             }
 
-            // Enhanced debugging
             $roleId = $user->role_id;
             $isCompany = $user->isCompany();
             $hasCompanyRelation = $user->company()->exists();
             
-            // Log detailed information for debugging
             Log::info('User login details', [
                 'user_id' => $user->id,
                 'email' => $user->email,
@@ -56,7 +54,6 @@ class LoginController extends Controller
                 'has company relation' => $hasCompanyRelation
             ]);
             
-            // Check if company user doesn't have a company record
             if ($user->isCompany() && !$hasCompanyRelation) {
                 Log::error('Company user without company record', ['user_id' => $user->id]);
                 return redirect()->route('company.complete-registration')

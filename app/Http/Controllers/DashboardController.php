@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Carbon\Carbon;
+
 
 class DashboardController extends Controller
 {
@@ -11,7 +11,6 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
         
-        // For regular users, show their reservations
         if ($user->isUser()) {
             $now = Carbon::now();
             

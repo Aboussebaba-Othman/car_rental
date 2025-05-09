@@ -52,11 +52,9 @@ class ResetPasswordController extends Controller
                 ->withInput();
         }
 
-        // Update the user's password
         User::where('email', $request->email)
             ->update(['password' => Hash::make($request->password)]);
 
-        // Delete the password reset token
         DB::table('password_reset_tokens')
             ->where('email', $request->email)
             ->delete();

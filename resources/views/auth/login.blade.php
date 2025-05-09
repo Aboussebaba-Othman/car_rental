@@ -165,7 +165,7 @@
         </div>
     </div>
 </div>
-
+@include('layouts.footer')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Toggle password visibility
